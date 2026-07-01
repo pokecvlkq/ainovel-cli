@@ -20,7 +20,7 @@ func (o *observer) handleSubagentDelta(p *agentcore.ProgressPayload) {
 	}
 
 	// 流式识别到工具名时提前发 TOOL 进行中事件，让 spinner 覆盖整段 LLM 生成期间
-	// （否则 draft_chapter 这类工具的"进行中"只在真实 Execute 的几十毫秒里显示）。
+	// （否则 draft_chapter 这类工具的"Đang xử lý"只在真实 Execute 的几十毫秒里显示）。
 	// 真正的 ProgressToolStart 到来时识别到 toolStarts 已有记录，只会补齐 summary。
 	o.ensureSubagentToolStarted(p.Agent, p.Tool)
 	o.updateToolCallSummaryFromDelta(p.Agent, p.Tool, p.Delta)

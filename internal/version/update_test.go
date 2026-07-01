@@ -3,6 +3,7 @@ package version
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 )
 
@@ -74,8 +75,10 @@ func TestReplaceExecutable(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if info.Mode().Perm() != 0o755 {
-		t.Fatalf("mode = %v", info.Mode().Perm())
+	if runtime.GOOS != "windows" {
+		if info.Mode().Perm() != 0o755 {
+			t.Fatalf("mode = %v", info.Mode().Perm())
+		}
 	}
 	if _, err := os.Stat(dst + ".old"); !os.IsNotExist(err) {
 		t.Fatalf("backup should be removed, err=%v", err)

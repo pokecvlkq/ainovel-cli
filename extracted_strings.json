@@ -1,0 +1,1972 @@
+[
+  {
+    "file": "internal/entry/tui\\ask_user.go",
+    "line": 85,
+    "string": "\"自由输入\""
+  },
+  {
+    "file": "internal/entry/tui\\ask_user.go",
+    "line": 93,
+    "string": "\"以上都不合适，自己补充\""
+  },
+  {
+    "file": "internal/entry/tui\\ask_user.go",
+    "line": 199,
+    "string": "\"需要补充信息 %d/%d\""
+  },
+  {
+    "file": "internal/entry/tui\\ask_user.go",
+    "line": 230,
+    "string": "\"补充内容\""
+  },
+  {
+    "file": "internal/entry/tui\\ask_user.go",
+    "line": 234,
+    "string": "\"请输入...\""
+  },
+  {
+    "file": "internal/entry/tui\\ask_user.go",
+    "line": 245,
+    "string": "\"↑↓ 选择 · Enter 确认 · Esc 关闭\""
+  },
+  {
+    "file": "internal/entry/tui\\ask_user.go",
+    "line": 247,
+    "string": "\"↑↓ 选择 · Space 勾选 · Enter 提交 · Esc 关闭\""
+  },
+  {
+    "file": "internal/entry/tui\\ask_user.go",
+    "line": 250,
+    "string": "\"输入补充内容 · Enter 确认 · Esc 返回选项\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 23,
+    "string": "\"共创规划\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 25,
+    "string": "\"快速开始\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 32,
+    "string": "\"先与 AI 对话澄清，再开始创作\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 34,
+    "string": "\"一句话直接开始写\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 41,
+    "string": "\"先输入你的核心想法，Enter 开始与 AI 共创\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 43,
+    "string": "\"输入一句小说需求，Enter 直接开始创作\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 53,
+    "string": "\"AI 正在整理你的要求...\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 56,
+    "string": "\"继续补充，或按 Ctrl+S 应用方向并继续创作\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 58,
+    "string": "\"继续补充，或按 Ctrl+S 开始创作\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 60,
+    "string": "\"继续补充你的要求，Enter 发送给 AI\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 104,
+    "string": "\"当前故事状态\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 105,
+    "string": "\"我先暂停一下，想和你一起规划接下来的走向。\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 108,
+    "string": "\"你\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 110,
+    "string": "\"已暂停创作，进入阶段共创 —— AI 会结合当前故事进度，和你一起规划接下来的走向。\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 162,
+    "string": "\"快速开始\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 163,
+    "string": "\"共创规划\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 167,
+    "string": "\"启动模式\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 296,
+    "string": "\"AI 建议（按数字键填入输入框）：\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 357,
+    "string": "\"共创规划\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 357,
+    "string": "\"先把需求聊清楚，再开始创作\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 359,
+    "string": "\"阶段共创\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 359,
+    "string": "\"规划后续走向，再继续创作\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 368,
+    "string": "\"再按一次 Ctrl+C\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 391,
+    "string": "\"Enter 发送 · Esc 退出\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 393,
+    "string": "\"AI 回复中 · ↑↓ 滚对话 · 滚轮滚指令 · Esc 退出\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 395,
+    "string": "\"Ctrl+S 开始创作\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 397,
+    "string": "\"Ctrl+S 应用并继续\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 399,
+    "string": "\"Enter 继续补充 · \""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 399,
+    "string": "\" · ↑↓ 滚对话 · 滚轮滚指令 · Esc 退出\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 401,
+    "string": "\"Enter 发送 · ↑↓ 滚对话 · 滚轮滚指令 · Esc 退出\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 410,
+    "string": "\"高度抖动\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 417,
+    "string": "\"你\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 422,
+    "string": "\"AI 思考\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 474,
+    "string": "\"AI 在工作\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 502,
+    "string": "\":: 共创对话\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 506,
+    "string": "\"已可开始创作\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 508,
+    "string": "\"已可应用并继续\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 510,
+    "string": "\"继续对话中\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 515,
+    "string": "\"AI 整理中\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 524,
+    "string": "\"AI 会在这里持续整理出一段可直接进入创作的最终指令。\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 525,
+    "string": "\":: 当前创作指令\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 527,
+    "string": "\"AI 会在这里持续整理出后续阶段的方向 brief。\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 528,
+    "string": "\":: 后续方向\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 551,
+    "string": "\"↓ 下方还有内容，可滚轮或 PgDn 查看\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 553,
+    "string": "\"↑ 上方还有内容，可滚轮或 PgUp 查看\""
+  },
+  {
+    "file": "internal/entry/tui\\cocreate.go",
+    "line": 555,
+    "string": "\"↑↓ 可继续滚动查看\""
+  },
+  {
+    "file": "internal/entry/tui\\commands.go",
+    "line": 58,
+    "string": "\"查看命令列表\""
+  },
+  {
+    "file": "internal/entry/tui\\commands.go",
+    "line": 70,
+    "string": "\"切换默认或角色模型\""
+  },
+  {
+    "file": "internal/entry/tui\\commands.go",
+    "line": 78,
+    "string": "\"未知角色：\""
+  },
+  {
+    "file": "internal/entry/tui\\commands.go",
+    "line": 93,
+    "string": "\"诊断小说创作健康度\""
+  },
+  {
+    "file": "internal/entry/tui\\commands.go",
+    "line": 106,
+    "string": "\"反推外部小说续写\""
+  },
+  {
+    "file": "internal/entry/tui\\commands.go",
+    "line": 113,
+    "string": "\"导入启动失败：\""
+  },
+  {
+    "file": "internal/entry/tui\\commands.go",
+    "line": 128,
+    "string": "\"暂停创作，共创规划后续阶段走向\""
+  },
+  {
+    "file": "internal/entry/tui\\commands.go",
+    "line": 133,
+    "string": "\"阶段共创仅在创作中可用\""
+  },
+  {
+    "file": "internal/entry/tui\\commands.go",
+    "line": 140,
+    "string": "\"无法进入阶段共创：全书已完成或已在共创中\""
+  },
+  {
+    "file": "internal/entry/tui\\commands.go",
+    "line": 155,
+    "string": "\"读取 ./simulate 生成或增量更新仿写画像\""
+  },
+  {
+    "file": "internal/entry/tui\\commands.go",
+    "line": 162,
+    "string": "\"仿写画像启动失败：\""
+  },
+  {
+    "file": "internal/entry/tui\\commands.go",
+    "line": 176,
+    "string": "\"导入已有仿写画像并按语料指纹合并\""
+  },
+  {
+    "file": "internal/entry/tui\\commands.go",
+    "line": 183,
+    "string": "\"导入仿写画像失败：\""
+  },
+  {
+    "file": "internal/entry/tui\\commands.go",
+    "line": 197,
+    "string": "\"导出已完成章节为 TXT/EPUB\""
+  },
+  {
+    "file": "internal/entry/tui\\commands.go",
+    "line": 203,
+    "string": "\"导出启动失败：\""
+  },
+  {
+    "file": "internal/entry/tui\\commands.go",
+    "line": 209,
+    "string": "\"正在导出...\""
+  },
+  {
+    "file": "internal/entry/tui\\commands.go",
+    "line": 226,
+    "string": "\"未知命令：/\""
+  },
+  {
+    "file": "internal/entry/tui\\commands.go",
+    "line": 233,
+    "string": "\"命令仅可在空闲状态执行：/\""
+  },
+  {
+    "file": "internal/entry/tui\\command_help.go",
+    "line": 33,
+    "string": "\"命令帮助\""
+  },
+  {
+    "file": "internal/entry/tui\\command_help.go",
+    "line": 52,
+    "string": "\"快捷键\""
+  },
+  {
+    "file": "internal/entry/tui\\command_help.go",
+    "line": 55,
+    "string": "\"输入 / 搜索命令\""
+  },
+  {
+    "file": "internal/entry/tui\\command_help.go",
+    "line": 56,
+    "string": "\"↑↓ 选择命令候选\""
+  },
+  {
+    "file": "internal/entry/tui\\command_help.go",
+    "line": 57,
+    "string": "\"Tab/Enter 接受补全\""
+  },
+  {
+    "file": "internal/entry/tui\\command_help.go",
+    "line": 58,
+    "string": "\"Esc 关闭当前命令面板\""
+  },
+  {
+    "file": "internal/entry/tui\\command_help.go",
+    "line": 59,
+    "string": "\"Ctrl+R 切换选中复制模式（关闭鼠标上报后可拖拽选中复制，再按一次恢复）\""
+  },
+  {
+    "file": "internal/entry/tui\\command_help.go",
+    "line": 85,
+    "string": "\"命令帮助\""
+  },
+  {
+    "file": "internal/entry/tui\\command_help.go",
+    "line": 86,
+    "string": "\"  ↑↓ 滚动 · Esc 关闭\""
+  },
+  {
+    "file": "internal/entry/tui\\command_model.go",
+    "line": 37,
+    "string": "\"默认\""
+  },
+  {
+    "file": "internal/entry/tui\\command_model.go",
+    "line": 47,
+    "string": "\"默认(继承)\""
+  },
+  {
+    "file": "internal/entry/tui\\command_model.go",
+    "line": 48,
+    "string": "\"关闭\""
+  },
+  {
+    "file": "internal/entry/tui\\command_model.go",
+    "line": 49,
+    "string": "\"低\""
+  },
+  {
+    "file": "internal/entry/tui\\command_model.go",
+    "line": 50,
+    "string": "\"中\""
+  },
+  {
+    "file": "internal/entry/tui\\command_model.go",
+    "line": 51,
+    "string": "\"高\""
+  },
+  {
+    "file": "internal/entry/tui\\command_model.go",
+    "line": 52,
+    "string": "\"极高\""
+  },
+  {
+    "file": "internal/entry/tui\\command_model.go",
+    "line": 53,
+    "string": "\"最高\""
+  },
+  {
+    "file": "internal/entry/tui\\command_model.go",
+    "line": 104,
+    "string": "\"当前没有可用 provider\""
+  },
+  {
+    "file": "internal/entry/tui\\command_model.go",
+    "line": 236,
+    "string": "\"当前没有可用 provider\""
+  },
+  {
+    "file": "internal/entry/tui\\command_model.go",
+    "line": 239,
+    "string": "\"provider %q 没有已配置模型\""
+  },
+  {
+    "file": "internal/entry/tui\\command_model.go",
+    "line": 298,
+    "string": "\"/model 切换模型\""
+  },
+  {
+    "file": "internal/entry/tui\\command_model.go",
+    "line": 300,
+    "string": "\"角色\""
+  },
+  {
+    "file": "internal/entry/tui\\command_model.go",
+    "line": 302,
+    "string": "\"模型\""
+  },
+  {
+    "file": "internal/entry/tui\\command_model.go",
+    "line": 303,
+    "string": "\"推理强度\""
+  },
+  {
+    "file": "internal/entry/tui\\command_model.go",
+    "line": 307,
+    "string": "\"Tab 切字段   ←→ 切选项   Enter 应用   Esc 取消\""
+  },
+  {
+    "file": "internal/entry/tui\\command_model.go",
+    "line": 358,
+    "string": "\"未设置\""
+  },
+  {
+    "file": "internal/entry/tui\\command_palette.go",
+    "line": 178,
+    "string": "\"↑↓ 选择 · Tab/Enter 接受 · Esc 关闭\""
+  },
+  {
+    "file": "internal/entry/tui\\command_palette.go",
+    "line": 181,
+    "string": "\" · 还有 \""
+  },
+  {
+    "file": "internal/entry/tui\\command_palette.go",
+    "line": 181,
+    "string": "\" 个命令\""
+  },
+  {
+    "file": "internal/entry/tui\\command_palette.go",
+    "line": 187,
+    "string": "\"命令\""
+  },
+  {
+    "file": "internal/entry/tui\\events.go",
+    "line": 129,
+    "string": "\"后续方向 brief\""
+  },
+  {
+    "file": "internal/entry/tui\\events.go",
+    "line": 243,
+    "string": "\"进行中\""
+  },
+  {
+    "file": "internal/entry/tui\\events.go",
+    "line": 258,
+    "string": "\"每秒数十次全量重渲\""
+  },
+  {
+    "file": "internal/entry/tui\\export.go",
+    "line": 56,
+    "string": "\"from 需为非负整数：%q\""
+  },
+  {
+    "file": "internal/entry/tui\\export.go",
+    "line": 62,
+    "string": "\"to 需为非负整数：%q\""
+  },
+  {
+    "file": "internal/entry/tui\\export.go",
+    "line": 66,
+    "string": "\"未知参数 %q（支持：from / to）\""
+  },
+  {
+    "file": "internal/entry/tui\\export.go",
+    "line": 71,
+    "string": "\"未知 flag %q\""
+  },
+  {
+    "file": "internal/entry/tui\\export.go",
+    "line": 74,
+    "string": "\"仅支持一个路径参数：%q\""
+  },
+  {
+    "file": "internal/entry/tui\\export.go",
+    "line": 84,
+    "string": "\"✓ 已导出 %d 章 / %s 到 %s\""
+  },
+  {
+    "file": "internal/entry/tui\\export.go",
+    "line": 86,
+    "string": "\"（跳过 %d 章未完成：%s）\""
+  },
+  {
+    "file": "internal/entry/tui\\import.go",
+    "line": 89,
+    "string": "\"导入外部小说\""
+  },
+  {
+    "file": "internal/entry/tui\\import.go",
+    "line": 91,
+    "string": "\"源文件 \""
+  },
+  {
+    "file": "internal/entry/tui\\import.go",
+    "line": 94,
+    "string": "\"开始 \""
+  },
+  {
+    "file": "internal/entry/tui\\import.go",
+    "line": 97,
+    "string": "\"  完成 \""
+  },
+  {
+    "file": "internal/entry/tui\\import.go",
+    "line": 103,
+    "string": "\"阶段 \""
+  },
+  {
+    "file": "internal/entry/tui\\import.go",
+    "line": 106,
+    "string": "\"  进度 \""
+  },
+  {
+    "file": "internal/entry/tui\\import.go",
+    "line": 116,
+    "string": "\"流程日志\""
+  },
+  {
+    "file": "internal/entry/tui\\import.go",
+    "line": 118,
+    "string": "\"(%d 条)\""
+  },
+  {
+    "file": "internal/entry/tui\\import.go",
+    "line": 140,
+    "string": "\"Esc 取消导入\""
+  },
+  {
+    "file": "internal/entry/tui\\import.go",
+    "line": 142,
+    "string": "\"导入失败\""
+  },
+  {
+    "file": "internal/entry/tui\\import.go",
+    "line": 144,
+    "string": "\"Esc 关闭面板\""
+  },
+  {
+    "file": "internal/entry/tui\\import.go",
+    "line": 146,
+    "string": "\"导入完成，正在自动接力续写\""
+  },
+  {
+    "file": "internal/entry/tui\\import.go",
+    "line": 148,
+    "string": "\"Esc 关闭面板查看进度\""
+  },
+  {
+    "file": "internal/entry/tui\\import.go",
+    "line": 171,
+    "string": "\"  ↑↓ 滚动 · Esc 取消/关闭\""
+  },
+  {
+    "file": "internal/entry/tui\\import.go",
+    "line": 172,
+    "string": "\"外部小说导入\""
+  },
+  {
+    "file": "internal/entry/tui\\import.go",
+    "line": 238,
+    "string": "\"用法：/import <文件路径> [from=N]\""
+  },
+  {
+    "file": "internal/entry/tui\\import.go",
+    "line": 244,
+    "string": "\"参数应为 key=value：%q\""
+  },
+  {
+    "file": "internal/entry/tui\\import.go",
+    "line": 250,
+    "string": "\"from 需为非负整数：%q\""
+  },
+  {
+    "file": "internal/entry/tui\\import.go",
+    "line": 254,
+    "string": "\"未知参数 %q（支持：from）\""
+  },
+  {
+    "file": "internal/entry/tui\\input.go",
+    "line": 46,
+    "string": "\"概览\""
+  },
+  {
+    "file": "internal/entry/tui\\layout.go",
+    "line": 52,
+    "string": "\" 而非 \""
+  },
+  {
+    "file": "internal/entry/tui\\model.go",
+    "line": 49,
+    "string": "\"进行中\""
+  },
+  {
+    "file": "internal/entry/tui\\model.go",
+    "line": 88,
+    "string": "\"未浏览，正在编辑草稿\""
+  },
+  {
+    "file": "internal/entry/tui\\model.go",
+    "line": 328,
+    "string": "\"超长内容/主动换行自动多行展示，最多 6 行\""
+  },
+  {
+    "file": "internal/entry/tui\\model.go",
+    "line": 441,
+    "string": "\" · Ctrl+R 切到选中复制模式\""
+  },
+  {
+    "file": "internal/entry/tui\\model.go",
+    "line": 446,
+    "string": "\"自由拖拽选中\""
+  },
+  {
+    "file": "internal/entry/tui\\model.go",
+    "line": 448,
+    "string": "\"✂ 选中复制模式：可拖拽选中文本复制 · Ctrl+R 退出恢复鼠标交互\""
+  },
+  {
+    "file": "internal/entry/tui\\model.go",
+    "line": 451,
+    "string": "\" · Tab 滚动:对话\""
+  },
+  {
+    "file": "internal/entry/tui\\model.go",
+    "line": 453,
+    "string": "\" · Tab 滚动:创作指令\""
+  },
+  {
+    "file": "internal/entry/tui\\model.go",
+    "line": 457,
+    "string": "\"等待 AI 回复 · Esc 退出共创\""
+  },
+  {
+    "file": "internal/entry/tui\\model.go",
+    "line": 459,
+    "string": "\"Ctrl+S 开始创作\""
+  },
+  {
+    "file": "internal/entry/tui\\model.go",
+    "line": 461,
+    "string": "\"Ctrl+S 应用并继续\""
+  },
+  {
+    "file": "internal/entry/tui\\model.go",
+    "line": 463,
+    "string": "\"Enter 发送 · \""
+  },
+  {
+    "file": "internal/entry/tui\\model.go",
+    "line": 463,
+    "string": "\" · Esc 退出共创\""
+  },
+  {
+    "file": "internal/entry/tui\\model.go",
+    "line": 465,
+    "string": "\"Enter 发送 · Esc 退出共创\""
+  },
+  {
+    "file": "internal/entry/tui\\model.go",
+    "line": 470,
+    "string": "\"Tab 切换启动模式 · 输入 / 搜索命令 · Enter 直接开始创作 · Esc 清空输入\""
+  },
+  {
+    "file": "internal/entry/tui\\model.go",
+    "line": 472,
+    "string": "\"Tab 切换启动模式 · 输入 / 搜索命令 · Enter 开始共创对话 · Esc 清空输入\""
+  },
+  {
+    "file": "internal/entry/tui\\model.go",
+    "line": 476,
+    "string": "\"正在暂停创作 · 请等待当前轮次结束\""
+  },
+  {
+    "file": "internal/entry/tui\\model.go",
+    "line": 478,
+    "string": "\"输入 / 搜索命令 · Enter 继续创作 · Esc 清空输入\""
+  },
+  {
+    "file": "internal/entry/tui\\model.go",
+    "line": 480,
+    "string": "\"输入 / 搜索命令 · 点击/Tab 切换面板 · ↑↓ 滚动 · End 跳底 · Ctrl+L 清屏 · Esc 暂停 · Enter 发送\""
+  },
+  {
+    "file": "internal/entry/tui\\model.go",
+    "line": 492,
+    "string": "\" · 输入 %d/%d\""
+  },
+  {
+    "file": "internal/entry/tui\\model.go",
+    "line": 538,
+    "string": "\"输入剧情干预，例如：把感情线提前到第4章\""
+  },
+  {
+    "file": "internal/entry/tui\\model.go",
+    "line": 546,
+    "string": "\"正在初始化创作...\""
+  },
+  {
+    "file": "internal/entry/tui\\model.go",
+    "line": 551,
+    "string": "\"创作已完成\""
+  },
+  {
+    "file": "internal/entry/tui\\model.go",
+    "line": 553,
+    "string": "\"正在暂停创作...\""
+  },
+  {
+    "file": "internal/entry/tui\\model.go",
+    "line": 555,
+    "string": "\"创作已暂停，输入任意内容继续创作\""
+  },
+  {
+    "file": "internal/entry/tui\\model.go",
+    "line": 558,
+    "string": "\"运行中断，输入任意内容恢复创作\""
+  },
+  {
+    "file": "internal/entry/tui\\model.go",
+    "line": 594,
+    "string": "\"加载中...\""
+  },
+  {
+    "file": "internal/entry/tui\\model.go",
+    "line": 601,
+    "string": "\"终端宽度不足，请至少扩展到 100 列\""
+  },
+  {
+    "file": "internal/entry/tui\\model.go",
+    "line": 748,
+    "string": "\"后续方向 brief\""
+  },
+  {
+    "file": "internal/entry/tui\\model.go",
+    "line": 772,
+    "string": "\" 被吞成 \""
+  },
+  {
+    "file": "internal/entry/tui\\model.go",
+    "line": 954,
+    "string": "\" 或 \""
+  },
+  {
+    "file": "internal/entry/tui\\model.go",
+    "line": 969,
+    "string": "\"<数字;数字;\""
+  },
+  {
+    "file": "internal/entry/tui\\model_update.go",
+    "line": 442,
+    "string": "\"等待用户补充关键信息\""
+  },
+  {
+    "file": "internal/entry/tui\\model_update.go",
+    "line": 465,
+    "string": "\"创作已完成 · 可输入返工要求(如\\\"重写第3章\\\")、/export 导出，或输入 / 看命令\""
+  },
+  {
+    "file": "internal/entry/tui\\model_update.go",
+    "line": 473,
+    "string": "\"运行中断，输入任意内容恢复创作\""
+  },
+  {
+    "file": "internal/entry/tui\\model_update.go",
+    "line": 479,
+    "string": "\"正在暂停创作...\""
+  },
+  {
+    "file": "internal/entry/tui\\model_update.go",
+    "line": 500,
+    "string": "\"重开项目恢复\""
+  },
+  {
+    "file": "internal/entry/tui\\model_update.go",
+    "line": 518,
+    "string": "\"导出失败：\""
+  },
+  {
+    "file": "internal/entry/tui\\model_update.go",
+    "line": 562,
+    "string": "\"进行中\""
+  },
+  {
+    "file": "internal/entry/tui\\model_update.go",
+    "line": 667,
+    "string": "\"正在初始化创作...\""
+  },
+  {
+    "file": "internal/entry/tui\\model_update.go",
+    "line": 670,
+    "string": "\"正在初始化创作\""
+  },
+  {
+    "file": "internal/entry/tui\\model_update.go",
+    "line": 686,
+    "string": "\"创作需求: \""
+  },
+  {
+    "file": "internal/entry/tui\\panels.go",
+    "line": 16,
+    "string": "\"未定书名\""
+  },
+  {
+    "file": "internal/entry/tui\\panels.go",
+    "line": 167,
+    "string": "\"多模型协作\""
+  },
+  {
+    "file": "internal/entry/tui\\panels.go",
+    "line": 167,
+    "string": "\"Architect 规划 / Writer 创作 / Editor 审阅\""
+  },
+  {
+    "file": "internal/entry/tui\\panels.go",
+    "line": 168,
+    "string": "\"断点恢复\""
+  },
+  {
+    "file": "internal/entry/tui\\panels.go",
+    "line": 168,
+    "string": "\"崩溃或中断后从上次进度自动续写\""
+  },
+  {
+    "file": "internal/entry/tui\\panels.go",
+    "line": 169,
+    "string": "\"实时干预\""
+  },
+  {
+    "file": "internal/entry/tui\\panels.go",
+    "line": 169,
+    "string": "\"创作过程中随时调整剧情走向\""
+  },
+  {
+    "file": "internal/entry/tui\\panels.go",
+    "line": 170,
+    "string": "\"分层长篇\""
+  },
+  {
+    "file": "internal/entry/tui\\panels.go",
+    "line": 170,
+    "string": "\"支持卷-弧-章分层结构的长篇创作\""
+  },
+  {
+    "file": "internal/entry/tui\\panels.go",
+    "line": 185,
+    "string": "\"在下方输入你的小说需求开始创作\""
+  },
+  {
+    "file": "internal/entry/tui\\panels.go",
+    "line": 189,
+    "string": "\"当前模式：\""
+  },
+  {
+    "file": "internal/entry/tui\\panels.go",
+    "line": 193,
+    "string": "\"写一部 12 章都市悬疑小说，主角是一名女法医\""
+  },
+  {
+    "file": "internal/entry/tui\\panels.go",
+    "line": 194,
+    "string": "\"创作一部仙侠长篇，主角从凡人修炼至飞升\""
+  },
+  {
+    "file": "internal/entry/tui\\panels.go",
+    "line": 195,
+    "string": "\"写一个科幻短篇，讲述 AI 觉醒后的伦理困境\""
+  },
+  {
+    "file": "internal/entry/tui\\panels.go",
+    "line": 225,
+    "string": "\"Tab 切换模式 · 快速开始下 Enter 直接创作 · 共创规划下 Enter 进入对话\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_activity.go",
+    "line": 16,
+    "string": "\"进行中\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_activity.go",
+    "line": 140,
+    "string": "\"输入\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_activity.go",
+    "line": 270,
+    "string": "\":: 事件流\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_activity.go",
+    "line": 295,
+    "string": "\"▍实时输出\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_activity.go",
+    "line": 310,
+    "string": "\"压\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_outline.go",
+    "line": 13,
+    "string": "\"进行中\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_outline.go",
+    "line": 17,
+    "string": "\"进行中\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_outline.go",
+    "line": 25,
+    "string": "\"进行中\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_outline.go",
+    "line": 48,
+    "string": "\" 进行中\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_outline.go",
+    "line": 56,
+    "string": "\"列优先\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_outline.go",
+    "line": 57,
+    "string": "\"读完一列再读下一列\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_outline.go",
+    "line": 58,
+    "string": "\" 进行中\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_outline.go",
+    "line": 59,
+    "string": "\"写作中 第 N 章\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_outline.go",
+    "line": 136,
+    "string": "\"视觉宽度\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_outline.go",
+    "line": 162,
+    "string": "\":: 大纲\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_outline.go",
+    "line": 164,
+    "string": "\":: 大纲（%s · 动态规划大纲）\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_outline.go",
+    "line": 173,
+    "string": "\"  ┄ 下一卷：\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_outline.go",
+    "line": 176,
+    "string": "\"  ··· 后续章节随创作推进自动生成\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_outline.go",
+    "line": 179,
+    "string": "\"  → 终局：%s\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_outline.go",
+    "line": 192,
+    "string": "\":: 角色\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_outline.go",
+    "line": 203,
+    "string": "\":: 配角生态\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_outline.go",
+    "line": 205,
+    "string": "\"已出场：%d 位\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_outline.go",
+    "line": 216,
+    "string": "\":: 前提\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_outline.go",
+    "line": 226,
+    "string": "\"~ 最近提交 ~\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_outline.go",
+    "line": 233,
+    "string": "\"~ 最近审阅 ~\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_outline.go",
+    "line": 240,
+    "string": "\"~ 摘要 ~\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 26,
+    "string": "\"运行态\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 27,
+    "string": "\"阶段\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 28,
+    "string": "\"流程\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 30,
+    "string": "\"已完成\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 30,
+    "string": "\"%d 章\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 31,
+    "string": "\"已规划\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 35,
+    "string": "\"已规划\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 35,
+    "string": "\"%d 章\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 40,
+    "string": "\"进度\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 40,
+    "string": "\"%d / %d 章\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 42,
+    "string": "\"已完成\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 42,
+    "string": "\"%d 章\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 45,
+    "string": "\"字数\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 47,
+    "string": "\"第 %d 章\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 50,
+    "string": "\"当前\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 52,
+    "string": "\"待恢复\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 56,
+    "string": "\"概览\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 65,
+    "string": "\"待命: \""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 68,
+    "string": "\"运行角色\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 73,
+    "string": "\"队列\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 75,
+    "string": "\"原因\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 77,
+    "string": "\"返工\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 81,
+    "string": "\"干预\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 82,
+    "string": "\"待处理\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 86,
+    "string": "\"用量\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 90,
+    "string": "\"缓存\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 94,
+    "string": "\"上下文\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 116,
+    "string": "\"待命\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 182,
+    "string": "\"进行中\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 196,
+    "string": "\"打磨中\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 204,
+    "string": "\"重写中\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 209,
+    "string": "\"写作中\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 216,
+    "string": "\"待恢复：处理用户干预\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 218,
+    "string": "\"等待处理用户干预\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 222,
+    "string": "\"待恢复：返工处理\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 224,
+    "string": "\"等待返工处理\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 232,
+    "string": "\"前提\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 234,
+    "string": "\"大纲\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 236,
+    "string": "\"写作\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 238,
+    "string": "\"完成\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 240,
+    "string": "\"初始化\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 252,
+    "string": "\"运行中\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 254,
+    "string": "\"暂停中\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 256,
+    "string": "\"已暂停\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 258,
+    "string": "\"已完成\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 260,
+    "string": "\"空闲\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 269,
+    "string": "\"写作\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 271,
+    "string": "\"评审\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 273,
+    "string": "\"重写\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 275,
+    "string": "\"打磨\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 277,
+    "string": "\"干预\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 288,
+    "string": "\"输入\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 289,
+    "string": "\"输出\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 291,
+    "string": "\"费用\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 294,
+    "string": "\"节省\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 298,
+    "string": "\"预算\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 303,
+    "string": "\"角色\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 313,
+    "string": "\"模型\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 371,
+    "string": "\"缓存\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 375,
+    "string": "\"未启用\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 376,
+    "string": "\"命中率累计/近10 · 节省 · 读/写\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 378,
+    "string": "\"累计/近10%\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 378,
+    "string": "\"未启用\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 379,
+    "string": "\"前期拖累\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 379,
+    "string": "\"稳态低命中\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 382,
+    "string": "\"没启用 cache\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 382,
+    "string": "\"用量太低被门控藏起来\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 386,
+    "string": "\"⚠ 上游未返 usage（%d 次）\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 388,
+    "string": "\"检查 provider stream_options.include_usage\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 396,
+    "string": "\"0% 命中需要排查\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 399,
+    "string": "\"当前模型未启用 prompt cache\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 404,
+    "string": "\"X% · 近N Y%\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 407,
+    "string": "\"累计命中\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 410,
+    "string": "\"近%d命中\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 414,
+    "string": "\"节省\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 422,
+    "string": "\"缓存读量\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 424,
+    "string": "\"缓存写量\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 426,
+    "string": "\"(自动缓存无溢价)\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 427,
+    "string": "\"缓存写量\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 451,
+    "string": "\"高百分比但小样本\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 458,
+    "string": "\"WRITER        未启用\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 460,
+    "string": "\"未启用\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 462,
+    "string": "\"运行角色\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 470,
+    "string": "\"未启用\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 478,
+    "string": "\"），避免读量列在 \""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 478,
+    "string": "\" 与 \""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 483,
+    "string": "\"看出规模\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 542,
+    "string": "\"主上下文\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 544,
+    "string": "\"最近策略\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 547,
+    "string": "\"当前视图\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 550,
+    "string": "\"摘要\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 550,
+    "string": "\"%d 条\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 553,
+    "string": "\"消息数\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 556,
+    "string": "\"最近重写\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 564,
+    "string": "\"基线\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 566,
+    "string": "\"投影\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 568,
+    "string": "\"恢复\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 570,
+    "string": "\"已提交\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 572,
+    "string": "\"熔断跳过\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 583,
+    "string": "\"工具结果微压缩\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 585,
+    "string": "\"轻裁剪\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 587,
+    "string": "\"完整摘要\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 653,
+    "string": "\"运行中\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 655,
+    "string": "\"异常\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 657,
+    "string": "\"待命\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 692,
+    "string": "\"基础规划\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 694,
+    "string": "\"章节写作\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 696,
+    "string": "\"章节评审\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 698,
+    "string": "\"章节重写\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 700,
+    "string": "\"章节打磨\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 702,
+    "string": "\"弧展开\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 704,
+    "string": "\"下一卷规划\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 706,
+    "string": "\"处理干预\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_sidebar.go",
+    "line": 708,
+    "string": "\"协调推进\""
+  },
+  {
+    "file": "internal/entry/tui\\panels_test.go",
+    "line": 14,
+    "string": "\"测试小说\""
+  },
+  {
+    "file": "internal/entry/tui\\report.go",
+    "line": 56,
+    "string": "\"诊断报告不可用\""
+  },
+  {
+    "file": "internal/entry/tui\\report.go",
+    "line": 87,
+    "string": "\"已导出脱敏诊断（可贴到 GitHub issue）\""
+  },
+  {
+    "file": "internal/entry/tui\\report.go",
+    "line": 93,
+    "string": "\"概览\""
+  },
+  {
+    "file": "internal/entry/tui\\report.go",
+    "line": 95,
+    "string": "\"开始 \""
+  },
+  {
+    "file": "internal/entry/tui\\report.go",
+    "line": 98,
+    "string": "\"  完成 \""
+  },
+  {
+    "file": "internal/entry/tui\\report.go",
+    "line": 104,
+    "string": "\"章节 \""
+  },
+  {
+    "file": "internal/entry/tui\\report.go",
+    "line": 106,
+    "string": "\"  字数 \""
+  },
+  {
+    "file": "internal/entry/tui\\report.go",
+    "line": 111,
+    "string": "\"  阶段 \""
+  },
+  {
+    "file": "internal/entry/tui\\report.go",
+    "line": 120,
+    "string": "\"评审 \""
+  },
+  {
+    "file": "internal/entry/tui\\report.go",
+    "line": 121,
+    "string": "\"%d次\""
+  },
+  {
+    "file": "internal/entry/tui\\report.go",
+    "line": 123,
+    "string": "\"  改写 \""
+  },
+  {
+    "file": "internal/entry/tui\\report.go",
+    "line": 124,
+    "string": "\"%d次\""
+  },
+  {
+    "file": "internal/entry/tui\\report.go",
+    "line": 127,
+    "string": "\"  均分 \""
+  },
+  {
+    "file": "internal/entry/tui\\report.go",
+    "line": 134,
+    "string": "\"伏笔 \""
+  },
+  {
+    "file": "internal/entry/tui\\report.go",
+    "line": 135,
+    "string": "\"打开%d\""
+  },
+  {
+    "file": "internal/entry/tui\\report.go",
+    "line": 137,
+    "string": "\" 停滞%d\""
+  },
+  {
+    "file": "internal/entry/tui\\report.go",
+    "line": 142,
+    "string": "\"规划 \""
+  },
+  {
+    "file": "internal/entry/tui\\report.go",
+    "line": 151,
+    "string": "\"未发现问题\""
+  },
+  {
+    "file": "internal/entry/tui\\report.go",
+    "line": 157,
+    "string": "\"发现\""
+  },
+  {
+    "file": "internal/entry/tui\\report.go",
+    "line": 169,
+    "string": "\"可执行动作\""
+  },
+  {
+    "file": "internal/entry/tui\\report.go",
+    "line": 197,
+    "string": "\"正在生成诊断报告\""
+  },
+  {
+    "file": "internal/entry/tui\\report.go",
+    "line": 199,
+    "string": "\"开始时间 \""
+  },
+  {
+    "file": "internal/entry/tui\\report.go",
+    "line": 201,
+    "string": "\"正在读取当前小说 output 产物并分析流程、质量、规划和上下文问题。项目较大时可能需要几秒。\""
+  },
+  {
+    "file": "internal/entry/tui\\report.go",
+    "line": 203,
+    "string": "\"Esc 可先关闭面板，后台分析完成后下次打开会重新生成。\""
+  },
+  {
+    "file": "internal/entry/tui\\report.go",
+    "line": 341,
+    "string": "\"诊断报告\""
+  },
+  {
+    "file": "internal/entry/tui\\report.go",
+    "line": 342,
+    "string": "\"  ↑↓ 滚动 · Esc 关闭\""
+  },
+  {
+    "file": "internal/entry/tui\\simulation.go",
+    "line": 99,
+    "string": "\"来源 \""
+  },
+  {
+    "file": "internal/entry/tui\\simulation.go",
+    "line": 103,
+    "string": "\"开始 \""
+  },
+  {
+    "file": "internal/entry/tui\\simulation.go",
+    "line": 106,
+    "string": "\"  完成 \""
+  },
+  {
+    "file": "internal/entry/tui\\simulation.go",
+    "line": 111,
+    "string": "\"阶段 \""
+  },
+  {
+    "file": "internal/entry/tui\\simulation.go",
+    "line": 114,
+    "string": "\"  进度 \""
+  },
+  {
+    "file": "internal/entry/tui\\simulation.go",
+    "line": 119,
+    "string": "\"流程日志\""
+  },
+  {
+    "file": "internal/entry/tui\\simulation.go",
+    "line": 121,
+    "string": "\"(%d 条)\""
+  },
+  {
+    "file": "internal/entry/tui\\simulation.go",
+    "line": 142,
+    "string": "\"Esc 取消\""
+  },
+  {
+    "file": "internal/entry/tui\\simulation.go",
+    "line": 144,
+    "string": "\"仿写画像处理失败\""
+  },
+  {
+    "file": "internal/entry/tui\\simulation.go",
+    "line": 146,
+    "string": "\"Esc 关闭面板\""
+  },
+  {
+    "file": "internal/entry/tui\\simulation.go",
+    "line": 148,
+    "string": "\"仿写画像已就绪，后续 Agent 会从 novel_context 读取\""
+  },
+  {
+    "file": "internal/entry/tui\\simulation.go",
+    "line": 150,
+    "string": "\"Esc 关闭面板\""
+  },
+  {
+    "file": "internal/entry/tui\\simulation.go",
+    "line": 172,
+    "string": "\"  ↑↓ 滚动 · Esc 取消/关闭\""
+  },
+  {
+    "file": "internal/entry/tui\\simulation.go",
+    "line": 173,
+    "string": "\"仿写画像\""
+  },
+  {
+    "file": "internal/entry/tui\\simulation.go",
+    "line": 203,
+    "string": "\"用法：/simulate\""
+  },
+  {
+    "file": "internal/entry/tui\\simulation.go",
+    "line": 211,
+    "string": "\"生成仿写画像\""
+  },
+  {
+    "file": "internal/entry/tui\\simulation.go",
+    "line": 217,
+    "string": "\"用法：/importsim <profile.json>\""
+  },
+  {
+    "file": "internal/entry/tui\\simulation.go",
+    "line": 225,
+    "string": "\"导入仿写画像\""
+  },
+  {
+    "file": "internal/entry/tui\\startup_test.go",
+    "line": 15,
+    "string": "\"写一本东方玄幻长篇\""
+  },
+  {
+    "file": "internal/entry/tui\\startup_test.go",
+    "line": 26,
+    "string": "\"正在初始化创作...\""
+  },
+  {
+    "file": "internal/entry/tui\\startup_test.go",
+    "line": 32,
+    "string": "\"创作需求: \""
+  },
+  {
+    "file": "internal/entry/tui\\startup_test.go",
+    "line": 39,
+    "string": "\"设\""
+  },
+  {
+    "file": "internal/entry/tui\\startup_test.go",
+    "line": 50,
+    "string": "\"创作需求: \""
+  },
+  {
+    "file": "internal/entry/tui\\theme.go",
+    "line": 12,
+    "string": "\"健康绿\""
+  },
+  {
+    "file": "internal/entry/tui\\theme.go",
+    "line": 13,
+    "string": "\"高命中\""
+  },
+  {
+    "file": "internal/entry/tui\\theme.go",
+    "line": 14,
+    "string": "\"中性正文\""
+  },
+  {
+    "file": "internal/entry/tui\\theme.go",
+    "line": 20,
+    "string": "\"无色\""
+  },
+  {
+    "file": "internal/entry/tui\\theme.go",
+    "line": 21,
+    "string": "\"中性正文\""
+  },
+  {
+    "file": "internal/entry/tui\\theme.go",
+    "line": 61,
+    "string": "\"就绪\""
+  },
+  {
+    "file": "internal/entry/tui\\theme.go",
+    "line": 62,
+    "string": "\"运行中\""
+  },
+  {
+    "file": "internal/entry/tui\\theme.go",
+    "line": 63,
+    "string": "\"审阅\""
+  },
+  {
+    "file": "internal/entry/tui\\theme.go",
+    "line": 64,
+    "string": "\"返工\""
+  },
+  {
+    "file": "internal/entry/tui\\theme.go",
+    "line": 65,
+    "string": "\"完成\""
+  },
+  {
+    "file": "internal/entry/tui\\theme.go",
+    "line": 66,
+    "string": "\"暂停\""
+  },
+  {
+    "file": "internal/entry/tui\\theme.go",
+    "line": 67,
+    "string": "\"暂停中\""
+  },
+  {
+    "file": "internal/entry/tui\\theme.go",
+    "line": 68,
+    "string": "\"错误\""
+  },
+  {
+    "file": "internal/entry/tui\\theme.go",
+    "line": 109,
+    "string": "\"中性正文内容\""
+  }
+]

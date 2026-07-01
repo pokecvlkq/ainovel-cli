@@ -502,7 +502,7 @@ func (o *observer) handleToolEnd(ev agentcore.Event) {
 	}
 	// 兜底：若 subagent 结束时，该 subagent 内部还有未完成的 TOOL 调用（比如 ensureSubagentToolStarted
 	// 提前发了进行中事件，但随后 abort/context cancel 让 ProgressToolEnd 没来），
-	// 在这里强制发 finish，避免 TOOL 行永远"进行中"。状态跟随 dispatch 同步。
+	// 在这里强制发 finish，避免 TOOL 行永远"Đang xử lý"。状态跟随 dispatch 同步。
 	flushOrphanSubagentTool := func(failed bool) {
 		if dispatchTarget == "" {
 			return

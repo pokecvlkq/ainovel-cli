@@ -43,7 +43,7 @@ func renderInputBox(inputView, hints string, snap host.UISnapshot, outputDir str
 }
 
 // buildRightInfo 构建右侧信息：provider · model(window) · 花费 · 目录。
-// 章节/字数等进度信息由左侧"概览"面板承载，这里不再重复。
+// 章节/字数等进度信息由左侧"Tổng quan"面板承载，这里不再重复。
 func buildRightInfo(snap host.UISnapshot, outputDir string) string {
 	var parts []string
 

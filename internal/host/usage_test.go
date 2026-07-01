@@ -333,7 +333,7 @@ func Test_UsageTracker_MissingAssistantUsageCounted(t *testing.T) {
 // 仍能根据"事实"标记为 true：自建 / 国内代理后端的模型经常不在 BerriAI/litellm
 // 的 pricing 索引里，resolveCost 返回 capable=false；但只要 backend 真的返回了
 // CacheRead 或 CacheWrite > 0，就证明该模型客观支持 prompt cache，per-role 行
-// 不该显示"未启用"。
+// 不该显示"Chưa bật"。
 func Test_UsageTracker_CacheCapableFromFacts(t *testing.T) {
 	tk := NewUsageTracker(nil, nil) // modelSet=nil → resolveCost 永远 capable=false
 

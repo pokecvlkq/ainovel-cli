@@ -155,7 +155,7 @@ func New(cfg bootstrap.Config, bundle assets.Bundle) (*Host, error) {
 		func(reason string) { h.abortWithEvent(reason, "error") },
 		func(level, summary string) {
 			h.emitEvent(Event{Time: time.Now(), Category: "SYSTEM", Summary: summary, Level: level})
-			h.notifier.Send(notify.Notification{Kind: "budget", Level: level, Title: "ainovel: 预算", Body: summary})
+			h.notifier.Send(notify.Notification{Kind: "budget", Level: level, Title: "ainovel: Ngân sách", Body: summary})
 		},
 	); sentinel != nil {
 		h.budget = sentinel
@@ -164,9 +164,9 @@ func New(cfg bootstrap.Config, bundle assets.Bundle) (*Host, error) {
 		h.budgetDetach = coordinator.Subscribe(sentinel.HandleEvent)
 		// 计费盲区告警：模型不报 usage 时成本恒 0，预算永不触发——保险丝没接上必须喊人。
 		usage.SetOnMissingUsage(func() {
-			const blind = "预算盲区: 模型未返回 usage 数据，成本统计为 0，预算上限不会触发（自定义模型请确认注册表价格或上游 include_usage）"
+			const blind = "Vùng mù ngân sách: Model không trả về dữ liệu usage, thống kê chi phí luôn bằng 0, hạn mức ngân sách sẽ không được kích hoạt (với model tùy chỉnh vui lòng xác nhận giá đăng ký hoặc cấu hình include_usage ở upstream)"
 			h.emitEvent(Event{Time: time.Now(), Category: "SYSTEM", Summary: blind, Level: "warn"})
-			h.notifier.Send(notify.Notification{Kind: "budget", Level: "warn", Title: "ainovel: 预算", Body: blind})
+			h.notifier.Send(notify.Notification{Kind: "budget", Level: "warn", Title: "ainovel: Ngân sách", Body: blind})
 		})
 	}
 	h.router = flow.NewDispatcher(coordinator, store)
@@ -174,13 +174,13 @@ func New(cfg bootstrap.Config, bundle assets.Bundle) (*Host, error) {
 	// 重复指令告警：纯 telemetry，挂机时"模型可能在原地打转"值得喊人看一眼。
 	// 事件流与 notify 成对发出——notify 只是屏内事件的离屏副本（架构 §2.3）。
 	h.router.SetOnRepeat(func(agent, task string, n int) {
-		body := fmt.Sprintf("同一指令已第 %d 次下达（%s）：%s", n, agent, task)
-		h.emitEvent(Event{Time: time.Now(), Category: "SYSTEM", Summary: "指令重复: " + body, Level: "warn"})
-		h.notifier.Send(notify.Notification{Kind: "repeat", Level: "warn", Title: "ainovel: 指令重复", Body: body})
+		body := fmt.Sprintf("Cùng một lệnh đã được đưa ra lần thứ %d (%s): %s", n, agent, task)
+		h.emitEvent(Event{Time: time.Now(), Category: "SYSTEM", Summary: "Lặp lại lệnh: " + body, Level: "warn"})
+		h.notifier.Send(notify.Notification{Kind: "repeat", Level: "warn", Title: "ainovel: Lặp lại lệnh", Body: body})
 	})
 
 	if err := store.RunMeta.Init(cfg.Style, cfg.Provider, cfg.ModelName); err != nil {
-		slog.Error("初始化运行元信息失败", "module", "boot", "err", err)
+		slog.Error("Khởi tạo siêu dữ liệu chạy thất bại", "module", "boot", "err", err)
 	}
 
 	return h, nil
@@ -222,7 +222,7 @@ func logUserRulesSnapshot(snap *rules.Snapshot) {
 	if snap == nil {
 		return
 	}
-	words := "未设置"
+	words := "Chưa đặt"
 	if w := snap.Structured.ChapterWords; w != nil {
 		words = fmt.Sprintf("%d-%d", w.Min, w.Max)
 	}
@@ -249,7 +249,7 @@ func (h *Host) StartPrepared(promptText string) error {
 	}
 	if h.cocreating {
 		h.mu.Unlock()
-		return fmt.Errorf("阶段共创进行中，请先结束共创")
+		return fmt.Errorf("Đang trong quá trình đồng sáng tác phân đoạn, vui lòng kết thúc đồng sáng tác trước")
 	}
 	h.mu.Unlock()
 
@@ -267,8 +267,8 @@ func (h *Host) StartPrepared(promptText string) error {
 		return fmt.Errorf("init progress: %w", err)
 	}
 
-	slog.Info("开始创作", "module", "host", "prompt_len", len(promptText))
-	h.emitEvent(Event{Time: time.Now(), Category: "SYSTEM", Summary: "开始创作", Level: "info"})
+	slog.Info("Bắt đầu sáng tác", "module", "host", "prompt_len", len(promptText))
+	h.emitEvent(Event{Time: time.Now(), Category: "SYSTEM", Summary: "Bắt đầu sáng tác", Level: "info"})
 	h.observer.setAborting(false)
 	// 先重置重复追踪并启用路由，再启动 Prompt，避免首轮事件先于 Enable 抵达
 	h.router.ResetRepeat()
@@ -311,11 +311,11 @@ func (h *Host) Resume() (string, error) {
 		return "", err
 	}
 
-	slog.Info("恢复创作", "module", "host", "label", label)
-	h.emitEvent(Event{Time: time.Now(), Category: "SYSTEM", Summary: "恢复创作: " + label, Level: "info"})
+	slog.Info("Khôi phục sáng tác", "module", "host", "label", label)
+	h.emitEvent(Event{Time: time.Now(), Category: "SYSTEM", Summary: "Khôi phục sáng tác: " + label, Level: "info"})
 	for _, w := range h.store.CheckConsistency() {
-		slog.Warn("一致性告警", "module", "host", "detail", w)
-		h.emitEvent(Event{Time: time.Now(), Category: "SYSTEM", Summary: "一致性告警: " + w, Level: "warn"})
+		slog.Warn("Cảnh báo tính nhất quán", "module", "host", "detail", w)
+		h.emitEvent(Event{Time: time.Now(), Category: "SYSTEM", Summary: "Cảnh báo tính nhất quán: " + w, Level: "warn"})
 	}
 	// 老书无快照时惰性生成（按 system_defaults + rules 文件归一化）；已有则廉价读取。
 	h.ensureUserRules()
@@ -353,12 +353,12 @@ func (h *Host) Continue(text string) error {
 	h.mu.Lock()
 	if h.cocreating {
 		h.mu.Unlock()
-		return fmt.Errorf("阶段共创进行中，请先结束共创")
+		return fmt.Errorf("Đang trong quá trình đồng sáng tác phân đoạn, vui lòng kết thúc đồng sáng tác trước")
 	}
 	running := h.lifecycle == lifecycleRunning
 	h.mu.Unlock()
 
-	h.emitEvent(Event{Time: time.Now(), Category: "USER", Summary: "[继续] " + text, Level: "info"})
+	h.emitEvent(Event{Time: time.Now(), Category: "USER", Summary: "[Tiếp tục] " + text, Level: "info"})
 
 	if running {
 		h.coordinator.FollowUp(interventionMsg(text))
@@ -387,23 +387,23 @@ func (h *Host) Steer(text string) {
 	running := h.lifecycle == lifecycleRunning
 	h.mu.Unlock()
 
-	h.emitEvent(Event{Time: time.Now(), Category: "USER", Summary: "[用户干预] " + text, Level: "info"})
+	h.emitEvent(Event{Time: time.Now(), Category: "USER", Summary: "[Can thiệp người dùng] " + text, Level: "info"})
 
 	msg := interventionMsg(text)
 	if running {
 		if _, err := h.coordinator.Inject(msg); err != nil {
-			slog.Error("steer inject 失败", "module", "host", "err", err)
+			slog.Error("steer inject thất bại", "module", "host", "err", err)
 		}
 		return
 	}
 	// 停机：持久化待下次启动 + 反馈系统状态（"已保存"是 USER 事件之外的系统提示）
 	_ = h.store.RunMeta.SetPendingSteer(text)
-	h.emitEvent(Event{Time: time.Now(), Category: "SYSTEM", Summary: "干预已保存，下次启动时生效", Level: "info"})
+	h.emitEvent(Event{Time: time.Now(), Category: "SYSTEM", Summary: "Đã lưu can thiệp, sẽ có hiệu lực trong lần khởi động tiếp theo", Level: "info"})
 }
 
 // Abort 暂停当前 coordinator。
 func (h *Host) Abort() bool {
-	return h.abortWithEvent("用户手动暂停当前创作", "warn")
+	return h.abortWithEvent("Người dùng tạm dừng sáng tác hiện tại theo cách thủ công", "warn")
 }
 
 // abortWithEvent 以指定原因事件执行暂停。预算停机与手动暂停共用同一停机机制，
@@ -444,7 +444,7 @@ func (h *Host) Close() {
 		h.usageCancel = nil
 	}
 	if err := h.usage.SaveNow(); err != nil {
-		slog.Warn("usage 退出前落盘失败", "module", "usage", "err", err)
+		slog.Warn("Ghi usage xuống đĩa trước khi thoát thất bại", "module", "usage", "err", err)
 	}
 	h.closeOnce.Do(func() {
 		close(h.done)
@@ -469,12 +469,12 @@ func (h *Host) waitDone() {
 	progress, _ := h.store.Progress.Load()
 	if progress != nil && progress.Phase == domain.PhaseComplete {
 		h.lifecycle = lifecycleCompleted
-		summary := fmt.Sprintf("创作完成: %d 章 %d 字", len(progress.CompletedChapters), progress.TotalWordCount)
+		summary := fmt.Sprintf("Sáng tác hoàn tất: %d chương %d chữ", len(progress.CompletedChapters), progress.TotalWordCount)
 		h.mu.Unlock()
 		slog.Info(summary, "module", "host")
 		h.emitEvent(Event{Time: time.Now(), Category: "SYSTEM", Summary: summary, Level: "success"})
 		h.notifier.Send(notify.Notification{
-			Kind: "run_end", Level: "info", Title: "ainovel: 创作完成",
+			Kind: "run_end", Level: "info", Title: "ainovel: Sáng tác hoàn tất",
 			Body: h.runEndBody(progress.NovelName, summary),
 		})
 	} else {
@@ -490,11 +490,11 @@ func (h *Host) waitDone() {
 		}
 		h.mu.Unlock()
 		if wasRunning {
-			summary := fmt.Sprintf("Coordinator 停止 (已完成 %d 章)", completed)
+			summary := fmt.Sprintf("Coordinator dừng (Đã hoàn thành %d chương)", completed)
 			slog.Warn(summary, "module", "host")
 			h.emitEvent(Event{Time: time.Now(), Category: "SYSTEM", Summary: summary, Level: "warn"})
 			h.notifier.Send(notify.Notification{
-				Kind: "run_end", Level: "warn", Title: "ainovel: 创作停止",
+				Kind: "run_end", Level: "warn", Title: "ainovel: Dừng sáng tác",
 				Body: h.runEndBody(name, summary),
 			})
 		}
@@ -1029,7 +1029,7 @@ func (h *Host) SetRoleThinking(role, level string) error {
 	}
 	shown := string(parsed)
 	if shown == "" {
-		shown = "默认(继承)"
+		shown = "Mặc định"
 	}
 	h.emitEvent(Event{
 		Time:     time.Now(),
@@ -1062,7 +1062,7 @@ func (h *Host) StageCoCreateStream(ctx context.Context, history []CoCreateMessag
 	return coCreateStream(ctx, h.models, h.store.Sessions, stageSystemPrompt(h.store), history, onProgress)
 }
 
-// stagePlanPrefix 把共创产出的"后续方向 brief"包装成一条阶段规划干预，交 Coordinator 裁定。
+// stagePlanPrefix 把共创产出的"Hướng đi tiếp theo"包装成一条阶段规划干预，交 Coordinator 裁定。
 // 只贴 [阶段规划] 事实标记 + 中性陈述，不写死"怎么落地"——具体路由（compass / architect /
 // save_user_rules）交给 coordinator.md 的「阶段规划」判据，避免与 prompt 形成第二真相源、
 // 也不堵死风格类要求走 user_rules（守"分类裁定归 LLM"）。Continue 再叠加 [用户干预] 前缀。
@@ -1086,9 +1086,9 @@ func (h *Host) PauseForCoCreate() bool {
 	// 运行中复用 abortWithEvent 停机（running→paused + setAborting + Abort + 事件），与手动
 	// 暂停同序、不另抄一遍；已停止（idle/paused）只置标记，规划完经 Continue 续跑。
 	if running {
-		h.abortWithEvent("进入阶段共创，创作已暂停", "info")
+		h.abortWithEvent("Đã vào chế độ đồng sáng tác phân đoạn, tạm dừng sáng tác", "info")
 	} else {
-		h.emitEvent(Event{Time: time.Now(), Category: "SYSTEM", Summary: "进入阶段共创", Level: "info"})
+		h.emitEvent(Event{Time: time.Now(), Category: "SYSTEM", Summary: "Đã vào chế độ đồng sáng tác phân đoạn, tạm dừng sáng tác", Level: "info"})
 	}
 	return true
 }
@@ -1115,7 +1115,7 @@ func (h *Host) ResumeFromCoCreate(draft string) error {
 	// Abort）时 coordinator 本就 idle，WaitForIdle 立即返回。
 	h.coordinator.WaitForIdle()
 
-	h.emitEvent(Event{Time: time.Now(), Category: "SYSTEM", Summary: "阶段共创完成，已注入后续方向并恢复创作", Level: "info"})
+	h.emitEvent(Event{Time: time.Now(), Category: "SYSTEM", Summary: "Đã hoàn thành đồng sáng tác phân đoạn, đã thêm hướng đi tiếp theo và tiếp tục sáng tác", Level: "info"})
 	return h.Continue(stagePlanPrefix + draft)
 }
 
@@ -1128,7 +1128,7 @@ func (h *Host) CancelCoCreate() {
 	}
 	h.cocreating = false
 	h.mu.Unlock()
-	h.emitEvent(Event{Time: time.Now(), Category: "SYSTEM", Summary: "已退出阶段共创，创作保持暂停（可在输入框继续）", Level: "info"})
+	h.emitEvent(Event{Time: time.Now(), Category: "SYSTEM", Summary: "Đã thoát đồng sáng tác phân đoạn, tạm dừng sáng tác (có thể tiếp tục trong khung nhập)", Level: "info"})
 }
 
 // ── 工具 ──
@@ -1169,7 +1169,7 @@ func (h *Host) ImportFrom(ctx context.Context, opts imp.Options) (<-chan imp.Eve
 
 // Simulate 读取 simulate 目录并生成或增量更新仿写画像。
 func (h *Host) Simulate(ctx context.Context) (<-chan sim.Event, error) {
-	if err := h.guardExclusive("生成仿写画像"); err != nil {
+	if err := h.guardExclusive("Tạo hồ sơ mô phỏng"); err != nil {
 		return nil, err
 	}
 
@@ -1190,7 +1190,7 @@ func (h *Host) Simulate(ctx context.Context) (<-chan sim.Event, error) {
 
 // ImportSimulationProfile 导入此前生成的仿写画像。
 func (h *Host) ImportSimulationProfile(ctx context.Context, path string) (<-chan sim.Event, error) {
-	if err := h.guardExclusive("导入仿写画像"); err != nil {
+	if err := h.guardExclusive("Nhập hồ sơ mô phỏng"); err != nil {
 		return nil, err
 	}
 	return sim.RunImport(ctx, h.store, path)
@@ -1203,9 +1203,9 @@ func (h *Host) guardExclusive(action string) error {
 	defer h.mu.Unlock()
 	switch {
 	case h.lifecycle == lifecycleRunning:
-		return fmt.Errorf("coordinator 运行中，请先暂停后再%s", action)
+		return fmt.Errorf("coordinator Đang chạy, vui lòng tạm dừng trước khi thực hiện %s", action)
 	case h.cocreating:
-		return fmt.Errorf("阶段共创进行中，请先结束共创后再%s", action)
+		return fmt.Errorf("Giai đoạn đồng sáng tác đang diễn ra, vui lòng kết thúc đồng sáng tác trước khi thực hiện %s", action)
 	}
 	return nil
 }

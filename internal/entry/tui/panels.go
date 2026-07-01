@@ -13,7 +13,7 @@ import (
 func renderTopBar(snap host.UISnapshot, width int, spinnerFrame, version string) string {
 	novelName := snap.NovelName
 	if novelName == "" {
-		novelName = "未定书名"
+		novelName = "Chưa có tên truyện"
 	}
 
 	var infoParts []string
@@ -164,10 +164,10 @@ func renderWelcome(width, height int, errMsg string, mode startupMode) string {
 
 	// 功能亮点
 	features := []struct{ icon, label, desc string }{
-		{">>", "多模型协作", "Architect 规划 / Writer 创作 / Editor 审阅"},
-		{"::", "断点恢复", "崩溃或中断后从上次进度自动续写"},
-		{"<>", "实时干预", "创作过程中随时调整剧情走向"},
-		{"##", "分层长篇", "支持卷-弧-章分层结构的长篇创作"},
+		{">>", "Nhiều model kết hợp", "Architect Lên KH / Writer Viết / Editor Duyệt"},
+		{"::", "Khôi phục", "Tự động viết tiếp sau khi gián đoạn"},
+		{"<>", "Can thiệp realtime", "Điều chỉnh cốt truyện bất kỳ lúc nào"},
+		{"##", "Truyện dài phân tầng", "Hỗ trợ cấu trúc Quyển-Phần-Chương"},
 	}
 	iconStyle := lipgloss.NewStyle().Foreground(colorAccent2).Bold(true)
 	featLabelStyle := lipgloss.NewStyle().Foreground(bodyTextColor)
@@ -182,17 +182,17 @@ func renderWelcome(width, height int, errMsg string, mode startupMode) string {
 	feats := strings.Join(featLines, "\n")
 
 	// 输入提示
-	prompt := lipgloss.NewStyle().Foreground(bodyTextColor).Render("在下方输入你的小说需求开始创作")
+	prompt := lipgloss.NewStyle().Foreground(bodyTextColor).Render("Nhập yêu cầu tiểu thuyết bên dưới để bắt đầu")
 
 	modeLine := lipgloss.NewStyle().
 		Foreground(colorMuted).
-		Render("当前模式：" + mode.label() + " · " + mode.subtitle())
+		Render("Chế độ hiện tại: " + mode.label() + " · " + mode.subtitle())
 
 	// 示例
 	examples := []string{
-		"写一部 12 章都市悬疑小说，主角是一名女法医",
-		"创作一部仙侠长篇，主角从凡人修炼至飞升",
-		"写一个科幻短篇，讲述 AI 觉醒后的伦理困境",
+		"Viết tiểu thuyết trinh thám đô thị 12 chương, nữ chính là pháp y",
+		"Viết truyện Tiên hiệp, nam chính tu luyện phi thăng",
+		"Viết truyện ngắn Sci-Fi về đạo đức AI",
 	}
 	exStyle := lipgloss.NewStyle().Foreground(colorAccent)
 	dotStyle := lipgloss.NewStyle().Foreground(colorDim)
@@ -222,7 +222,7 @@ func renderWelcome(width, height int, errMsg string, mode startupMode) string {
 	b.WriteString(exBlock)
 	b.WriteString("\n\n")
 	b.WriteString(lipgloss.NewStyle().Foreground(colorDim).Italic(true).
-		Render("Tab 切换模式 · 快速开始下 Enter 直接创作 · 共创规划下 Enter 进入对话"))
+		Render("Tab Chuyển chế độ · Bắt đầu nhanh: Enter Viết luôn · Lên kế hoạch: Enter để chat"))
 
 	if errMsg != "" {
 		b.WriteString("\n\n")

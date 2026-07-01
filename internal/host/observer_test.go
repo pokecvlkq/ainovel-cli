@@ -82,7 +82,7 @@ func TestObserverRetryEventsUpdateSameLine(t *testing.T) {
 	if events[0].ID == "" || events[1].ID != events[0].ID {
 		t.Fatalf("retry events should share ID for TUI in-place update: %+v", events)
 	}
-	if !strings.Contains(events[1].Summary, "重试 (2/7，4s后)") {
+	if !strings.Contains(events[1].Summary, "Thử lại (2/7, sau 4s)") {
 		t.Fatalf("summary = %q, want updated retry count", events[1].Summary)
 	}
 }
@@ -110,7 +110,7 @@ func TestObserverSubagentRetryEventsUpdateSameLinePerAgent(t *testing.T) {
 	if events[0].ID == "" || events[1].ID != events[0].ID {
 		t.Fatalf("writer retry events should share ID: %+v", events)
 	}
-	if events[1].Agent != "writer" || !strings.Contains(events[1].Summary, "重试 (2/7)") {
+	if events[1].Agent != "writer" || !strings.Contains(events[1].Summary, "Thử lại (2/7)") {
 		t.Fatalf("event = %+v, want writer retry 2/7", events[1])
 	}
 }

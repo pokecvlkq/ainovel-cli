@@ -83,7 +83,7 @@ func (pc ProviderConfig) ProviderType(name string) (string, error) {
 	if llm.IsProviderRegistered(name) {
 		return name, nil
 	}
-	return "", fmt.Errorf("provider %q 缺少 type，且不在 litellm 已知 provider 列表中: %w", name, errs.ErrConfig)
+	return "", fmt.Errorf("provider %q thiếu type, và không nằm trong danh sách provider đã biết của litellm: %w", name, errs.ErrConfig)
 }
 
 // ModelRef 表示一个 provider/model 组合。
@@ -185,7 +185,7 @@ func (c *Config) ValidateBase() error {
 	// 默认 provider 必须有凭证
 	pc, ok := c.Providers[c.Provider]
 	if !ok {
-		return fmt.Errorf("provider %q 未在 providers 中配置凭证；若在 ./.ainovel/config.json 里覆盖了 provider，需同时声明 providers.%s（含 api_key/base_url），不能只改顶层 provider: %w", c.Provider, c.Provider, errs.ErrConfig)
+		return fmt.Errorf("provider %q chưa được cấu hình credentials trong providers; nếu bạn ghi đè provider trong ./.ainovel/config.json, bạn cũng cần khai báo providers.%s (bao gồm api_key/base_url), không thể chỉ thay đổi provider ở cấp cao nhất: %w", c.Provider, c.Provider, errs.ErrConfig)
 	}
 	if pc.RequiresAPIKey(c.Provider) && pc.APIKey == "" {
 		return fmt.Errorf("provider %q has no api_key configured: %w", c.Provider, errs.ErrConfig)
@@ -376,11 +376,11 @@ func LogContextWindowChoice(role, model string, window int, source ContextWindow
 	attrs := []any{"module", "context", "role", role, "model", model, "window", window, "source", source}
 	switch source {
 	case CtxWindowDefault:
-		slog.Warn("未识别的模型，使用兜底窗口（自定义代理或 OpenRouter 未收录，可用 context_window 显式指定）", attrs...)
+		slog.Warn("Model không xác định, sử dụng cửa sổ ngữ cảnh mặc định (proxy tùy chỉnh hoặc OpenRouter chưa hỗ trợ, có thể chỉ định rõ bằng context_window)", attrs...)
 	case CtxWindowConfig:
-		slog.Info("上下文窗口（来自配置文件 context_window）", attrs...)
+		slog.Info("Cửa sổ ngữ cảnh (lấy từ cấu hình context_window)", attrs...)
 	default:
-		slog.Info("上下文窗口", attrs...)
+		slog.Info("Cửa sổ ngữ cảnh", attrs...)
 	}
 }
 
@@ -447,10 +447,10 @@ func (c Config) validateProviderAPI(owner, providerName string, pc ProviderConfi
 	}
 	providerType, err := pc.ProviderType(providerName)
 	if err != nil {
-		return fmt.Errorf("%s provider %q api 配置无法解析协议类型: %w", owner, providerName, err)
+		return fmt.Errorf("cấu hình api của %s provider %q không thể phân tích loại giao thức: %w", owner, providerName, err)
 	}
 	if strings.ToLower(strings.TrimSpace(providerType)) != "openai" {
-		return fmt.Errorf("%s provider %q api 仅支持 OpenAI 协议 provider: %w", owner, providerName, errs.ErrConfig)
+		return fmt.Errorf("API của %s provider %q chỉ hỗ trợ provider giao thức OpenAI: %w", owner, providerName, errs.ErrConfig)
 	}
 	return nil
 }

@@ -9,16 +9,16 @@ import "github.com/charmbracelet/lipgloss"
 // 提亮 ~25% lightness、略升饱和，保证暗底有足够对比度（colorDim 之前 #6b6355
 // 在 #1c1c1c 黑底上几乎不可见，分隔线/辅助文字全消失）。
 //
-// colorAccent2 暗底从 #7a9e7e 改为青绿 #5fb8a3，跟 colorSuccess 的"健康绿"拉
-// 开 — 之前两者完全同色，让 architect agent 的色标和"高命中"喜悦感混淆。
-// bodyTextColor 是"中性正文"的前景策略：
+// colorAccent2 暗底从 #7a9e7e 改为青绿 #5fb8a3，跟 colorSuccess 的"Xanh an toàn"拉
+// 开 — 之前两者完全同色，让 architect agent 的色标和"Trúng đích cao"喜悦感混淆。
+// bodyTextColor 是"Nội dung trung lập"的前景策略：
 //   - 暗色终端 → NoColor，继承终端默认前景，避免我们硬塞 #e8e0d0 米白在用户自配
 //     的暖底/冷底主题上撞色（用户实测暗底默认色更耐读）。
 //   - 亮色终端 → 用 colorText 的 Light 档（深棕 #3d3529），保留品牌暖调；
 //     亮底默认黑色对比度太硬，原本调过的深棕在亮底视觉更柔和。
 //
-// AdaptiveColor 两端都必须给颜色值，没有"无色"档，所以这里启动时判一次背景，
-// 之后所有概览值/章节正文/命令描述等"中性正文"统一引用 bodyTextColor。
+// AdaptiveColor 两端都必须给颜色值，没有"Không màu"档，所以这里启动时判一次背景，
+// 之后所有概览值/章节正文/命令描述等"Nội dung trung lập"统一引用 bodyTextColor。
 var bodyTextColor lipgloss.TerminalColor = func() lipgloss.TerminalColor {
 	if lipgloss.HasDarkBackground() {
 		return lipgloss.NoColor{}
@@ -58,14 +58,14 @@ var statusDisplay = map[string]struct {
 	icon  string
 	label string
 }{
-	"READY":    {"○", "就绪"},
-	"RUNNING":  {"", "运行中"},
-	"REVIEW":   {"◆", "审阅"},
-	"REWRITE":  {"◆", "返工"},
-	"COMPLETE": {"●", "完成"},
-	"PAUSED":   {"⏸", "暂停"},
-	"PAUSING":  {"⏸", "暂停中"},
-	"ERROR":    {"✕", "错误"},
+	"READY":    {"○", "Sẵn sàng"},
+	"RUNNING":  {"", "Đang chạy"},
+	"REVIEW":   {"◆", "Đánh giá"},
+	"REWRITE":  {"◆", "Làm lại"},
+	"COMPLETE": {"●", "Hoàn thành"},
+	"PAUSED":   {"⏸", "Tạm dừng"},
+	"PAUSING":  {"⏸", "Đang tạm dừng"},
+	"ERROR":    {"✕", "Lỗi"},
 }
 
 // 事件分类颜色映射
@@ -106,7 +106,7 @@ var (
 			Width(10)
 
 	// fieldValueStyle / cardContentStyle 用 bodyTextColor —— 概览区的值（运行态、
-	// 已完成章节数、字数等）、大纲条目、角色列表、章节摘要等"中性正文内容"
+	// 已完成章节数、字数等）、大纲条目、角色列表、章节摘要等"Nội dung chính trung lập"
 	// 在暗底跟随终端默认前景色（避免硬塞米白撞主题），亮底走深棕保留暖调。
 	// 语义性强的元素（标题、高亮值、状态、错误、命中率染色等）仍走 colorAccent /
 	// colorError 等主题色。

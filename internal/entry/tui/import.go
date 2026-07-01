@@ -86,24 +86,24 @@ func (s *importState) refresh(contentW int) {
 	stageStyle := lipgloss.NewStyle().Foreground(colorAccent2)
 
 	var b strings.Builder
-	b.WriteString(titleStyle.Render("导入外部小说"))
+	b.WriteString(titleStyle.Render("Nhập truyện từ ngoài"))
 	b.WriteString("\n\n")
-	b.WriteString(dimStyle.Render("源文件 "))
+	b.WriteString(dimStyle.Render("File nguồn "))
 	b.WriteString(s.source)
 	b.WriteString("\n")
-	b.WriteString(dimStyle.Render("开始 "))
+	b.WriteString(dimStyle.Render("Bắt đầu "))
 	b.WriteString(formatReportTime(s.startedAt))
 	if !s.finishedAt.IsZero() {
-		b.WriteString(dimStyle.Render("  完成 "))
+		b.WriteString(dimStyle.Render("  Xong "))
 		b.WriteString(formatReportTime(s.finishedAt))
 	}
 	b.WriteString("\n\n")
 
 	// 当前阶段行
-	b.WriteString(mutedStyle.Render("阶段 "))
+	b.WriteString(mutedStyle.Render("Giai đoạn "))
 	b.WriteString(stageStyle.Render(string(s.stage)))
 	if s.total > 0 {
-		b.WriteString(mutedStyle.Render("  进度 "))
+		b.WriteString(mutedStyle.Render("  Tiến độ "))
 		if s.current > 0 {
 			b.WriteString(fmt.Sprintf("%d/%d", s.current, s.total))
 		} else {
@@ -113,9 +113,9 @@ func (s *importState) refresh(contentW int) {
 	b.WriteString("\n\n")
 
 	// 历史日志
-	b.WriteString(titleStyle.Render("流程日志"))
+	b.WriteString(titleStyle.Render("Nhật ký luồng"))
 	b.WriteString(" ")
-	b.WriteString(dimStyle.Render(fmt.Sprintf("(%d 条)", len(s.history))))
+	b.WriteString(dimStyle.Render(fmt.Sprintf("(%d Mục)", len(s.history))))
 	b.WriteString("\n")
 	for _, ln := range s.history {
 		b.WriteString("\n")
@@ -137,15 +137,15 @@ func (s *importState) refresh(contentW int) {
 	b.WriteString("\n\n")
 	switch {
 	case !s.done:
-		b.WriteString(dimStyle.Render("Esc 取消导入"))
+		b.WriteString(dimStyle.Render("Esc Hủy nhập"))
 	case s.err != nil:
-		b.WriteString(errStyle.Render("导入失败"))
+		b.WriteString(errStyle.Render("Lỗi nhập"))
 		b.WriteString("\n")
-		b.WriteString(dimStyle.Render("Esc 关闭面板"))
+		b.WriteString(dimStyle.Render("Esc Đóng"))
 	default:
-		b.WriteString(okStyle.Render("导入完成，正在自动接力续写"))
+		b.WriteString(okStyle.Render("Đã nhập, đang tự viết tiếp"))
 		b.WriteString("\n")
-		b.WriteString(dimStyle.Render("Esc 关闭面板查看进度"))
+		b.WriteString(dimStyle.Render("Esc Đóng để xem tiến độ"))
 	}
 
 	s.viewport.SetContent(b.String())
@@ -168,8 +168,8 @@ func renderImportModal(width, height int, s *importState) string {
 		s.viewport.Height = boxH - 4
 	}
 
-	hint := "  ↑↓ 滚动 · Esc 取消/关闭"
-	modal := renderPaddedModalFrame(boxW, boxH, "外部小说导入", hint,
+	hint := "  ↑↓ Cuộn · Esc Hủy/Đóng"
+	modal := renderPaddedModalFrame(boxW, boxH, "Nhập truyện ngoài", hint,
 		strings.Split(s.viewport.View(), "\n"))
 	return lipgloss.Place(width, height, lipgloss.Center, lipgloss.Center, modal)
 }
@@ -235,23 +235,23 @@ func listenImportEvent(reqID int, ch <-chan imp.Event) tea.Cmd {
 // parseImportArgs 解析 `/import <path> [from=N]` 形式参数。
 func parseImportArgs(args []string) (imp.Options, error) {
 	if len(args) == 0 {
-		return imp.Options{}, fmt.Errorf("用法：/import <文件路径> [from=N]")
+		return imp.Options{}, fmt.Errorf("Cú pháp: /import <đường_dẫn> [from=N]")
 	}
 	opts := imp.Options{SourcePath: args[0]}
 	for _, a := range args[1:] {
 		k, v, ok := strings.Cut(a, "=")
 		if !ok {
-			return imp.Options{}, fmt.Errorf("参数应为 key=value：%q", a)
+			return imp.Options{}, fmt.Errorf("Tham số phải là key=value: %q", a)
 		}
 		switch strings.ToLower(k) {
 		case "from":
 			n, err := strconv.Atoi(v)
 			if err != nil || n < 0 {
-				return imp.Options{}, fmt.Errorf("from 需为非负整数：%q", v)
+				return imp.Options{}, fmt.Errorf("from phải >= 0: %q", v)
 			}
 			opts.ResumeFrom = n
 		default:
-			return imp.Options{}, fmt.Errorf("未知参数 %q（支持：from）", k)
+			return imp.Options{}, fmt.Errorf("Tham số lạ %q (Hỗ trợ: from)", k)
 		}
 	}
 	return opts, nil

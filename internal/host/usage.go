@@ -16,7 +16,7 @@ import (
 )
 
 // recentSampleCap 是滑动窗大小：只保留每个 role 最近 N 次调用的 (cacheRead, input)
-// 样本，用于在左栏对比"累计 vs 近 N 次"命中率，识别"前期拖累"vs"稳态低命中"。
+// 样本，用于在左栏对比"累计 vs 近 N 次"命中率，识别"Bị kéo lùi"vs"Trúng đích thấp"。
 const recentSampleCap = 10
 
 // UsageTracker 累计整个会话所有 agent 的 LLM 输入/输出 token 与美元成本。
@@ -31,7 +31,7 @@ const recentSampleCap = 10
 // 同时维护 per-role 维度（writer/editor/architect/coordinator）：
 //   - 累计命中数据 → 整体优化效果
 //   - 滑动窗最近 N 次 → 区分前期拖累 vs 稳态低命中
-//   - CacheCapable 标记 → 区分"未启用"和"真的 0% 命中"
+//   - CacheCapable 标记 → 区分"Chưa bật"和"真的 0% 命中"
 //
 // 线程安全。
 type UsageTracker struct {
@@ -248,7 +248,7 @@ func modelUsageKey(provider, modelName string) string {
 // CacheCapable 优先用"事实"判定：只要见过 CacheRead 或 CacheWrite > 0，就证明
 // 上游确实做了 prompt caching。注册表的 CacheReadCostPer1M 仅作 fallback，
 // 因为自建 backend 模型（mimo-v2.5-pro / 国内代理等）通常不在 BerriAI/litellm
-// pricing 索引里，但实际 Usage 里完全有 cache 数据，UI 不该误判为"未启用"。
+// pricing 索引里，但实际 Usage 里完全有 cache 数据，UI 不该误判为"Chưa bật"。
 func addUsage(t *agentTotals, u agentcore.Usage, cost, saved float64, capable bool) {
 	t.Input += u.Input
 	t.Output += u.Output

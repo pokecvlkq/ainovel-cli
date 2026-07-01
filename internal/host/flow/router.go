@@ -78,9 +78,9 @@ func Route(s State) *Instruction {
 	// 3. 重写/打磨队列优先（事实已在工具层落盘，Router 只照单派发）
 	if len(p.PendingRewrites) > 0 {
 		ch := p.PendingRewrites[0]
-		verb := "重写"
+		verb := "Viết lại"
 		if p.Flow == domain.FlowPolishing {
-			verb = "打磨"
+			verb = "Gọt giũa"
 		}
 		return &Instruction{
 			Agent:   "writer",

@@ -3,6 +3,7 @@ package notify
 import (
 	"encoding/json"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -28,6 +29,9 @@ func TestAllowsFilter(t *testing.T) {
 }
 
 func TestCommandChannelEnvAndStdin(t *testing.T) {
+	if _, err := exec.LookPath("sh"); err != nil {
+		t.Skip("skipping test: sh not found on this system")
+	}
 	dir := t.TempDir()
 	envFile := filepath.Join(dir, "env.txt")
 	jsonFile := filepath.Join(dir, "stdin.json")
@@ -58,6 +62,9 @@ func TestCommandChannelEnvAndStdin(t *testing.T) {
 }
 
 func TestCommandChannelTimeoutKill(t *testing.T) {
+	if _, err := exec.LookPath("sh"); err != nil {
+		t.Skip("skipping test: sh not found on this system")
+	}
 	n := New("sleep 30", nil)
 	n.timeout = 200 * time.Millisecond
 

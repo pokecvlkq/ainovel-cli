@@ -10,7 +10,7 @@ import (
 // Event 是 TUI 消费的结构化事件。
 //
 // 对于 TOOL / DISPATCH 两类调用事件，同一次调用的开始与结束共用一个 ID：
-// 开始时先发 FinishedAt 为零值的事件（TUI 渲染为"进行中"样式）；
+// 开始时先发 FinishedAt 为零值的事件（TUI 渲染为"Đang xử lý"样式）；
 // 结束时再发一条同 ID 的事件，填入 FinishedAt + Duration（+ Failed），
 // TUI 按 ID 定位原行原地更新，避免"开始一行、完成又一行"的冗余。
 //
@@ -81,7 +81,7 @@ type UISnapshot struct {
 	BudgetLimitUSD        float64 // 预算上限（config budget.book_usd）；0 = 未启用
 
 	// 缓存诊断
-	OverallCacheCapable    bool // 至少一个 role 跑过支持 prompt cache 的模型（区分"未启用"和"0% 命中"）
+	OverallCacheCapable    bool // 至少一个 role 跑过支持 prompt cache 的模型（区分"Chưa bật"和"0% 命中"）
 	OverallRecentCacheRead int  // 滑动窗最近 N 次的 cacheRead 总和
 	OverallRecentInput     int  // 滑动窗最近 N 次的 input 总和
 	OverallRecentSamples   int  // 滑动窗内的样本数（≤ recentSampleCap）
@@ -142,7 +142,7 @@ type AgentSnapshot struct {
 //   - true  → 模型支持 prompt cache，0% 是 prompt 设计差或前缀不稳定，需要优化
 //   - false → 模型/provider 不支持 prompt cache，0% 是预期，不必排查
 //
-// Recent* 是滑动窗（最近 N 次调用）的命中数据，对比累计可识别"前期拖累"vs"稳态低命中"。
+// Recent* 是滑动窗（最近 N 次调用）的命中数据，对比累计可识别"Bị kéo lùi"vs"Trúng đích thấp"。
 type AgentCacheStat struct {
 	Role            string
 	Model           string

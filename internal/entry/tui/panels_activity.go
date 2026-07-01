@@ -13,7 +13,7 @@ import (
 
 // renderEventContent 将事件列表渲染为层次化事件流。
 // DISPATCH 作为顶级标题，子代理工具缩进显示，形成清晰的调度树。
-// spinnerFrame 用于给"进行中"的行渲染动态图标（跟 topbar spinner 同步）。
+// spinnerFrame 用于给"Đang xử lý"的行渲染动态图标（跟 topbar spinner 同步）。
 func renderEventContent(events []host.Event, width, spinnerFrame int) string {
 	var b strings.Builder
 	for i, ev := range events {
@@ -137,7 +137,7 @@ func renderEventLine(ev host.Event, width, spinnerFrame int) string {
 		return tsStr + " " + indent + icon + " " + sum
 
 	case ev.Category == "USER":
-		// 用户在输入框发送的 Steer / Continue 文本回显；与 SYSTEM 的 ⚙ 拉开形态，用 ✎ 暗示"输入"。
+		// 用户在输入框发送的 Steer / Continue 文本回显；与 SYSTEM 的 ⚙ 拉开形态，用 ✎ 暗示"Nhập vào"。
 		// 颜色用 colorAccent2（青绿）与 SYSTEM 的金色拉开，避免误读为系统消息。
 		icon := lipgloss.NewStyle().Foreground(colorAccent2).Bold(true).Render("✎")
 		sum := lipgloss.NewStyle().Foreground(colorAccent2).Render(truncate(ev.Summary, maxSumW))
@@ -267,7 +267,7 @@ func renderEventFlowViewport(vp viewport.Model, width, height int, focused bool)
 	if focused {
 		titleColor = colorAccent
 	}
-	title := lipgloss.NewStyle().Foreground(titleColor).Render(":: 事件流")
+	title := lipgloss.NewStyle().Foreground(titleColor).Render(":: Luồng sự kiện")
 	lineW := width - lipgloss.Width(title) - 4
 	if lineW < 0 {
 		lineW = 0
@@ -292,7 +292,7 @@ func renderStreamPanel(vp viewport.Model, width, height int, focused, running bo
 	// 分隔标题栏（始终醒目）：粗竖条前缀 + 永远 Bold + 强调色，避免与思考的淡灰斜体撞色
 	// focused 时额外下划线，区分焦点态。
 	titleStyle := lipgloss.NewStyle().Foreground(colorAccent).Bold(true).Underline(focused)
-	title := titleStyle.Render("▍实时输出")
+	title := titleStyle.Render("▍Output realtime")
 	if running {
 		status := renderStreamActivity(frame)
 		title += " " + status
@@ -307,7 +307,7 @@ func renderStreamPanel(vp viewport.Model, width, height int, focused, running bo
 	// viewport 内容（height 包含 header 行，viewport 实际高度需减 1）。
 	// 外层 vpStyle 不设 Foreground —— 章节正文颜色由 renderChapterBlock 内部的
 	// contentStyle 管（亮底深棕 / 暗底终端默认）。如果外层加 Foreground，亮底
-	// 主题下 agent 调度块（✻ 金色 + 青色 label）会被深棕"压"成普通正文色。
+	// 主题下 agent 调度块（✻ 金色 + 青色 label）会被深棕"Nén"成普通正文色。
 	vpH := height - 1
 	if vpH < 1 {
 		vpH = 1

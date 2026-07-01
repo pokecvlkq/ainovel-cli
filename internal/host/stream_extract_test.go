@@ -323,7 +323,7 @@ func TestExtract_DeeplyNested(t *testing.T) {
 // ── chunk 切在 utf-8 多字节中间 ──
 
 func TestExtract_ChunkSplitInUTF8(t *testing.T) {
-	// "中" 是 3 字节 (E4 B8 AD)。把切片大小定到 1，确保每个 byte 单独喂入。
+	// "Vừa" 是 3 字节 (E4 B8 AD)。把切片大小定到 1，确保每个 byte 单独喂入。
 	in := `{"goal":"中文测试"}`
 	whole := feedAll(t, "plan_chapter", in)
 	chunked := feedChunked(t, "plan_chapter", in, 1)
