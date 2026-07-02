@@ -1,6 +1,9 @@
 package tui
 
 import (
+	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -166,6 +169,66 @@ func (m Model) handleBaseKeyMsg(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	if msg.Type == tea.KeyRunes {
 		m.lastKeyAt = time.Now()
 	}
+
+	if m.mode == modeEditing {
+		switch msg.Type {
+		case tea.KeyCtrlS:
+			if m.editingPath != "" {
+				content := m.editor.Value()
+				err := os.WriteFile(m.editingPath, []byte(content), 0644)
+				if err != nil {
+					m.err = err
+				} else {
+					m.mode = modeRunning
+				}
+			}
+			return m, nil
+		case tea.KeyEsc:
+			m.mode = modeRunning
+			return m, nil
+		}
+		var cmd tea.Cmd
+		m.editor, cmd = m.editor.Update(msg)
+		return m, cmd
+	}
+
+	if m.mode == modeReviewing {
+		switch msg.Type {
+		case tea.KeyEsc:
+			m.mode = modeRunning
+			return m, nil
+		case tea.KeyRunes:
+			switch string(msg.Runes) {
+			case "a", "A":
+				// Approve -> just close review
+				m.mode = modeRunning
+				return m, nil
+			case "r", "R":
+				// Reject -> close review (actual reject logic needs Host integration)
+				m.mode = modeRunning
+				return m, nil
+			case "e", "E":
+				// Edit -> switch to modeEditing
+				m.mode = modeEditing
+				chapter := m.snapshot.InProgressChapter
+				if chapter == 0 {
+					chapter = m.snapshot.CompletedCount
+				}
+				m.editingPath = filepath.Join(m.outputDir(), fmt.Sprintf("chapters/%02d.md", chapter))
+				content, err := os.ReadFile(m.editingPath)
+				if err == nil {
+					m.editor.SetValue(string(content))
+				}
+				m.editor.Focus()
+				return m, nil
+			}
+		}
+		var cmd tea.Cmd
+		updated, cmd := m.reviewer.Update(msg)
+		m.reviewer = updated.(ReviewModel)
+		return m, cmd
+	}
+
 	switch msg.Type {
 	case tea.KeyEscape:
 		if m.mode == modeRunning && m.snapshot.IsRunning {
@@ -180,6 +243,54 @@ func (m Model) handleBaseKeyMsg(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	case tea.KeyCtrlL:
 		m.resetOutputPanels()
 		return m, nil
+	case tea.KeyCtrlD:
+		if m.mode != modeReviewing {
+			chapter := m.snapshot.InProgressChapter
+			if chapter == 0 {
+				chapter = m.snapshot.CompletedCount
+			}
+			if chapter == 0 {
+				return m, nil
+			}
+			m.mode = modeReviewing
+			m.err = nil
+			draftPath := filepath.Join(m.outputDir(), fmt.Sprintf("drafts/%02d.draft.md", chapter))
+			finalPath := filepath.Join(m.outputDir(), fmt.Sprintf("chapters/%02d.md", chapter))
+			
+			oldText, _ := os.ReadFile(draftPath)
+			newText, _ := os.ReadFile(finalPath)
+			
+			m.reviewer.SetDiff(string(oldText), string(newText))
+			return m, nil
+		}
+	case tea.KeyCtrlE:
+		if m.mode != modeEditing {
+			chapter := m.snapshot.InProgressChapter
+			if chapter == 0 {
+				chapter = m.snapshot.CompletedCount
+			}
+			if chapter == 0 {
+				return m, nil // Không có chương nào
+			}
+			m.mode = modeEditing
+			m.err = nil
+			m.editingPath = filepath.Join(m.outputDir(), fmt.Sprintf("chapters/%02d.md", chapter))
+			content, err := os.ReadFile(m.editingPath)
+			if err != nil {
+				m.editingPath = filepath.Join(m.outputDir(), fmt.Sprintf("chapters/%02d.txt", chapter))
+				content, err = os.ReadFile(m.editingPath)
+				if err != nil {
+					m.editor.SetValue("")
+					m.err = fmt.Errorf("Chưa có nội dung chương %d", chapter)
+				} else {
+					m.editor.SetValue(string(content))
+				}
+			} else {
+				m.editor.SetValue(string(content))
+			}
+			m.editor.Focus()
+			return m, nil
+		}
 	case tea.KeyCtrlU:
 		// 清空当前输入；同时退出历史浏览态。
 		m.textarea.Reset()

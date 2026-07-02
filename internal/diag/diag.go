@@ -132,7 +132,15 @@ func buildStats(snap *Snapshot) Stats {
 func sortFindings(findings []Finding) {
 	order := map[Severity]int{SevCritical: 0, SevWarning: 1, SevInfo: 2}
 	sort.SliceStable(findings, func(i, j int) bool {
-		return order[findings[i].Severity] < order[findings[j].Severity]
+		pI, okI := order[findings[i].Severity]
+		if !okI {
+			pI = 99
+		}
+		pJ, okJ := order[findings[j].Severity]
+		if !okJ {
+			pJ = 99
+		}
+		return pI < pJ
 	})
 }
 

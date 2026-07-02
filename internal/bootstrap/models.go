@@ -307,17 +307,22 @@ type failoverModel struct {
 
 func (m *failoverModel) Generate(ctx context.Context, messages []agentcore.Message, tools []agentcore.ToolSpec, opts ...agentcore.CallOption) (*agentcore.LLMResponse, error) {
 	current := m.currentTarget()
-	resp, err := current.model.Generate(ctx, messages, tools, opts...)
-	if err == nil {
-		return resp, nil
-	}
+	tried := map[modelTarget]bool{current: true}
 
-	next, reason, ok := m.pickFallback(current, err)
-	if !ok {
-		return nil, err
+	for {
+		resp, err := current.model.Generate(ctx, messages, tools, opts...)
+		if err == nil {
+			return resp, nil
+		}
+
+		next, reason, ok := m.pickNextFallback(tried, err)
+		if !ok {
+			return nil, err
+		}
+		m.reportFailover(current, next, reason, err)
+		current = next
+		tried[current] = true
 	}
-	m.reportFailover(current, next, reason, err)
-	return next.model.Generate(ctx, messages, tools, opts...)
 }
 
 func (m *failoverModel) GenerateStream(ctx context.Context, messages []agentcore.Message, tools []agentcore.ToolSpec, opts ...agentcore.CallOption) (<-chan agentcore.StreamEvent, error) {
@@ -327,18 +332,16 @@ func (m *failoverModel) GenerateStream(ctx context.Context, messages []agentcore
 		defer close(out)
 
 		current := m.currentTarget()
-		fallbackUsed := false
+		tried := map[modelTarget]bool{current: true}
 
 	retry:
 		source, resp, err := m.startAttempt(ctx, current, messages, tools, opts...)
 		if err != nil {
-			if !fallbackUsed {
-				if next, reason, ok := m.pickFallback(current, err); ok {
-					fallbackUsed = true
-					m.reportFailover(current, next, reason, err)
-					current = next
-					goto retry
-				}
+			if next, reason, ok := m.pickNextFallback(tried, err); ok {
+				m.reportFailover(current, next, reason, err)
+				current = next
+				tried[current] = true
+				goto retry
 			}
 			out <- agentcore.StreamEvent{Type: agentcore.StreamEventError, Err: err}
 			return
@@ -356,11 +359,11 @@ func (m *failoverModel) GenerateStream(ctx context.Context, messages []agentcore
 		for ev := range source {
 			switch ev.Type {
 			case agentcore.StreamEventError:
-				if ev.Err != nil && !forwarded && !fallbackUsed {
-					if next, reason, ok := m.pickFallback(current, ev.Err); ok {
-						fallbackUsed = true
+				if ev.Err != nil && !forwarded {
+					if next, reason, ok := m.pickNextFallback(tried, ev.Err); ok {
 						m.reportFailover(current, next, reason, ev.Err)
 						current = next
+						tried[current] = true
 						goto retry
 					}
 				}
@@ -409,8 +412,8 @@ func (m *failoverModel) currentTarget() modelTarget {
 	}
 }
 
-func (m *failoverModel) pickFallback(current modelTarget, err error) (modelTarget, string, bool) {
-	if err == nil || current.model == nil {
+func (m *failoverModel) pickNextFallback(tried map[modelTarget]bool, err error) (modelTarget, string, bool) {
+	if err == nil {
 		return modelTarget{}, "", false
 	}
 	if errors.Is(err, context.Canceled) {
@@ -422,7 +425,7 @@ func (m *failoverModel) pickFallback(current modelTarget, err error) (modelTarge
 	}
 	reason := agentcore.FailoverReason(err)
 	for _, target := range m.fallbacks {
-		if target.provider == current.provider && target.name == current.name {
+		if tried[target] {
 			continue
 		}
 		if target.model == nil {

@@ -6,6 +6,7 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"github.com/charmbracelet/bubbles/progress"
 	"github.com/charmbracelet/bubbles/textarea"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
@@ -41,6 +42,8 @@ const (
 	modeNew     appMode = iota // 等待用户输入小说需求
 	modeRunning                // 正在创作（包括出错停止，输入可恢复）
 	modeDone                   // 创作完成
+	modeEditing                // Đang chỉnh sửa văn bản
+	modeReviewing              // Giao diện duyệt bản thảo
 )
 
 // 顶栏 / 流式活动共用的 spinner 帧序列（bubbles.Spinner.MiniDot）。
@@ -75,9 +78,13 @@ type Model struct {
 	streamVP       viewport.Model   // 流式输出 viewport
 	detailVP       viewport.Model   // 右侧详情 viewport
 	stateVP        viewport.Model   // 左侧状态侧栏 viewport（可滚动）
+	prog           progress.Model   // Thanh tiến trình
 	streamBuf      *strings.Builder // 流式文本累积缓冲
 	streamRounds   []string
 	textarea       textarea.Model
+	editor         textarea.Model // Trình soạn thảo văn bản
+	editingPath    string         // Đường dẫn file đang chỉnh sửa
+	reviewer       ReviewModel    // Giao diện duyệt bản thảo
 	width          int
 	height         int
 	autoScroll     bool
@@ -110,16 +117,16 @@ func NewModel(rt *host.Host, bridge *askUserBridge, version string) Model {
 	ta := textarea.New()
 	ta.Placeholder = placeholderForNewMode(startupModeQuick)
 	ta.CharLimit = 5000
-	ta.SetHeight(1)
-	// MaxHeight=6 让超长输入按宽度自动 wrap 显示成多行（视觉上限 6 行）。
-	ta.MaxHeight = 6
-	ta.ShowLineNumbers = false
+	ta.SetHeight(5)
 	ta.Focus()
 
-	// 默认 Enter 不换行（由 handleEnterKey 提交）；
-	// 主动换行重绑到 ctrl+j（unix \n）和 alt+enter（GUI 习惯）。
-	// 终端协议层无法区分 Shift+Enter 与 Enter，所以不支持 Shift+Enter。
-	ta.KeyMap.InsertNewline.SetKeys("ctrl+j", "alt+enter")
+	editor := textarea.New()
+	editor.Placeholder = "Bắt đầu soạn thảo..."
+	editor.Prompt = ""
+	editor.CharLimit = 0
+	editor.ShowLineNumbers = true
+
+	rm := NewReviewModel()
 
 	vp := viewport.New(80, 20)
 	vp.SetContent("")
@@ -133,6 +140,8 @@ func NewModel(rt *host.Host, bridge *askUserBridge, version string) Model {
 	stvp := viewport.New(32, 20)
 	stvp.SetContent("")
 
+	prog := progress.New(progress.WithDefaultGradient())
+
 	return Model{
 		runtime:      rt,
 		askBridge:    bridge,
@@ -142,10 +151,14 @@ func NewModel(rt *host.Host, bridge *askUserBridge, version string) Model {
 		mode:         modeNew,
 		startupMode:  startupModeQuick,
 		textarea:     ta,
+		editor:       editor,
+		reviewer:     rm,
+		events:       nil,
 		viewport:     vp,
 		streamVP:     svp,
 		detailVP:     dvp,
 		stateVP:      stvp,
+		prog:         prog,
 		streamBuf:    &strings.Builder{},
 		eventIndex:   make(map[string]int),
 	}
@@ -195,8 +208,8 @@ func (m *Model) paneAtMouse(x, y int) (focusPane, bool) {
 		return focusState, true
 	}
 
-	eventH, _ := m.splitHeights(bodyH)
-	if y-bodyStartY < eventH {
+	dashboardH, eventH, _ := m.splitHeights(bodyH)
+	if y-bodyStartY < dashboardH+eventH {
 		return focusEvents, true
 	}
 	return focusStream, true
@@ -284,7 +297,7 @@ func (m *Model) updateViewportSize() {
 	centerW := m.eventFlowWidth()
 	rightW := m.detailWidth()
 	bodyH := m.bodyHeight()
-	eventH, streamH := m.splitHeights(bodyH)
+	_, eventH, streamH := m.splitHeights(bodyH)
 	m.viewport.Width = centerW - 2
 	m.viewport.Height = eventH - 1 // -1 为 event panel header 行
 	m.streamVP.Width = centerW - 2
@@ -296,13 +309,20 @@ func (m *Model) updateViewportSize() {
 	m.stateVP.Height = max(1, bodyH-2) // -2 为状态栏 Padding(1,1) 的上下留白
 }
 
-// splitHeights 计算事件流和流式输出的高度分配。
-func (m *Model) splitHeights(bodyH int) (eventH, streamH int) {
-	eventH = bodyH * 40 / 100
+// splitHeights 计算各个面板的高度分配。
+func (m *Model) splitHeights(bodyH int) (dashboardH, eventH, streamH int) {
+	dashboardH = 4 // Height of dashboard panel
+	remainingH := bodyH - dashboardH
+	if remainingH < 6 {
+		dashboardH = 0
+		remainingH = bodyH
+	}
+
+	eventH = remainingH * 40 / 100
 	if eventH < 3 {
 		eventH = 3
 	}
-	streamH = bodyH - eventH - 1 // -1 为分隔线
+	streamH = remainingH - eventH - 1 // -1 为分隔线
 	if streamH < 3 {
 		streamH = 3
 	}
@@ -593,6 +613,31 @@ func (m Model) View() string {
 	if m.width == 0 || m.height == 0 {
 		return "Đang tải..."
 	}
+	if m.mode == modeEditing {
+		box := lipgloss.NewStyle().
+			Border(lipgloss.RoundedBorder()).
+			BorderForeground(lipgloss.Color("62")).
+			Padding(1, 1).
+			Width(m.width - 2).
+			Height(m.height - 2)
+		m.editor.SetWidth(m.width - 4)
+		m.editor.SetHeight(m.height - 4)
+
+		return box.Render(m.editor.View())
+	}
+
+	if m.mode == modeReviewing {
+		box := lipgloss.NewStyle().
+			Border(lipgloss.RoundedBorder()).
+			BorderForeground(lipgloss.Color("214")). // Orange border for review
+			Padding(1, 1).
+			Width(m.width - 2).
+			Height(m.height - 2)
+		m.reviewer.SetSize(m.width-4, m.height-4)
+
+		return box.Render(m.reviewer.View())
+	}
+
 	if m.width < 100 {
 		return lipgloss.NewStyle().
 			Width(m.width).Height(m.height).
@@ -634,7 +679,7 @@ func (m Model) View() string {
 		leftW := m.sidebarWidth()
 		rightW := m.detailWidth()
 		centerW := m.width - leftW - rightW
-		eventH, streamH := m.splitHeights(bodyH)
+		dashboardH, eventH, streamH := m.splitHeights(bodyH)
 
 		if m.viewport.Width != centerW-2 || m.viewport.Height != eventH-1 {
 			m.viewport.Width = centerW - 2
@@ -645,9 +690,17 @@ func (m Model) View() string {
 			m.streamVP.Height = streamH - 1 // -1 为 stream panel header 行
 		}
 
-		eventFlow := renderEventFlowViewport(m.viewport, centerW, eventH, m.paneHighlighted(focusEvents))
-		streamPanel := renderStreamPanel(m.streamVP, centerW, streamH, m.paneHighlighted(focusStream), m.snapshot.IsRunning || m.starting, m.spinnerIdx)
-		center := lipgloss.JoinVertical(lipgloss.Left, eventFlow, streamPanel)
+		var center string
+		if dashboardH > 0 {
+			dashboard := renderAgentDashboard(m.snapshot, m.prog, centerW, m.toolSpinnerIdx)
+			eventFlow := renderEventFlowViewport(m.viewport, centerW, eventH, m.paneHighlighted(focusEvents))
+			streamPanel := renderStreamPanel(m.streamVP, centerW, streamH, m.paneHighlighted(focusStream), m.snapshot.IsRunning || m.starting, m.spinnerIdx)
+			center = lipgloss.JoinVertical(lipgloss.Left, dashboard, eventFlow, streamPanel)
+		} else {
+			eventFlow := renderEventFlowViewport(m.viewport, centerW, eventH, m.paneHighlighted(focusEvents))
+			streamPanel := renderStreamPanel(m.streamVP, centerW, streamH, m.paneHighlighted(focusStream), m.snapshot.IsRunning || m.starting, m.spinnerIdx)
+			center = lipgloss.JoinVertical(lipgloss.Left, eventFlow, streamPanel)
+		}
 
 		left := renderStatePanel(m.stateVP, leftW, bodyH, m.paneHighlighted(focusState))
 		right := renderDetailPanel(m.detailVP, rightW, bodyH, m.paneHighlighted(focusDetail))

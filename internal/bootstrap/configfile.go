@@ -218,7 +218,11 @@ func cloneMap(m map[string]any) map[string]any {
 	}
 	c := make(map[string]any, len(m))
 	for k, v := range m {
-		c[k] = v
+		if subMap, ok := v.(map[string]any); ok {
+			c[k] = cloneMap(subMap)
+		} else {
+			c[k] = v
+		}
 	}
 	return c
 }
@@ -289,8 +293,11 @@ func WriteStartupError(msg string) string {
 	if err != nil {
 		return ""
 	}
-	defer f.Close()
 	if _, err := fmt.Fprintf(f, "[%s] %s\n", time.Now().Format(time.RFC3339), msg); err != nil {
+		_ = f.Close()
+		return ""
+	}
+	if err := f.Close(); err != nil {
 		return ""
 	}
 	return path
