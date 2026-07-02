@@ -256,10 +256,10 @@ func (m Model) handleBaseKeyMsg(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			m.err = nil
 			draftPath := filepath.Join(m.outputDir(), fmt.Sprintf("drafts/%02d.draft.md", chapter))
 			finalPath := filepath.Join(m.outputDir(), fmt.Sprintf("chapters/%02d.md", chapter))
-			
+
 			oldText, _ := os.ReadFile(draftPath)
 			newText, _ := os.ReadFile(finalPath)
-			
+
 			m.reviewer.SetDiff(string(oldText), string(newText))
 			return m, nil
 		}

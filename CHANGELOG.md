@@ -2,6 +2,17 @@
 
 Tất cả những thay đổi nổi bật đối với dự án AINovel CLI sẽ được ghi chép tại đây.
 
+## [v1.1.0] - 2026-07-02
+
+### Thêm mới (Added)
+- **Giao diện Web App (Wails GUI)**: Ra mắt phiên bản GUI thay thế/bổ sung cho TUI cũ, cung cấp giao diện trực quan và chuyên nghiệp hơn.
+- **Frontend React 18 & Tailwind CSS v4**: Xây dựng UI hiện đại với các tính năng Dark Mode, Editor tích hợp Markdown (Monaco), và Split View để Review nội dung.
+- **Wails Bindings Layer**: Tích hợp chặt chẽ giữa Go Backend (`host.Host`) và React Frontend thông qua Event Bridge, cho phép theo dõi log, token stream và trạng thái các Agents (Architect, Writer, Editor) theo thời gian thực.
+- **Quản lý cấu hình trực quan**: Hỗ trợ thay đổi model, cấu hình API Key và tham số ứng dụng ngay từ giao diện Settings của GUI.
+
+### Thay đổi (Changed)
+- **Cấu trúc dự án**: Chuyển đổi kiến trúc sang Wails project (`app.go`, `wails.json`, thư mục `frontend/`), biến TUI cũ thành phiên bản chạy nền (headless) hoặc CLI độc lập.
+
 ## [v1.0.0] - 2026-07-02
 
 ### Thêm mới (Added)

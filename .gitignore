@@ -43,3 +43,10 @@ tasks
 refer/
 output*
 workspace/
+
+# Wails and Frontend Ignore
+frontend/node_modules/
+frontend/dist/
+build/bin/
+frontend/wailsjs/
+wails.json~

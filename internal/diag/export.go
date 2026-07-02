@@ -28,7 +28,12 @@ func WriteExport(s *store.Store, rep Report, rc RuntimeCapture) (string, error) 
 	if err := os.MkdirAll(filepath.Dir(abs), 0o755); err != nil {
 		return "", err
 	}
-	if err := os.WriteFile(abs, data, 0o644); err != nil {
+	tmp := abs + ".tmp"
+	if err := os.WriteFile(tmp, data, 0o644); err != nil {
+		return "", err
+	}
+	if err := os.Rename(tmp, abs); err != nil {
+		os.Remove(tmp)
 		return "", err
 	}
 	return abs, nil

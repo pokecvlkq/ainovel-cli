@@ -29,13 +29,13 @@ func renderEditorScreen(width, height int, ed textarea.Model, err error) string 
 
 	// Nội dung
 	ed.SetWidth(width)
-	
+
 	// Tính toán chiều cao khả dụng
 	availHeight := height - lipgloss.Height(header)
 	if errBox != "" {
 		availHeight -= lipgloss.Height(errBox)
 	}
-	
+
 	ed.SetHeight(availHeight)
 
 	// Hiển thị

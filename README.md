@@ -173,6 +173,23 @@ ToolResultMicrocompact → LightTrim → StoreSummaryCompact → FullSummary
 
 ## Bắt đầu nhanh
 
+Dự án cung cấp 2 phiên bản: **CLI (Giao diện dòng lệnh)** và **GUI (Giao diện Web App thân thiện)**.
+
+### 1. Phiên bản GUI (Khuyên dùng)
+Giao diện trực quan, dễ thao tác, hỗ trợ Dark mode, Monaco Editor, và giám sát Agent theo thời gian thực.
+- **Cách sử dụng:** Khởi động file `ainovel-gui.exe`. Giao diện Web UI sẽ tự động mở lên, cho phép bạn thiết lập API Key, chọn Model và bắt đầu sáng tác một dự án tiểu thuyết mới.
+- **Tải sẵn:** Tải file `ainovel-gui.exe` (Windows) hoặc bản build tương ứng tại trang [Releases](https://github.com/voocel/ainovel-cli/releases/latest).
+- **Build từ source:** Cần cài đặt [Go](https://go.dev/) và [Node.js](https://nodejs.org/).
+  ```bash
+  # Cài đặt Wails CLI
+  go install github.com/wailsapp/wails/v2/cmd/wails@latest
+  
+  # Build ứng dụng GUI (Windows)
+  wails build
+  ```
+
+### 2. Phiên bản CLI
+Phù hợp chạy nền (headless), trên server, hoặc qua Docker.
 ```bash
 # Cài đặt tự động (macOS / Linux, không cần Go)
 curl -fsSL https://raw.githubusercontent.com/voocel/ainovel-cli/main/scripts/install.sh | sh

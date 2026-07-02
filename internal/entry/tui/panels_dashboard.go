@@ -16,7 +16,7 @@ func renderAgentDashboard(snap host.UISnapshot, prog progress.Model, width, spin
 	}
 	// Cấu hình 4 agents chính
 	agents := []string{"coordinator", "architect", "writer", "editor"}
-	
+
 	var cards []string
 	cardWidth := (width - 6) / 4 // 4 cards with some padding/gap
 
@@ -41,14 +41,14 @@ func renderAgentDashboard(snap host.UISnapshot, prog progress.Model, width, spin
 func renderAgentCard(agentName string, snap *host.AgentSnapshot, prog progress.Model, width, spinnerFrame int, uiSnap host.UISnapshot) string {
 	// Lấy màu đặc trưng của Agent
 	agentColor := eventAgentColor(agentName)
-	
+
 	// Icon và Name
 	titleStyle := lipgloss.NewStyle().Foreground(agentColor).Bold(true)
 	nameLabel := agentDisplayName(agentName)
-	
+
 	var stateIcon, stateLabel string
 	var stateColor lipgloss.AdaptiveColor
-	
+
 	if snap == nil || snap.State == "idle" {
 		stateIcon = "○"
 		stateLabel = "Chờ lệnh"
@@ -61,7 +61,7 @@ func renderAgentCard(agentName string, snap *host.AgentSnapshot, prog progress.M
 			stateIcon = runningSpinner(spinnerFrame)
 		}
 	}
-	
+
 	header := titleStyle.Render(nameLabel) + " " + lipgloss.NewStyle().Foreground(stateColor).Render(stateIcon+" "+stateLabel)
 
 	// Lấy Task hiện tại
@@ -75,7 +75,7 @@ func renderAgentCard(agentName string, snap *host.AgentSnapshot, prog progress.M
 	}
 
 	body := lipgloss.NewStyle().Foreground(colorMuted).Render(taskDesc)
-	
+
 	// Riêng Writer thì hiển thị thanh tiến trình
 	footer := ""
 	if agentName == "writer" {

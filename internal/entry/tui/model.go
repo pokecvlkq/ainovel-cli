@@ -39,11 +39,11 @@ const (
 type appMode int
 
 const (
-	modeNew     appMode = iota // 等待用户输入小说需求
-	modeRunning                // 正在创作（包括出错停止，输入可恢复）
-	modeDone                   // 创作完成
-	modeEditing                // Đang chỉnh sửa văn bản
-	modeReviewing              // Giao diện duyệt bản thảo
+	modeNew       appMode = iota // 等待用户输入小说需求
+	modeRunning                  // 正在创作（包括出错停止，输入可恢复）
+	modeDone                     // 创作完成
+	modeEditing                  // Đang chỉnh sửa văn bản
+	modeReviewing                // Giao diện duyệt bản thảo
 )
 
 // 顶栏 / 流式活动共用的 spinner 帧序列（bubbles.Spinner.MiniDot）。
