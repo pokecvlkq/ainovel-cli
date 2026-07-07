@@ -437,6 +437,13 @@ func (m *failoverModel) pickNextFallback(tried map[modelTarget]bool, err error) 
 			if reason == "" {
 				reason = "quota"
 			}
+		} else if strings.Contains(msg, "high demand") ||
+			strings.Contains(msg, "spikes in demand") ||
+			strings.Contains(msg, "temporary") {
+			eligible = true
+			if reason == "" {
+				reason = "overloaded"
+			}
 		}
 	}
 
