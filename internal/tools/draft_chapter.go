@@ -49,7 +49,7 @@ func (t *DraftChapterTool) Schema() map[string]any {
 // litellm chuyển trực tiếp trường strict; các backend như OpenAI / xAI hỗ trợ tính năng này sẽ thi hành một cách bắt buộc, các backend khác
 // sẽ bỏ qua các trường chưa biết theo quy ước HTTP/JSON. Anthropic/Gemini/Bedrock thực hiện luồng chuyển đổi riêng
 // tất nhiên sẽ không thấy trường này.
-func (t *DraftChapterTool) StrictSchema() bool { return true }
+func (t *DraftChapterTool) StrictSchema() bool { return false }
 
 func (t *DraftChapterTool) Execute(_ context.Context, args json.RawMessage) (json.RawMessage, error) {
 	var a struct {
