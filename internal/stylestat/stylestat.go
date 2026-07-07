@@ -74,16 +74,16 @@ var patternDefs = []struct {
 	name string
 	re   *regexp.Regexp
 }{
-	{"矫正句『不是…(而)是…』", regexp.MustCompile(`不是[^。！？\n]{1,24}?[，、]?(?:而)?是`)},
-	{"计时量词『X息/X瞬』", regexp.MustCompile(`[一两二三四五六七八九十几数半][息瞬]`)},
-	{"明喻『像一/仿佛/如同/宛如』", regexp.MustCompile(`像一|仿佛|如同|宛如`)},
-	{"沉默节拍『沉默了/没有说话/没有回头』", regexp.MustCompile(`沉默了|没有说话|没有回头`)},
+	{"Câu chỉnh hướng『không phải… mà là…』", regexp.MustCompile(`(?i)không phải[^。！？\n]{1,50}?[，、]?(?:mà là|mà lại|là)`)},
+	{"Từ chỉ thời gian nhanh『nhịp thở/khoảnh khắc』", regexp.MustCompile(`(?i)[0-9一二三四五六七八九十数vài]+\s*(?:nhịp thở|phút|giây|khoảnh khắc|sát na)`)},
+	{"So sánh tu từ『như một/giống như/tựa như』", regexp.MustCompile(`(?i)như một|giống như|tựa như|phảng phất|như thể|tựa hồ`)},
+	{"Tiết tấu im lặng『im lặng/không nói gì/không ngoảnh lại』", regexp.MustCompile(`(?i)im lặng|không nói gì|không quay đầu|không ngoảnh lại|trầm mặc`)},
 }
 
 var (
 	sentenceSplit = regexp.MustCompile(`[。！？\n]+`)
-	openingTimeRe = regexp.MustCompile(`夜|清晨|黎明|天亮|醒来|晨光|一整夜`)
-	titlePrefixRe = regexp.MustCompile(`^#{0,2}\s*第[零〇一二三四五六七八九十百千万\d]+章`)
+	openingTimeRe = regexp.MustCompile(`(?i)đêm|tối|đêm qua|sáng|sáng sớm|bình minh|rạng đông|hừng đông|tỉnh dậy|thức dậy|ánh mai|ánh bình minh`)
+	titlePrefixRe = regexp.MustCompile(`^#{0,2}\s*Chương\s*(?:[零〇一二三四五六七八九十百千万\d]+|\d+)`)
 )
 
 // shortEndingRunes 末行不超过此字数计为"短结尾"。

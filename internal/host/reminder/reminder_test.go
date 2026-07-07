@@ -105,7 +105,7 @@ func TestStopGuard_DefaultBlockMessageAllowsCoordinatorJudgmentWhenNoRoute(t *te
 	if strings.Contains(decision.InjectMessage, "[Host ra chỉ thị]") {
 		t.Fatalf("no-route inject should not tell coordinator to wait for Host, got %q", decision.InjectMessage)
 	}
-	if !strings.Contains(decision.InjectMessage, "裁定场景") {
+	if !strings.Contains(decision.InjectMessage, "chờ đánh giá") {
 		t.Fatalf("no-route inject should mention coordinator judgment, got %q", decision.InjectMessage)
 	}
 }

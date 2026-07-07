@@ -83,10 +83,11 @@ func (t *SaveReviewTool) Execute(_ context.Context, args json.RawMessage) (json.
 
 	if r.Verdict == "accept" {
 		// Kiểm tra trạng thái contract
-		if r.ContractStatus == "missed" {
+		switch r.ContractStatus {
+		case "missed":
 			finalVerdict = "rewrite"
 			escalationReason = "Trạng thái hợp đồng là missed, nâng cấp lên viết lại (rewrite)"
-		} else if r.ContractStatus == "partial" {
+		case "partial":
 			finalVerdict = "polish"
 			escalationReason = "Trạng thái hợp đồng là partial, nâng cấp lên đánh bóng (polish)"
 		}

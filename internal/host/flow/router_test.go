@@ -224,7 +224,7 @@ func TestRoute_ArcEndNonLayeredSkipsBoundary(t *testing.T) {
 
 func TestFormatMessage(t *testing.T) {
 	msg := FormatMessage(&Instruction{Agent: "writer", Task: "Viết chương 5", Reason: "Viết tiếp"})
-	for _, want := range []string{"[Host ra chỉ thị]", "subagent(writer, \"Viết chương 5\")", "agent: writer", "task: \"Viết chương 5\"", "Viết tiếp", "必须原样使用", "不要改写 task", "不要先调 novel_context"} {
+	for _, want := range []string{"[Host ra chỉ thị]", "subagent(writer, \"Viết chương 5\")", "agent: writer", "task: \"Viết chương 5\"", "Viết tiếp", "phải được sử dụng nguyên văn", "không được viết lại task", "không được gọi novel_context trước"} {
 		if !contains(msg, want) {
 			t.Errorf("message missing %q: %s", want, msg)
 		}
@@ -272,7 +272,7 @@ func TestFormatDispatchMessage_RepeatNotice(t *testing.T) {
 		t.Fatalf("首次下达不应附加重复注记: %s", first)
 	}
 	third := formatDispatchMessage(inst, 3)
-	for _, want := range []string{"第 3 次下达", "路由事实未变化", "novel_context", "改派"} {
+	for _, want := range []string{"Ban hành lần thứ 3", "liên tục 3 lần", "novel_context", "phân công lại"} {
 		if !contains(third, want) {
 			t.Errorf("重复注记缺少 %q: %s", want, third)
 		}

@@ -441,7 +441,7 @@ func TestContextToolSelectedMemoryRecallsStoryThreadsAndReviewLessons(t *testing
 	}
 	if err := s.Outline.SaveOutline([]domain.OutlineEntry{
 		{Chapter: 1, Title: "Lời mời", CoreEvent: "Trưởng lão âm thầm đưa ra thư mời thử thách nội môn", Scenes: []string{"Mật đàm", "Để lại lệnh bài thử thách"}},
-		{Chapter: 2, Title: "Đêm trước thử thách", CoreEvent: "Lâm Nghiên chuẩn bị hồi đáp thư mời thử thách nội môn", Hook: "Ai đứng sau thúc đẩy thử thách này", Scenes: []string{"Sắp xếp manh mối", "Quyết định phó ước"}},
+		{Chapter: 2, Title: "Đêm trước thư mời", CoreEvent: "Lâm Nghiên chuẩn bị hồi đáp thư mời của trưởng lão", Hook: "Ai đứng sau thúc đẩy việc này", Scenes: []string{"Sắp xếp manh mối", "Quyết định phó ước"}},
 	}); err != nil {
 		t.Fatalf("SaveOutline: %v", err)
 	}
@@ -461,11 +461,11 @@ func TestContextToolSelectedMemoryRecallsStoryThreadsAndReviewLessons(t *testing
 	}
 	if err := s.Drafts.SaveChapterPlan(domain.ChapterPlan{
 		Chapter: 2,
-		Title:   "Đêm trước thử thách",
-		Goal:    "Quyết định xem có nên nhận lời mời không",
+		Title:   "Đêm trước thư mời",
+		Goal:    "Quyết định xem có nên nhận thư mời không",
 		Contract: domain.ChapterContract{
-			PayoffPoints: []string{"Hồi đáp thư mời thử thách nội môn"},
-			HookGoal:     "Mở ra vấn đề ai đứng sau thúc đẩy thử thách",
+			PayoffPoints: []string{"Hồi đáp thư mời của trưởng lão"},
+			HookGoal:     "Mở ra vấn đề ai đứng sau thúc đẩy việc này",
 		},
 	}); err != nil {
 		t.Fatalf("SaveChapterPlan: %v", err)
@@ -523,10 +523,10 @@ func TestContextToolSelectedMemoryRecallsStoryThreadsAndReviewLessons(t *testing
 	if containsRecallSummary(payload.Selected.StoryThreads, "Đề nghị xem lại chương") {
 		t.Fatalf("expected related_chapters not to be duplicated into story_threads, got %+v", payload.Selected.StoryThreads)
 	}
-	if !containsRecallSummary(payload.Selected.ReviewLessons, "bỏ sót contract") {
+	if !containsRecallSummary(payload.Selected.ReviewLessons, "thiếu sót hợp đồng") {
 		t.Fatalf("expected review lesson recall to mention contract miss, got %+v", payload.Selected.ReviewLessons)
 	}
-	if !strings.Contains(payload.Summary, "Gợi nhớ manh mối:") || !strings.Contains(payload.Summary, "Gợi nhớ đánh giá:") {
+	if !strings.Contains(payload.Summary, "Thu hồi manh mối:") || !strings.Contains(payload.Summary, "Thu hồi đánh giá:") {
 		t.Fatalf("expected loading summary to report selected memory, got %q", payload.Summary)
 	}
 }
@@ -587,7 +587,7 @@ func TestContextToolSelectedMemorySurfacesAgingForeshadow(t *testing.T) {
 	if !containsRecallSummary(payload.Selected.StoryThreads, "huyết mạch thất lạc") {
 		t.Fatalf("expected second aging foreshadow to surface, got %+v", payload.Selected.StoryThreads)
 	}
-	if !containsRecallSummary(payload.Selected.StoryThreads, "Chưa thu hồi") {
+	if !containsRecallSummary(payload.Selected.StoryThreads, "chưa thu hồi") {
 		t.Fatalf("expected aging item to carry overdue annotation, got %+v", payload.Selected.StoryThreads)
 	}
 	// Phục bút gần đây (thời gian tồn tại <30 và không liên quan) không nên được điền lại.
@@ -698,7 +698,7 @@ func TestContextToolFallsBackToFullForeshadowWhenSelectionIsTooSparse(t *testing
 	}
 	if err := s.Outline.SaveOutline([]domain.OutlineEntry{
 		{Chapter: 1, Title: "Lời mời", CoreEvent: "Trưởng lão âm thầm đưa ra thư mời thử thách nội môn"},
-		{Chapter: 2, Title: "Đêm trước thử thách", CoreEvent: "Lâm Nghiên chuẩn bị hồi đáp thư mời thử thách nội môn", Scenes: []string{"Sắp xếp manh mối", "Quyết định phó ước"}},
+		{Chapter: 2, Title: "Đêm trước lúc đi xa", CoreEvent: "Lâm Nghiên suy nghĩ về tương lai và cuộc sống bình dị", Scenes: []string{"Sắp xếp hành lý", "Quyết định phó ước"}},
 	}); err != nil {
 		t.Fatalf("SaveOutline: %v", err)
 	}

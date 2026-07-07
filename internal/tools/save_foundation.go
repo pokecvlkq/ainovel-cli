@@ -232,9 +232,10 @@ func (t *SaveFoundationTool) Execute(_ context.Context, args json.RawMessage) (j
 
 	// checkpoint
 	scope := domain.GlobalScope()
-	if a.Type == "expand_arc" {
+	switch a.Type {
+	case "expand_arc":
 		scope = domain.ArcScope(a.Volume, a.Arc)
-	} else if a.Type == "append_volume" {
+	case "append_volume":
 		scope = domain.GlobalScope()
 	}
 	if _, err := t.store.Checkpoints.AppendArtifact(scope, a.Type, foundationArtifact(a.Type)); err != nil {

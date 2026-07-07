@@ -17,7 +17,7 @@ func TestComputeBelowMinChapters(t *testing.T) {
 }
 
 func TestComputePatterns(t *testing.T) {
-	body := "他不是愤怒，而是恐惧。沉默了几息。像一盏灯。\n正文。\n"
+	body := "Hắn không phải do dự, mà là sợ hãi. Trầm mặc vài nhịp thở. Như một đạo ánh sáng.\nChính văn。\n"
 	chapters := make([]string, 6)
 	for i := range chapters {
 		chapters[i] = chapterWith(body)
@@ -27,10 +27,10 @@ func TestComputePatterns(t *testing.T) {
 		t.Fatal("expected stats")
 	}
 	want := map[string]int{
-		"矫正句『不是…(而)是…』":       6,
-		"计时量词『X息/X瞬』":         6,
-		"明喻『像一/仿佛/如同/宛如』":     6,
-		"沉默节拍『沉默了/没有说话/没有回头』": 6,
+		"Câu chỉnh hướng『không phải… mà là…』":                     6,
+		"Từ chỉ thời gian nhanh『nhịp thở/khoảnh khắc』":           6,
+		"So sánh tu từ『như một/giống như/tựa như』":               6,
+		"Tiết tấu im lặng『im lặng/không nói gì/không ngoảnh lại』": 6,
 	}
 	for _, p := range s.Patterns {
 		if w, ok := want[p.Name]; ok && p.Total != w {
@@ -74,7 +74,7 @@ func TestComputeTopPhrasesWithStopwords(t *testing.T) {
 }
 
 func TestComputeRepeatedSentences(t *testing.T) {
-	motto := "此生未能远行，望你替我看看远方的山海。"
+	motto := "Kiếp này chưa thể đi xa, mong ngươi đi xem non sông xa xôi giúp ta."
 	chapters := make([]string, 6)
 	for i := range chapters {
 		body := "平常正文，没有什么重复。\n"
@@ -94,14 +94,14 @@ func TestComputeRepeatedSentences(t *testing.T) {
 	if got.Chapters != 3 || got.Count != 3 {
 		t.Errorf("repeated sentence: %+v", got)
 	}
-	if !strings.HasPrefix(got.Text, "此生未能远行") {
+	if !strings.HasPrefix(got.Text, "Kiếp này chưa thể đi xa") {
 		t.Errorf("text: %q", got.Text)
 	}
 }
 
 func TestComputeEndingAndOpening(t *testing.T) {
-	short := chapterWith("一整夜没有睡。\n正文很长很长很长。\n他走了。")
-	long := chapterWith("白天的事。\n正文。\n这是一个非常非常非常长的结尾句子，远远超过三十个字符的阈值长度，用来测试中位数。")
+	short := chapterWith("Cả một đêm không ngủ。\nChính văn rất dài rất dài rất dài。\nHắn đi rồi。")
+	long := chapterWith("Chuyện ban ngày。\nChính văn。\nĐây là một câu kết vô cùng vô cùng vô cùng dài, vượt xa ngưỡng ba mươi ký tự, dùng để test trung vị。")
 	chapters := []string{short, short, short, long, long}
 	s := Compute(Input{Chapters: chapters})
 	if s == nil {
@@ -121,7 +121,7 @@ func TestComputeTitleFormats(t *testing.T) {
 		chapters[i] = chapterWith("正文。")
 	}
 	// 混用 → 上报
-	s := Compute(Input{Chapters: chapters, Titles: []string{"第一章 风起", "云涌", "第3章 雷动"}})
+	s := Compute(Input{Chapters: chapters, Titles: []string{"Chương 1 Phong khởi", "Vân dũng", "Chương 3 Lôi động"}})
 	if s.TitleFormats == nil || s.TitleFormats.WithPrefix != 2 || s.TitleFormats.WithoutPrefix != 1 {
 		t.Errorf("title formats: %+v", s.TitleFormats)
 	}

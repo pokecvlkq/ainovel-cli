@@ -694,7 +694,7 @@ func (t *ContextTool) selectStoryThreads(state contextBuildState) []domain.Recal
 			Key:     entry.ID,
 			Chapter: entry.PlantedAt,
 			Reason:  "Chương hiện tại có thể cần tiếp nối phục bút hiện có",
-			Summary: fmt.Sprintf("Phục bút “%s” đã vùi ở chương %d: %s", entry.ID, entry.PlantedAt, truncateRunes(entry.Description, 30)),
+			Summary: fmt.Sprintf("Phục bút “%s” đã vùi ở chương %d: %s", entry.ID, entry.PlantedAt, truncateRunes(entry.Description, 80)),
 		})
 		if len(items) >= maxThreads {
 			return items
@@ -709,7 +709,7 @@ func (t *ContextTool) selectStoryThreads(state contextBuildState) []domain.Recal
 			Key:     entry.ID,
 			Chapter: entry.PlantedAt,
 			Reason:  "Phục bút treo lâu chưa thu hồi, chú ý thúc đẩy hoặc thu hồi kịp thời",
-			Summary: fmt.Sprintf("Phục bút “%s” đã vùi ở chương %d, đã %d chương chưa thu hồi: %s", entry.ID, entry.PlantedAt, state.chapter-entry.PlantedAt, truncateRunes(entry.Description, 30)),
+			Summary: fmt.Sprintf("Phục bút “%s” đã vùi ở chương %d, đã %d chương chưa thu hồi: %s", entry.ID, entry.PlantedAt, state.chapter-entry.PlantedAt, truncateRunes(entry.Description, 80)),
 		})
 		if len(items) >= maxThreads {
 			break
@@ -778,7 +778,7 @@ func (t *ContextTool) selectReviewLessons(chapter int, warn func(string, error))
 					Key:     fmt.Sprintf("review-%d-issue-%d", review.Chapter, i),
 					Chapter: review.Chapter,
 					Reason:  "Bài đánh giá gần đây chỉ ra cần tránh các vấn đề lặp lại",
-					Summary: fmt.Sprintf("Chương %d nhắc nhở đánh giá: %s", review.Chapter, truncateRunes(issue.Description, 36)),
+					Summary: fmt.Sprintf("Chương %d nhắc nhở đánh giá: %s", review.Chapter, truncateRunes(issue.Description, 80)),
 				})
 			}
 			if len(items) >= 3 {

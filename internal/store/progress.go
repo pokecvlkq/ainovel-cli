@@ -450,7 +450,7 @@ func normalizePendingRewrites(chapters, completed []int) ([]int, error) {
 		normalized = append(normalized, ch)
 	}
 	if len(invalid) > 0 {
-		return nil, fmt.Errorf("pending_rewrites 只能包含已完成章节，非法章节：%v，completed_chapters=%v: %w", invalid, completed, errs.ErrToolPrecondition)
+		return nil, fmt.Errorf("pending_rewrites chỉ có thể chứa các chương đã hoàn thành, chương không hợp lệ: %v, các chương đã hoàn thành=%v: %w", invalid, completed, errs.ErrToolPrecondition)
 	}
 	return normalized, nil
 }

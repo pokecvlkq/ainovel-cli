@@ -2,6 +2,18 @@
 
 Tất cả những thay đổi nổi bật đối với dự án AINovel CLI sẽ được ghi chép tại đây.
 
+## [v1.1.2] - 2026-07-07
+
+### Thay đổi (Changed)
+- **Bản địa hóa 100% giao diện TUI/CLI**:
+  - Dịch hoàn toàn các chuỗi hiển thị tiếng Trung còn sót lại trong backend lúc chạy (như `设定` -> `Thiết lập`, `本弧` -> `hồi này`, `全局` -> `toàn cục`, `对话` -> `đối thoại`).
+  - Việt hóa hoàn toàn các token can thiệp hệ thống (`[用户干预]` -> `[Can thiệp người dùng]`, `[阶段规划]` -> `[Quy hoạch giai đoạn]`) trong cả mã nguồn Go và file cấu hình Prompts để đồng bộ.
+  - Sửa nhãn trạng thái và tiến trình khôi phục sáng tác sang tiếng Việt.
+- **Biên dịch đồng bộ các file thực thi (Executable Binaries)**:
+  - Rebuild lại đồng thời cả `ainovel-cli.exe`, `ainovel-tui.exe` và bản giao diện đồ họa `ainovel-gui.exe` để các thay đổi Việt hóa có hiệu lực.
+- **Tối ưu hóa luồng gọi Model cho Writer**:
+  - Cấu hình lại `config.json` để vai trò `writer` chạy hết hạn ngạch (quota) của 7 tài khoản Gemini API (`gemini-3.5-flash`) theo thứ tự ưu tiên trước khi fallback về mô hình local Ollama (`qwen3.6:27b`).
+
 ## [v1.1.1] - 2026-07-06
 
 ### Thay đổi (Changed)

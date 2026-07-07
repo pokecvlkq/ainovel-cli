@@ -341,7 +341,7 @@ func (h *Host) Resume() (string, error) {
 // 才能稳定触发 coordinator.md 的干预分类。否则 Continue 的裸文本会绕过路由规则，
 // Coordinator 失去分类锚点而误派子代理（曾导致"改已写章节"被派给 writer 撞 edit_chapter 守卫）。
 func interventionMsg(text string) agentcore.Message {
-	return agentcore.UserMsg("[用户干预] " + text)
+	return agentcore.UserMsg("[Can thiệp người dùng] " + text)
 }
 
 // Continue 用指定 prompt 继续。停机后用户在输入框输入时调用。
@@ -1073,7 +1073,7 @@ func (h *Host) StageCoCreateStream(ctx context.Context, history []CoCreateMessag
 // 只贴 [阶段规划] 事实标记 + 中性陈述，不写死"怎么落地"——具体路由（compass / architect /
 // save_user_rules）交给 coordinator.md 的「阶段规划」判据，避免与 prompt 形成第二真相源、
 // 也不堵死风格类要求走 user_rules（守"分类裁定归 LLM"）。Continue 再叠加 [用户干预] 前缀。
-const stagePlanPrefix = "[阶段规划] 我暂停创作，和共创助手一起梳理了下面的后续方向，请按你的干预分类裁定如何落地，然后继续创作。后续方向如下：\n\n"
+const stagePlanPrefix = "[Quy hoạch giai đoạn] Tôi tạm dừng sáng tác, cùng trợ lý đồng sáng tác sắp xếp hướng đi tiếp theo dưới đây, vui lòng phán quyết cách triển khai theo phân loại can thiệp của bạn, sau đó tiếp tục sáng tác. Hướng đi tiếp theo như sau:\n\n"
 
 // PauseForCoCreate 进入阶段共创：置共创占用标记，运行中则一并暂停 coordinator。
 // 返回 false 表示无法进入（全书已完成或已在共创中），调用方忽略即可。
