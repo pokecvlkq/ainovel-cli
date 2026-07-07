@@ -420,10 +420,29 @@ func (m *failoverModel) pickNextFallback(tried map[modelTarget]bool, err error) 
 		return modelTarget{}, "", false
 	}
 
-	if !agentcore.IsFailoverEligible(err) {
-		return modelTarget{}, agentcore.FailoverReason(err), false
-	}
+	eligible := agentcore.IsFailoverEligible(err)
 	reason := agentcore.FailoverReason(err)
+
+	// agentcore không coi quota errors là failover-eligible, nhưng với cấu hình
+	// nhiều API key (multi-provider) ta cần xoay sang key tiếp theo khi hết quota.
+	// Đồng thời agentcore pattern "quota exceeded" không khớp thông báo Gemini
+	// "You exceeded your current quota" (thứ tự từ ngược), nên phải check thủ công.
+	if !eligible {
+		msg := strings.ToLower(err.Error())
+		if strings.Contains(msg, "quota") ||
+			strings.Contains(msg, "billing") ||
+			strings.Contains(msg, "insufficient") ||
+			strings.Contains(msg, "exceeded") {
+			eligible = true
+			if reason == "" {
+				reason = "quota"
+			}
+		}
+	}
+
+	if !eligible {
+		return modelTarget{}, reason, false
+	}
 	for _, target := range m.fallbacks {
 		if tried[target] {
 			continue
