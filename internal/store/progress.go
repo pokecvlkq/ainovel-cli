@@ -415,11 +415,11 @@ func (s *ProgressStore) ValidateChapterWork(chapter int) error {
 		return nil
 	}
 
-	verb := "重写"
+	verb := "viết lại"
 	if p.Flow == domain.FlowPolishing {
-		verb = "打磨"
+		verb = "đánh bóng"
 	}
-	return fmt.Errorf("第 %d 章不在待%s队列中，当前队列：%v。请先处理队列内章节，再动新章节: %w", chapter, verb, p.PendingRewrites, errs.ErrToolConflict)
+	return fmt.Errorf("Chương %d không có trong danh sách chờ %s, danh sách hiện tại: %v. Hãy xử lý các chương trong danh sách trước khi viết chương mới: %w", chapter, verb, p.PendingRewrites, errs.ErrToolConflict)
 }
 
 func normalizePendingRewrites(chapters, completed []int) ([]int, error) {

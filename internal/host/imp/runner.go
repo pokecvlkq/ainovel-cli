@@ -109,28 +109,28 @@ func Run(ctx context.Context, deps Deps, opts Options) (<-chan Event, error) {
 
 			// 已完成 → 跳过 LLM
 			if deps.Store.Progress.IsChapterCompleted(chNum) {
-				emit(StageChapter, chNum, total, fmt.Sprintf("第 %d 章已完成，跳过", chNum), nil)
+				emit(StageChapter, chNum, total, fmt.Sprintf("Chương %d đã hoàn thành, bỏ qua", chNum), nil)
 				continue
 			}
 
-			emit(StageChapter, chNum, total, fmt.Sprintf("分析第 %d/%d 章：%s", chNum, total, ch.Title), nil)
+			emit(StageChapter, chNum, total, fmt.Sprintf("Phân tích chương %d/%d: %s", chNum, total, ch.Title), nil)
 
 			activeHooks, _ := deps.Store.World.LoadActiveForeshadow()
 			analysis, err := AnalyzeChapter(ctx, deps.LLM, deps.Prompts.Analyzer,
 				chNum, ch.Title, ch.Content, premise, charactersBlock, activeHooks)
 			if err != nil {
-				emit(StageError, chNum, total, fmt.Sprintf("第 %d 章分析失败", chNum), err)
+				emit(StageError, chNum, total, fmt.Sprintf("Phân tích Chương %d thất bại", chNum), err)
 				return
 			}
 
 			if err := PersistChapter(ctx, deps.Store, deps.CommitTool, chNum, ch.Title, ch.Content, analysis); err != nil {
-				emit(StageError, chNum, total, fmt.Sprintf("第 %d 章落盘失败", chNum), err)
+				emit(StageError, chNum, total, fmt.Sprintf("Lưu Chương %d thất bại", chNum), err)
 				return
 			}
-			emit(StageChapter, chNum, total, fmt.Sprintf("第 %d 章导入完成", chNum), nil)
+			emit(StageChapter, chNum, total, fmt.Sprintf("Nhập Chương %d hoàn thành", chNum), nil)
 		}
 
-		emit(StageDone, total, total, fmt.Sprintf("导入完成：%d 章", total), nil)
+		emit(StageDone, total, total, fmt.Sprintf("Nhập hoàn thành: %d chương", total), nil)
 	}()
 
 	return events, nil

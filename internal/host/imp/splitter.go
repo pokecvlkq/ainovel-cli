@@ -119,7 +119,7 @@ func extractTitle(line string, pattern *regexp.Regexp, loc []int, fallbackNum in
 			return t
 		}
 	}
-	return fmt.Sprintf("第%d章", fallbackNum)
+	return fmt.Sprintf("Chương %d", fallbackNum)
 }
 
 // stripTrailingNoise 剥离常见的尾部噪声（Project Gutenberg 等 license trailer）。

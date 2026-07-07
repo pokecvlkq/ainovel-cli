@@ -19,10 +19,10 @@ func ShouldReview(completedCount int) (bool, string) {
 // ShouldArcReview 长篇模式下判断是否需要弧级/卷级评审。
 func ShouldArcReview(isArcEnd, isVolumeEnd bool, volume, arc int) (bool, string) {
 	if isVolumeEnd {
-		return true, fmt.Sprintf("第 %d 卷第 %d 弧结束（卷结束），触发弧级+卷级评审", volume, arc)
+		return true, fmt.Sprintf("Kết thúc Quyển %d Hồi %d (Hết quyển), kích hoạt đánh giá Hồi + Quyển", volume, arc)
 	}
 	if isArcEnd {
-		return true, fmt.Sprintf("第 %d 卷第 %d 弧结束，触发弧级评审", volume, arc)
+		return true, fmt.Sprintf("Kết thúc Quyển %d Hồi %d, kích hoạt đánh giá Hồi", volume, arc)
 	}
 	return false, ""
 }
