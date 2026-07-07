@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"sync"
 
 	"github.com/sergi/go-diff/diffmatchpatch"
@@ -48,6 +49,66 @@ func (a *App) shutdown(ctx context.Context) {
 	}
 }
 
+func (a *App) resolveOutputDir(customDir string) string {
+	if customDir != "" {
+		if abs, err := filepath.Abs(customDir); err == nil {
+			return abs
+		}
+		return customDir
+	}
+
+	out := a.cfg.OutputDir
+	if out == "" {
+		out = filepath.Join("output", "novel")
+	}
+
+	if filepath.IsAbs(out) {
+		return out
+	}
+
+	candidates := []string{
+		out,
+		filepath.Join("..", out),
+		filepath.Join("..", "..", out),
+	}
+
+	if exe, err := os.Executable(); err == nil {
+		exeDir := filepath.Dir(exe)
+		candidates = append(candidates,
+			filepath.Join(exeDir, out),
+			filepath.Join(exeDir, "..", out),
+			filepath.Join(exeDir, "..", "..", out),
+			filepath.Join(exeDir, "..", "..", "..", out),
+		)
+	}
+
+	for _, cand := range candidates {
+		checkPath := filepath.Join(cand, "meta", "progress.json")
+		if _, err := os.Stat(checkPath); err == nil {
+			if abs, err := filepath.Abs(cand); err == nil {
+				return abs
+			}
+			return cand
+		}
+	}
+
+	if abs, err := filepath.Abs(out); err == nil {
+		return abs
+	}
+	return out
+}
+
+// SelectProjectDir opens directory dialog to choose novel output dir
+func (a *App) SelectProjectDir() (string, error) {
+	dir, err := runtime.OpenDirectoryDialog(a.ctx, runtime.OpenDialogOptions{
+		Title: "Chọn thư mục dự án Novel",
+	})
+	if err != nil {
+		return "", err
+	}
+	return dir, nil
+}
+
 // StartNovel starts a new novel writing session
 func (a *App) StartNovel(prompt string) error {
 	a.mu.Lock()
@@ -57,7 +118,11 @@ func (a *App) StartNovel(prompt string) error {
 		a.host.Close()
 	}
 
-	eng, err := host.New(a.cfg, a.bundle)
+	targetDir := a.resolveOutputDir("")
+	cfg := a.cfg
+	cfg.OutputDir = targetDir
+
+	eng, err := host.New(cfg, a.bundle)
 	if err != nil {
 		return fmt.Errorf("lỗi khởi tạo host: %v", err)
 	}
@@ -65,18 +130,17 @@ func (a *App) StartNovel(prompt string) error {
 	a.store = store.NewStore(eng.Dir())
 
 	eng.AskUser().SetHandler(func(ctx context.Context, questions []tools.Question) (*tools.AskUserResponse, error) {
-		// Mock implementation just to pass build
 		return nil, fmt.Errorf("ask-user needs async implementation")
 	})
 
 	err = eng.PrepareUserRules(prompt)
 	if err != nil {
-		return err
+		return fmt.Errorf("lỗi chuẩn bị quy tắc: %v", err)
 	}
 
 	err = eng.StartPrepared(prompt)
 	if err != nil {
-		return err
+		return fmt.Errorf("lỗi bắt đầu sáng tác: %v", err)
 	}
 
 	go a.listenEvents()
@@ -91,18 +155,23 @@ func (a *App) ResumeNovel(dir string) error {
 		a.host.Close()
 	}
 
-	eng, err := host.New(a.cfg, a.bundle)
+	targetDir := a.resolveOutputDir(dir)
+	cfg := a.cfg
+	cfg.OutputDir = targetDir
+
+	eng, err := host.New(cfg, a.bundle)
 	if err != nil {
-		return fmt.Errorf("lỗi khởi tạo host: %v", err)
+		return fmt.Errorf("lỗi khởi tạo host (%s): %v", targetDir, err)
 	}
 	a.host = eng
 	a.store = store.NewStore(eng.Dir())
 
-	// Implement resuming from specific dir if needed, but currently host.New uses config OutputDir.
-	// We will just resume.
-	_, err = eng.Resume()
+	label, err := eng.Resume()
 	if err != nil {
-		return err
+		return fmt.Errorf("lỗi khôi phục: %v", err)
+	}
+	if label == "" {
+		return fmt.Errorf("không tìm thấy dự án dở dang trong thư mục:\n%s", targetDir)
 	}
 
 	go a.listenEvents()
@@ -113,7 +182,7 @@ func (a *App) PauseNovel() error {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 	if a.host != nil {
-		a.host.Close() // simple pause for now
+		a.host.Close()
 	}
 	return nil
 }
@@ -150,6 +219,60 @@ func (a *App) GetSnapshot() host.UISnapshot {
 	if a.host != nil {
 		return a.host.Snapshot()
 	}
+
+	targetDir := a.resolveOutputDir("")
+	st := store.NewStore(targetDir)
+	progress, err := st.Progress.Load()
+	if err == nil && progress != nil && progress.NovelName != "" {
+		snap := host.UISnapshot{
+			NovelName:         progress.NovelName,
+			Phase:             string(progress.Phase),
+			Flow:              string(progress.Flow),
+			CurrentChapter:    progress.CurrentChapter,
+			TotalChapters:     progress.TotalChapters,
+			CompletedCount:    len(progress.CompletedChapters),
+			TotalWordCount:    progress.TotalWordCount,
+			InProgressChapter: progress.InProgressChapter,
+			RuntimeState:      "stopped",
+		}
+
+		if usageState, err := st.Usage.Load(); err == nil && usageState != nil {
+			snap.TotalInputTokens = usageState.Overall.Input
+			snap.TotalOutputTokens = usageState.Overall.Output
+			snap.TotalCacheReadTokens = usageState.Overall.CacheRead
+			snap.TotalCacheWriteTokens = usageState.Overall.CacheWrite
+			snap.TotalCostUSD = usageState.Overall.Cost
+			snap.TotalSavedUSD = usageState.Overall.Saved
+		}
+
+		// Tải dữ liệu bổ sung để hiển thị khi offline
+		if outline, err := st.Outline.LoadOutline(); err == nil && len(outline) > 0 {
+			var uiOutline []host.OutlineSnapshot
+			for _, node := range outline {
+				uiOutline = append(uiOutline, host.OutlineSnapshot{
+					Chapter:   node.Chapter,
+					Title:     node.Title,
+					CoreEvent: node.CoreEvent,
+				})
+			}
+			snap.Outline = uiOutline
+		}
+
+		if premise, err := st.Outline.LoadPremise(); err == nil && premise != "" {
+			snap.Premise = premise
+		}
+
+		if chars, err := st.Characters.Load(); err == nil && len(chars) > 0 {
+			var charNames []string
+			for _, char := range chars {
+				charNames = append(charNames, char.Name)
+			}
+			snap.Characters = charNames
+		}
+
+		return snap
+	}
+
 	return host.UISnapshot{}
 }
 

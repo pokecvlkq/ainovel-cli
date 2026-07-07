@@ -12,16 +12,17 @@ import (
 	"github.com/voocel/ainovel-cli/internal/userrules"
 )
 
-// SaveUserRulesTool 持久化用户的长效"写作风格/质量"要求（仅 Coordinator 持有）。
+// SaveUserRulesTool lưu trữ lâu dài các yêu cầu "phong cách viết/chất lượng" của người dùng (chỉ Coordinator giữ).
 //
-// 它是长期写作规则的统一入口：任何时候都成立、约束 writer 笔法的风格/质量规则（如"每章1500字"
-// "少用比喻""禁止出现'某种程度上'""对话占比高一点""主角整体冷静克制"）经 LLM 归一化为结构化
-// 约束写入本书快照 meta/user_rules.json，novel_context 注入 working_memory.user_rules、
-// commit_chapter 据此机械检查。剧情/结构/人物/阶段调整走 architect，已写章节返工先走 editor 入队，
-// 后续由 Host 派 writer 改写。
+// Đây là cổng thống nhất cho các quy tắc viết dài hạn: các quy tắc phong cách/chất lượng ràng buộc ngòi bút của writer,
+// luôn có giá trị (ví dụ: "mỗi chương 1500 chữ", "ít dùng phép ẩn dụ", "cấm dùng 'ở một mức độ nào đó'", "tỉ lệ đối thoại cao", "nhân vật chính tổng thể bình tĩnh, kiềm chế")
+// được LLM chuẩn hóa thành ràng buộc có cấu trúc và ghi vào snapshot của sách tại meta/user_rules.json,
+// novel_context tiêm vào working_memory.user_rules, commit_chapter dựa vào đó kiểm tra cơ học.
+// Chỉnh sửa cốt truyện/cấu trúc/nhân vật/giai đoạn đi qua architect, các chương đã viết làm lại trước tiên đưa vào hàng đợi của editor,
+// sau đó Host cử writer viết lại.
 //
-// 归一化失败不报错（降级为 raw preferences），只有落盘失败才返回 tool error——
-// 技术细节不应抛回 Coordinator 当流程错误。
+// Chuẩn hóa thất bại không báo lỗi (hạ cấp thành raw preferences), chỉ khi ghi đĩa thất bại mới trả về tool error——
+// Chi tiết kỹ thuật không nên ném lại cho Coordinator như là lỗi quy trình.
 type SaveUserRulesTool struct {
 	svc *userrules.Service
 }
@@ -31,28 +32,28 @@ func NewSaveUserRulesTool(svc *userrules.Service) *SaveUserRulesTool {
 }
 
 func (t *SaveUserRulesTool) Name() string  { return "save_user_rules" }
-func (t *SaveUserRulesTool) Label() string { return "保存写作规则" }
+func (t *SaveUserRulesTool) Label() string { return "Lưu quy tắc viết" }
 
 func (t *SaveUserRulesTool) Description() string {
-	return "把用户的长效写作风格/质量要求归一化为本书的结构化规则并持久化" +
-		"（如\"每章1500字左右\"\"少用比喻和排比\"\"禁止出现'某种程度上'\"）。" +
-		"保存后所有子代理每章都会在 working_memory.user_rules 看到，writer 据此写作、commit_chapter 据此自检，跨重启生效。" +
-		"text 必填，原样转述用户的要求即可，结构化提炼由系统完成。" +
-		"返回本次理解到的结构化约束与当前全量生效约束——请把它回显给用户确认是否理解正确。" +
-		"只存\"任何时候都成立\"的写作风格/质量规则；剧情/结构/人物走向、阶段篇幅调整（如\"增加10章\"\"这一卷多写战斗\"）走 architect，已写章节返工走 editor，都不要存这里。"
+	return "Chuẩn hóa các yêu cầu phong cách/chất lượng viết dài hạn của người dùng thành các quy tắc có cấu trúc cho cuốn sách này và lưu trữ lâu dài" +
+		"(ví dụ: \"mỗi chương khoảng 1500 chữ\", \"ít dùng ẩn dụ và điệp ngữ\", \"cấm dùng 'ở một mức độ nào đó'\")." +
+		"Sau khi lưu, tất cả các sub-agent trong mỗi chương sẽ thấy trong working_memory.user_rules, writer dựa vào đó để viết, commit_chapter tự kiểm tra dựa vào đó, có hiệu lực qua các lần khởi động lại." +
+		"text là bắt buộc, chỉ cần thuật lại nguyên văn yêu cầu của người dùng, việc trích xuất cấu trúc sẽ do hệ thống hoàn thành." +
+		"Trả về các ràng buộc có cấu trúc hiểu được lần này và các ràng buộc toàn bộ có hiệu lực hiện tại——vui lòng hiển thị lại cho người dùng để xác nhận xem đã hiểu đúng chưa." +
+		"Chỉ lưu các quy tắc phong cách/chất lượng viết \"luôn đúng\"; điểu chỉnh cốt truyện/cấu trúc/hướng nhân vật, độ dài theo giai đoạn (ví dụ: \"thêm 10 chương\", \"quyển này viết nhiều về chiến đấu\") đi qua architect, làm lại chương đã viết đi qua editor, tất cả không lưu ở đây."
 }
 
-// 写工具，禁止并发。
+// Công cụ ghi, cấm chạy đồng thời.
 func (t *SaveUserRulesTool) ReadOnly(_ json.RawMessage) bool        { return false }
 func (t *SaveUserRulesTool) ConcurrencySafe(_ json.RawMessage) bool { return false }
 
 func (t *SaveUserRulesTool) ActivityDescription(_ json.RawMessage) string {
-	return "保存写作规则"
+	return "Lưu quy tắc viết"
 }
 
 func (t *SaveUserRulesTool) Schema() map[string]any {
 	return schema.Object(
-		schema.Property("text", schema.String("用户的长效写作要求（原样转述，可适当凝练），系统会归一化为结构化约束")).Required(),
+		schema.Property("text", schema.String("Yêu cầu viết dài hạn của người dùng (thuật lại nguyên văn, có thể cô đọng), hệ thống sẽ chuẩn hóa thành các ràng buộc có cấu trúc")).Required(),
 	)
 }
 
@@ -65,25 +66,25 @@ func (t *SaveUserRulesTool) Execute(ctx context.Context, args json.RawMessage) (
 	}
 	text := strings.TrimSpace(a.Text)
 	if text == "" {
-		return nil, fmt.Errorf("text 不能为空: %w", errs.ErrToolArgs)
+		return nil, fmt.Errorf("text không được bỏ trống: %w", errs.ErrToolArgs)
 	}
 
-	// 归一化失败只会把该条降级为 raw preferences（不报错）；只有落盘失败才返回 tool error。
+	// Chuẩn hóa thất bại sẽ chỉ làm giảm mục nhập đó thành raw preferences (không báo lỗi); chỉ khi lưu thất bại mới trả về tool error.
 	snap, cand, err := t.svc.AddRuntimeRule(ctx, text)
 	if err != nil {
-		return nil, fmt.Errorf("保存写作规则失败: %w", err)
+		return nil, fmt.Errorf("Lưu quy tắc viết thất bại: %w", err)
 	}
 
 	return json.Marshal(map[string]any{
 		"saved":      true,
 		"status":     snap.Status,
-		"understood": userRuleUnderstanding(cand), // 本次理解，供回显确认
-		"in_effect":  snap.Payload(),              // 当前全量生效约束
+		"understood": userRuleUnderstanding(cand), // Hiểu lần này, cung cấp để phản hồi xác nhận
+		"in_effect":  snap.Payload(),              // Các ràng buộc toàn bộ có hiệu lực hiện tại
 	})
 }
 
-// userRuleUnderstanding 把本次归一化候选转成给 LLM 的事实视图——
-// Coordinator 据此向用户回显"我把你这句理解成了什么"，便于及时纠偏。
+// userRuleUnderstanding biến ứng viên chuẩn hóa lần này thành một chế độ xem thực tế cho LLM——
+// Coordinator dựa vào đó để trả lại cho người dùng "tôi đã hiểu câu này của bạn là gì", giúp sửa lỗi kịp thời.
 func userRuleUnderstanding(c rules.Candidate) map[string]any {
 	m := map[string]any{"degraded": c.Degraded}
 	if !c.Structured.IsEmpty() {
@@ -93,7 +94,7 @@ func userRuleUnderstanding(c rules.Candidate) map[string]any {
 		m["preferences"] = p
 	}
 	if len(c.Uncertain) > 0 {
-		m["uncertain"] = c.Uncertain // 故意未提升为硬性检查的项 + 原因
+		m["uncertain"] = c.Uncertain // Các mục cố ý không nâng cấp thành kiểm tra cứng + lý do
 	}
 	return m
 }

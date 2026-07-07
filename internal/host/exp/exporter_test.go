@@ -65,7 +65,7 @@ func TestRun_HappyPath_DefaultsToNovelDir(t *testing.T) {
 		t.Fatalf("read output: %v", err)
 	}
 	text := string(data)
-	for _, want := range []string{"《光斑》", "第 1 章  雨夜归人", "第 3 章  余烬"} {
+	for _, want := range []string{"《光斑》", "Chương 1: 雨夜归人", "Chương 3: 余烬"} {
 		if !strings.Contains(text, want) {
 			t.Errorf("output missing %q\nfull:\n%s", want, text)
 		}

@@ -26,13 +26,13 @@ func TestSaveReviewPersistsContractAssessment(t *testing.T) {
 	args, err := json.Marshal(map[string]any{
 		"chapter":           3,
 		"scope":             "chapter",
-		"dimensions":        []map[string]any{{"dimension": "consistency", "score": 85, "verdict": "pass", "comment": "基本一致"}, {"dimension": "character", "score": 82, "verdict": "pass", "comment": "人设稳定"}, {"dimension": "pacing", "score": 78, "verdict": "warning", "comment": "略慢"}, {"dimension": "continuity", "score": 84, "verdict": "pass", "comment": "连贯"}, {"dimension": "foreshadow", "score": 80, "verdict": "pass", "comment": "正常"}, {"dimension": "hook", "score": 76, "verdict": "warning", "comment": "钩子一般"}, {"dimension": "aesthetic", "score": 81, "verdict": "pass", "comment": "语言基本成立"}},
+		"dimensions":        []map[string]any{{"dimension": "consistency", "score": 85, "verdict": "pass", "comment": "Cơ bản nhất quán"}, {"dimension": "character", "score": 82, "verdict": "pass", "comment": "Nhân vật ổn định"}, {"dimension": "pacing", "score": 78, "verdict": "warning", "comment": "Hơi chậm"}, {"dimension": "continuity", "score": 84, "verdict": "pass", "comment": "Mạch lạc"}, {"dimension": "foreshadow", "score": 80, "verdict": "pass", "comment": "Bình thường"}, {"dimension": "hook", "score": 76, "verdict": "warning", "comment": "Hook bình thường"}, {"dimension": "aesthetic", "score": 81, "verdict": "pass", "comment": "Văn phong cơ bản hợp lý"}},
 		"issues":            []map[string]any{},
 		"contract_status":   "partial",
-		"contract_misses":   []string{"未明确埋下内门试炼邀请"},
-		"contract_notes":    "主线推进达成，但 contract 中的第二个推进项没有落地。",
+		"contract_misses":   []string{"Chưa thiết lập rõ thư mời tham gia thử thách nội môn"},
+		"contract_notes":    "Tuyến chính đã được thúc đẩy, nhưng mục thúc đẩy thứ hai trong hợp đồng chưa được thực hiện.",
 		"verdict":           "polish",
-		"summary":           "本章基本完成目标，但 contract 仍有漏项。",
+		"summary":           "Chương này cơ bản hoàn thành mục tiêu, nhưng hợp đồng vẫn còn thiếu sót.",
 		"affected_chapters": []int{3},
 	})
 	if err != nil {
@@ -53,7 +53,7 @@ func TestSaveReviewPersistsContractAssessment(t *testing.T) {
 	if review.ContractStatus != "partial" {
 		t.Fatalf("unexpected contract status: %q", review.ContractStatus)
 	}
-	if len(review.ContractMisses) != 1 || review.ContractMisses[0] != "未明确埋下内门试炼邀请" {
+	if len(review.ContractMisses) != 1 || review.ContractMisses[0] != "Chưa thiết lập rõ thư mời tham gia thử thách nội môn" {
 		t.Fatalf("unexpected contract misses: %+v", review.ContractMisses)
 	}
 	if review.Dimension("aesthetic") == nil {
@@ -77,7 +77,7 @@ func TestSaveReviewRejectsMissingDimensions(t *testing.T) {
 	args, err := json.Marshal(map[string]any{
 		"chapter":    3,
 		"scope":      "chapter",
-		"dimensions": []map[string]any{{"dimension": "consistency", "score": 85, "verdict": "pass", "comment": "基本一致"}},
+		"dimensions": []map[string]any{{"dimension": "consistency", "score": 85, "verdict": "pass", "comment": "Cơ bản nhất quán"}},
 		"issues":     []map[string]any{},
 		"verdict":    "accept",
 		"summary":    "ok",
@@ -108,13 +108,13 @@ func TestSaveReviewRejectsDimensionWithoutComment(t *testing.T) {
 		"chapter": 3,
 		"scope":   "chapter",
 		"dimensions": []map[string]any{
-			{"dimension": "consistency", "score": 85, "comment": "基本一致"},
-			{"dimension": "character", "score": 82, "comment": "人设稳定"},
+			{"dimension": "consistency", "score": 85, "comment": "Cơ bản nhất quán"},
+			{"dimension": "character", "score": 82, "comment": "Nhân vật ổn định"},
 			{"dimension": "pacing", "score": 78},
-			{"dimension": "continuity", "score": 84, "comment": "连贯"},
-			{"dimension": "foreshadow", "score": 80, "comment": "正常"},
-			{"dimension": "hook", "score": 76, "comment": "钩子一般"},
-			{"dimension": "aesthetic", "score": 81, "comment": "语言基本成立"},
+			{"dimension": "continuity", "score": 84, "comment": "Mạch lạc"},
+			{"dimension": "foreshadow", "score": 80, "comment": "Bình thường"},
+			{"dimension": "hook", "score": 76, "comment": "Hook bình thường"},
+			{"dimension": "aesthetic", "score": 81, "comment": "Văn phong cơ bản hợp lý"},
 		},
 		"issues":  []map[string]any{},
 		"verdict": "accept",
@@ -148,27 +148,27 @@ func TestSaveReviewRejectsUnfinishedAffectedChapter(t *testing.T) {
 		"chapter": 58,
 		"scope":   "chapter",
 		"dimensions": []map[string]any{
-			{"dimension": "consistency", "score": 85, "comment": "基本一致"},
-			{"dimension": "character", "score": 82, "comment": "人设稳定"},
-			{"dimension": "pacing", "score": 58, "comment": "节奏需要重写"},
-			{"dimension": "continuity", "score": 84, "comment": "连贯"},
-			{"dimension": "foreshadow", "score": 80, "comment": "正常"},
-			{"dimension": "hook", "score": 76, "comment": "钩子一般"},
-			{"dimension": "aesthetic", "score": 81, "comment": "语言基本成立"},
+			{"dimension": "consistency", "score": 85, "comment": "Cơ bản nhất quán"},
+			{"dimension": "character", "score": 82, "comment": "Nhân vật ổn định"},
+			{"dimension": "pacing", "score": 58, "comment": "Cần viết lại nhịp độ"},
+			{"dimension": "continuity", "score": 84, "comment": "Mạch lạc"},
+			{"dimension": "foreshadow", "score": 80, "comment": "Bình thường"},
+			{"dimension": "hook", "score": 76, "comment": "Hook bình thường"},
+			{"dimension": "aesthetic", "score": 81, "comment": "Văn phong cơ bản hợp lý"},
 		},
 		"issues":            []map[string]any{},
 		"contract_status":   "partial",
 		"verdict":           "polish",
-		"summary":           "需要打磨第 58 章，不能把未完成章节入队。",
+		"summary":           "Cần trau chuốt chương 58, không thể đưa chương chưa hoàn thành vào hàng đợi.",
 		"affected_chapters": []int{65},
-		"contract_misses":   []string{"节奏超出本章职责"},
-		"contract_notes":    "应只处理已完成章节。",
+		"contract_misses":   []string{"Nhịp độ vượt quá trách nhiệm của chương này"},
+		"contract_notes":    "Chỉ nên xử lý các chương đã hoàn thành.",
 	})
 	if err != nil {
 		t.Fatalf("Marshal: %v", err)
 	}
 
-	if _, err := tool.Execute(context.Background(), args); err == nil || !strings.Contains(err.Error(), "pending_rewrites 只能包含已完成章节") {
+	if _, err := tool.Execute(context.Background(), args); err == nil || !strings.Contains(err.Error(), "pending_rewrites chỉ có thể chứa các chương đã hoàn thành") {
 		t.Fatalf("expected unfinished affected chapter rejection, got %v", err)
 	}
 	review, err := s.World.LoadReview(58)
@@ -187,9 +187,9 @@ func TestSaveReviewRejectsUnfinishedAffectedChapter(t *testing.T) {
 	}
 }
 
-// TestSaveReviewDerivesVerdictFromScore 验证：verdict 由 score 确定性推导，模型给的
-// 不一致 verdict（如 score=85 却填 warning）不再报错，而是被覆写成正确值（pass）。
-// 防回归 issue：弱模型 score/verdict 打架曾导致 save_review 反复失败。
+// TestSaveReviewDerivesVerdictFromScore Kiểm tra: verdict được suy ra một cách chắc chắn từ score, nếu mô hình cung cấp
+// verdict không nhất quán (ví dụ score=85 nhưng ghi là warning) sẽ không báo lỗi nữa, mà được ghi đè thành giá trị đúng (pass).
+// Issue phòng ngừa lùi lội: Tình trạng điểm/verdict không khớp từ mô hình yếu từng khiến save_review liên tục gặp lỗi.
 func TestSaveReviewDerivesVerdictFromScore(t *testing.T) {
 	s := store.NewStore(t.TempDir())
 	if err := s.Init(); err != nil {
@@ -207,13 +207,13 @@ func TestSaveReviewDerivesVerdictFromScore(t *testing.T) {
 		"chapter": 3,
 		"scope":   "chapter",
 		"dimensions": []map[string]any{
-			{"dimension": "consistency", "score": 85, "verdict": "pass", "comment": "一致"},
-			{"dimension": "character", "score": 82, "comment": "稳定"}, // 省略 verdict
-			{"dimension": "pacing", "score": 78, "verdict": "warning", "comment": "略慢"},
-			{"dimension": "continuity", "score": 84, "verdict": "pass", "comment": "连贯"},
-			{"dimension": "foreshadow", "score": 80, "verdict": "pass", "comment": "正常"},
-			{"dimension": "hook", "score": 76, "verdict": "warning", "comment": "钩子一般"},
-			{"dimension": "aesthetic", "score": 85, "verdict": "warning", "comment": "语言成立"}, // 不一致：85 却填 warning
+			{"dimension": "consistency", "score": 85, "verdict": "pass", "comment": "Nhất quán"},
+			{"dimension": "character", "score": 82, "comment": "Ổn định"}, // Bỏ qua verdict
+			{"dimension": "pacing", "score": 78, "verdict": "warning", "comment": "Hơi chậm"},
+			{"dimension": "continuity", "score": 84, "verdict": "pass", "comment": "Mạch lạc"},
+			{"dimension": "foreshadow", "score": 80, "verdict": "pass", "comment": "Bình thường"},
+			{"dimension": "hook", "score": 76, "verdict": "warning", "comment": "Hook bình thường"},
+			{"dimension": "aesthetic", "score": 85, "verdict": "warning", "comment": "Văn phong hợp lý"}, // Không nhất quán: 85 nhưng ghi warning
 		},
 		"issues":  []map[string]any{},
 		"verdict": "accept",
@@ -231,7 +231,7 @@ func TestSaveReviewDerivesVerdictFromScore(t *testing.T) {
 	if err != nil || review == nil {
 		t.Fatalf("LoadReview: %v", err)
 	}
-	// 85 → pass（覆写模型给的 warning）；82 省略 → pass。
+	// 85 → pass (ghi đè warning mô hình đưa ra); 82 bị bỏ qua → pass.
 	if d := review.Dimension("aesthetic"); d == nil || d.Verdict != "pass" {
 		t.Fatalf("aesthetic verdict should be derived to pass, got %+v", d)
 	}
@@ -251,17 +251,17 @@ func TestSaveReviewRejectsMissingAffectedChaptersForRewrite(t *testing.T) {
 		"chapter": 3,
 		"scope":   "chapter",
 		"dimensions": []map[string]any{
-			{"dimension": "consistency", "score": 85, "verdict": "pass", "comment": "基本一致"},
-			{"dimension": "character", "score": 82, "verdict": "pass", "comment": "人设稳定"},
-			{"dimension": "pacing", "score": 78, "verdict": "warning", "comment": "略慢"},
-			{"dimension": "continuity", "score": 84, "verdict": "pass", "comment": "连贯"},
-			{"dimension": "foreshadow", "score": 80, "verdict": "pass", "comment": "正常"},
-			{"dimension": "hook", "score": 76, "verdict": "warning", "comment": "钩子一般"},
-			{"dimension": "aesthetic", "score": 81, "verdict": "pass", "comment": "语言基本成立"},
+			{"dimension": "consistency", "score": 85, "verdict": "pass", "comment": "Cơ bản nhất quán"},
+			{"dimension": "character", "score": 82, "verdict": "pass", "comment": "Nhân vật ổn định"},
+			{"dimension": "pacing", "score": 78, "verdict": "warning", "comment": "Hơi chậm"},
+			{"dimension": "continuity", "score": 84, "verdict": "pass", "comment": "Mạch lạc"},
+			{"dimension": "foreshadow", "score": 80, "verdict": "pass", "comment": "Bình thường"},
+			{"dimension": "hook", "score": 76, "verdict": "warning", "comment": "Hook bình thường"},
+			{"dimension": "aesthetic", "score": 81, "verdict": "pass", "comment": "Văn phong cơ bản hợp lý"},
 		},
 		"issues":  []map[string]any{},
 		"verdict": "rewrite",
-		"summary": "需要重写",
+		"summary": "Cần viết lại",
 	})
 	if err != nil {
 		t.Fatalf("Marshal: %v", err)
@@ -283,19 +283,19 @@ func TestSaveReviewRejectsIssueWithoutEvidence(t *testing.T) {
 		"chapter": 3,
 		"scope":   "chapter",
 		"dimensions": []map[string]any{
-			{"dimension": "consistency", "score": 85, "verdict": "pass", "comment": "基本一致"},
-			{"dimension": "character", "score": 82, "verdict": "pass", "comment": "人设稳定"},
-			{"dimension": "pacing", "score": 78, "verdict": "warning", "comment": "略慢"},
-			{"dimension": "continuity", "score": 84, "verdict": "pass", "comment": "连贯"},
-			{"dimension": "foreshadow", "score": 80, "verdict": "pass", "comment": "正常"},
-			{"dimension": "hook", "score": 76, "verdict": "warning", "comment": "钩子一般"},
-			{"dimension": "aesthetic", "score": 81, "verdict": "pass", "comment": "语言基本成立"},
+			{"dimension": "consistency", "score": 85, "verdict": "pass", "comment": "Cơ bản nhất quán"},
+			{"dimension": "character", "score": 82, "verdict": "pass", "comment": "Nhân vật ổn định"},
+			{"dimension": "pacing", "score": 78, "verdict": "warning", "comment": "Hơi chậm"},
+			{"dimension": "continuity", "score": 84, "verdict": "pass", "comment": "Mạch lạc"},
+			{"dimension": "foreshadow", "score": 80, "verdict": "pass", "comment": "Bình thường"},
+			{"dimension": "hook", "score": 76, "verdict": "warning", "comment": "Hook bình thường"},
+			{"dimension": "aesthetic", "score": 81, "verdict": "pass", "comment": "Văn phong cơ bản hợp lý"},
 		},
 		"issues": []map[string]any{
-			{"type": "hook", "severity": "warning", "description": "章末钩子偏弱"},
+			{"type": "hook", "severity": "warning", "description": "Hook cuối chương hơi yếu"},
 		},
 		"verdict":           "polish",
-		"summary":           "需要补强钩子。",
+		"summary":           "Cần củng cố hook.",
 		"affected_chapters": []int{3},
 	})
 	if err != nil {

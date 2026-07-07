@@ -1,0 +1,1 @@
+feat(localization): việt hóa toàn bộ hệ thống prompts và internal tools

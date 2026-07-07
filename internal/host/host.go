@@ -462,6 +462,12 @@ func (h *Host) Close() {
 // 用户要继续创作只有两条路径：手动 Continue（停机注入）或重启进程走 Resume。
 // 见 docs/architecture.md §13.3、§8.3。
 func (h *Host) waitDone() {
+	defer func() {
+		if r := recover(); r != nil {
+			slog.Error("Phát hiện panic trong waitDone", "module", "host", "panic", r)
+		}
+	}()
+
 	h.coordinator.WaitForIdle()
 	h.observer.finalize()
 
@@ -500,6 +506,7 @@ func (h *Host) waitDone() {
 		}
 	}
 
+	// Make sending to done channel non-blocking and safe
 	select {
 	case h.done <- struct{}{}:
 	default:
@@ -675,7 +682,7 @@ func (h *Host) Snapshot() UISnapshot {
 		snap.RewriteReason = progress.RewriteReason
 		snap.Layered = progress.Layered
 		if progress.CurrentVolume > 0 {
-			snap.CurrentVolumeArc = fmt.Sprintf("第%d卷·第%d弧", progress.CurrentVolume, progress.CurrentArc)
+			snap.CurrentVolumeArc = fmt.Sprintf("Quyển %d · Hồi %d", progress.CurrentVolume, progress.CurrentArc)
 		}
 	}
 	if snap.NovelName == "" {

@@ -447,7 +447,7 @@ func writerFallbackChapter(st *store.Store) int {
 	return progress.NextChapter()
 }
 
-var chapterTaskRe = regexp.MustCompile(`第\s*(\d+)\s*章`)
+var chapterTaskRe = regexp.MustCompile(`(?i)(?:第\s*|Chương\s*)(\d+)(?:\s*章)?`)
 
 func chapterFromTask(task string) int {
 	m := chapterTaskRe.FindStringSubmatch(task)

@@ -2,6 +2,16 @@
 
 Tất cả những thay đổi nổi bật đối với dự án AINovel CLI sẽ được ghi chép tại đây.
 
+## [v1.1.1] - 2026-07-06
+
+### Thay đổi (Changed)
+- **Bản địa hóa hoàn toàn (Localisation)**: Việt hóa triệt để 100% các file prompts đặc vụ (`coordinator.md`, `architect-short.md`, `architect-long.md`), dọn sạch các từ khóa tiếng Trung còn sót lại để tránh gây nhiễu cho mô hình.
+- **Việt hóa giao diện & định dạng xuất bản**:
+  - Bản địa hóa toàn bộ tiến trình nhiệm vụ và trạng thái hiển thị trên Terminal/TUI (như "Viết chương 1", "Quyển %d · Hồi %d").
+  - Đổi định dạng tiêu đề, mục lục và trang bìa trong file xuất bản (TXT, EPUB) sang tiếng Việt chuẩn, cấu hình thẻ ngôn ngữ EPUB thành `vi-VN`.
+- **Tương thích parser**: Bổ sung ánh xạ song ngữ tiêu đề trong `premise_structure.go` giúp AI có thể sinh dàn ý bằng tiếng Việt mà không làm hỏng cú pháp phân tích của Go backend.
+- **Cập nhật Regex**: Tối ưu regex phân tích số chương (`chapterRe` và `chapterTaskRe`) để hỗ trợ tốt cả hai định dạng `"第 N 章"` và `"Chương N"`.
+
 ## [v1.1.0] - 2026-07-02
 
 ### Thêm mới (Added)

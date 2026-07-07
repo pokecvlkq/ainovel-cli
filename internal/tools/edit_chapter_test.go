@@ -12,7 +12,7 @@ import (
 	"github.com/voocel/ainovel-cli/internal/store"
 )
 
-// TestEditChapterAppliesEdit 正常路径：drafts 已有内容，唯一匹配替换成功。
+// TestEditChapterAppliesEdit Đường dẫn bình thường: drafts đã có nội dung, khớp duy nhất và thay thế thành công.
 func TestEditChapterAppliesEdit(t *testing.T) {
 	dir := t.TempDir()
 	s := store.NewStore(dir)
@@ -22,15 +22,15 @@ func TestEditChapterAppliesEdit(t *testing.T) {
 	if err := s.Progress.Init("test", 10); err != nil {
 		t.Fatalf("InitProgress: %v", err)
 	}
-	if err := s.Drafts.SaveDraft(2, "他握紧了拳头，指节发白。"); err != nil {
+	if err := s.Drafts.SaveDraft(2, "Anh ta nắm chặt nắm đấm, các khớp ngón tay trắng bệch."); err != nil {
 		t.Fatalf("SaveDraft: %v", err)
 	}
 
 	tool := NewEditChapterTool(s)
 	args, _ := json.Marshal(map[string]any{
 		"chapter":    2,
-		"old_string": "指节发白",
-		"new_string": "指节泛起青白",
+		"old_string": "các khớp ngón tay trắng bệch",
+		"new_string": "các khớp ngón tay hiện lên vẻ xanh xao trắng bệch",
 	})
 	if _, err := tool.Execute(context.Background(), args); err != nil {
 		t.Fatalf("Execute: %v", err)
@@ -40,15 +40,15 @@ func TestEditChapterAppliesEdit(t *testing.T) {
 	if err != nil {
 		t.Fatalf("LoadDraft: %v", err)
 	}
-	if !strings.Contains(got, "指节泛起青白") {
+	if !strings.Contains(got, "các khớp ngón tay hiện lên vẻ xanh xao trắng bệch") {
 		t.Fatalf("expected draft to contain new text, got %q", got)
 	}
-	if strings.Contains(got, "指节发白") {
+	if strings.Contains(got, "các khớp ngón tay trắng bệch") {
 		t.Fatalf("old text should be replaced, got %q", got)
 	}
 }
 
-// TestEditChapterSeedsFromFinalChapter drafts 不存在但 chapters 有 → 自动从 chapters 播种。
+// TestEditChapterSeedsFromFinalChapter drafts không tồn tại nhưng chapters có → tự động lấy từ chapters.
 func TestEditChapterSeedsFromFinalChapter(t *testing.T) {
 	dir := t.TempDir()
 	s := store.NewStore(dir)
@@ -59,15 +59,15 @@ func TestEditChapterSeedsFromFinalChapter(t *testing.T) {
 		t.Fatalf("InitProgress: %v", err)
 	}
 
-	// 模拟第 3 章已提交且进入打磨队列
-	original := "风从窗缝里钻进来，带着潮湿的泥土气味。"
+	// Mô phỏng chương 3 đã được gửi và đưa vào hàng đợi trau chuốt
+	original := "Gió lùa vào từ khe cửa sổ, mang theo mùi đất ẩm ướt."
 	if err := s.Drafts.SaveFinalChapter(3, original); err != nil {
 		t.Fatalf("SaveFinalChapter: %v", err)
 	}
 	if err := s.Progress.MarkChapterComplete(3, len([]rune(original)), "mystery", "quest"); err != nil {
 		t.Fatalf("MarkChapterComplete: %v", err)
 	}
-	if err := s.Progress.SetPendingRewrites([]int{3}, "测试打磨"); err != nil {
+	if err := s.Progress.SetPendingRewrites([]int{3}, "Trau chuốt thử nghiệm"); err != nil {
 		t.Fatalf("SetPendingRewrites: %v", err)
 	}
 	if err := s.Progress.SetFlow(domain.FlowPolishing); err != nil {
@@ -77,23 +77,23 @@ func TestEditChapterSeedsFromFinalChapter(t *testing.T) {
 	tool := NewEditChapterTool(s)
 	args, _ := json.Marshal(map[string]any{
 		"chapter":    3,
-		"old_string": "潮湿的泥土气味",
-		"new_string": "泥土和铁锈混杂的气味",
+		"old_string": "mùi đất ẩm ướt",
+		"new_string": "mùi đất và rỉ sét lẫn lộn",
 	})
 	if _, err := tool.Execute(context.Background(), args); err != nil {
 		t.Fatalf("Execute: %v", err)
 	}
 
-	// drafts 应被播种且包含新文本
+	// drafts phải được gieo mầm và chứa văn bản mới
 	draft, err := s.Drafts.LoadDraft(3)
 	if err != nil {
 		t.Fatalf("LoadDraft: %v", err)
 	}
-	if !strings.Contains(draft, "泥土和铁锈混杂的气味") {
+	if !strings.Contains(draft, "mùi đất và rỉ sét lẫn lộn") {
 		t.Fatalf("expected draft seeded + edited, got %q", draft)
 	}
 
-	// chapters 保持原样（edit_chapter 不碰终稿）
+	// chapters giữ nguyên (edit_chapter không đụng vào bản cuối)
 	final, err := s.Drafts.LoadChapterText(3)
 	if err != nil {
 		t.Fatalf("LoadChapterText: %v", err)
@@ -103,7 +103,7 @@ func TestEditChapterSeedsFromFinalChapter(t *testing.T) {
 	}
 }
 
-// TestEditChapterRejectsCompletedWithoutQueue 已完成且不在重写队列中 → 拒绝。
+// TestEditChapterRejectsCompletedWithoutQueue Đã hoàn thành và không nằm trong hàng đợi viết lại → từ chối.
 func TestEditChapterRejectsCompletedWithoutQueue(t *testing.T) {
 	dir := t.TempDir()
 	s := store.NewStore(dir)
@@ -113,7 +113,7 @@ func TestEditChapterRejectsCompletedWithoutQueue(t *testing.T) {
 	if err := s.Progress.Init("test", 10); err != nil {
 		t.Fatalf("InitProgress: %v", err)
 	}
-	original := "第二章原始正文。"
+	original := "Nội dung gốc chương 2."
 	if err := s.Drafts.SaveDraft(2, original); err != nil {
 		t.Fatalf("SaveDraft: %v", err)
 	}
@@ -127,8 +127,8 @@ func TestEditChapterRejectsCompletedWithoutQueue(t *testing.T) {
 	tool := NewEditChapterTool(s)
 	args, _ := json.Marshal(map[string]any{
 		"chapter":    2,
-		"old_string": "原始正文",
-		"new_string": "篡改内容",
+		"old_string": "Nội dung gốc",
+		"new_string": "Nội dung bị giả mạo",
 	})
 	_, err := tool.Execute(context.Background(), args)
 	if err == nil {
@@ -139,7 +139,7 @@ func TestEditChapterRejectsCompletedWithoutQueue(t *testing.T) {
 	}
 }
 
-// TestEditChapterRejectsAmbiguousMatch 多处匹配且未开 replace_all → 报错。
+// TestEditChapterRejectsAmbiguousMatch Khớp nhiều chỗ và chưa bật replace_all → báo lỗi.
 func TestEditChapterRejectsAmbiguousMatch(t *testing.T) {
 	dir := t.TempDir()
 	s := store.NewStore(dir)
@@ -149,22 +149,22 @@ func TestEditChapterRejectsAmbiguousMatch(t *testing.T) {
 	if err := s.Progress.Init("test", 10); err != nil {
 		t.Fatalf("InitProgress: %v", err)
 	}
-	if err := s.Drafts.SaveDraft(2, "他笑了。她也笑了。"); err != nil {
+	if err := s.Drafts.SaveDraft(2, "Anh ấy cười. Cô ấy cũng cười."); err != nil {
 		t.Fatalf("SaveDraft: %v", err)
 	}
 
 	tool := NewEditChapterTool(s)
 	args, _ := json.Marshal(map[string]any{
 		"chapter":    2,
-		"old_string": "笑了",
-		"new_string": "沉默了",
+		"old_string": "cười",
+		"new_string": "im lặng",
 	})
 	if _, err := tool.Execute(context.Background(), args); err == nil {
 		t.Fatal("expected rejection for ambiguous match")
 	}
 }
 
-// TestEditChapterReplaceAll replace_all=true 时所有匹配均被替换。
+// TestEditChapterReplaceAll Khi replace_all=true, tất cả các kết quả khớp đều được thay thế.
 func TestEditChapterReplaceAll(t *testing.T) {
 	dir := t.TempDir()
 	s := store.NewStore(dir)
@@ -174,15 +174,15 @@ func TestEditChapterReplaceAll(t *testing.T) {
 	if err := s.Progress.Init("test", 10); err != nil {
 		t.Fatalf("InitProgress: %v", err)
 	}
-	if err := s.Drafts.SaveDraft(2, "他笑了。她也笑了。"); err != nil {
+	if err := s.Drafts.SaveDraft(2, "Anh ấy cười. Cô ấy cũng cười."); err != nil {
 		t.Fatalf("SaveDraft: %v", err)
 	}
 
 	tool := NewEditChapterTool(s)
 	args, _ := json.Marshal(map[string]any{
 		"chapter":     2,
-		"old_string":  "笑了",
-		"new_string":  "沉默了",
+		"old_string":  "cười",
+		"new_string":  "im lặng",
 		"replace_all": true,
 	})
 	if _, err := tool.Execute(context.Background(), args); err != nil {
@@ -190,15 +190,15 @@ func TestEditChapterReplaceAll(t *testing.T) {
 	}
 
 	got, _ := s.Drafts.LoadDraft(2)
-	if strings.Contains(got, "笑了") {
+	if strings.Contains(got, "cười") {
 		t.Fatalf("all occurrences should be replaced, got %q", got)
 	}
-	if strings.Count(got, "沉默了") != 2 {
+	if strings.Count(got, "im lặng") != 2 {
 		t.Fatalf("expected 2 replacements, got %q", got)
 	}
 }
 
-// TestEditChapterRejectsEmptyOldString 空 old_string → 参数非法。
+// TestEditChapterRejectsEmptyOldString old_string trống → Tham số không hợp lệ.
 func TestEditChapterRejectsEmptyOldString(t *testing.T) {
 	dir := t.TempDir()
 	s := store.NewStore(dir)
@@ -224,7 +224,7 @@ func TestEditChapterRejectsEmptyOldString(t *testing.T) {
 	}
 }
 
-// TestEditChapterRejectsNoDraftNoFinal drafts 与 chapters 都不存在 → 报错提示先 draft_chapter。
+// TestEditChapterRejectsNoDraftNoFinal drafts và chapters đều không tồn tại → Báo lỗi nhắc nhở draft_chapter trước.
 func TestEditChapterRejectsNoDraftNoFinal(t *testing.T) {
 	dir := t.TempDir()
 	s := store.NewStore(dir)
@@ -238,8 +238,8 @@ func TestEditChapterRejectsNoDraftNoFinal(t *testing.T) {
 	tool := NewEditChapterTool(s)
 	args, _ := json.Marshal(map[string]any{
 		"chapter":    5,
-		"old_string": "任何",
-		"new_string": "替换",
+		"old_string": "Bất kỳ",
+		"new_string": "Thay thế",
 	})
 	_, err := tool.Execute(context.Background(), args)
 	if err == nil {
@@ -250,8 +250,8 @@ func TestEditChapterRejectsNoDraftNoFinal(t *testing.T) {
 	}
 }
 
-// TestEditChapterWorksWithCommitValidation 整条链路：edit_chapter → commit_chapter 成功 drain 队列。
-// 验证新工具与 commit_chapter 的 drafts≠chapters 硬校验配合良好。
+// TestEditChapterWorksWithCommitValidation Toàn bộ chuỗi: edit_chapter → commit_chapter xả hàng đợi thành công.
+// Xác minh công cụ mới phối hợp tốt với kiểm tra cứng drafts≠chapters của commit_chapter.
 func TestEditChapterWorksWithCommitValidation(t *testing.T) {
 	dir := t.TempDir()
 	s := store.NewStore(dir)
@@ -262,7 +262,7 @@ func TestEditChapterWorksWithCommitValidation(t *testing.T) {
 		t.Fatalf("InitProgress: %v", err)
 	}
 
-	original := "风从窗缝里钻进来，带着潮湿的泥土气味。"
+	original := "Gió lùa vào từ khe cửa sổ, mang theo mùi đất ẩm ướt."
 	if err := s.Drafts.SaveDraft(2, original); err != nil {
 		t.Fatalf("SaveDraft: %v", err)
 	}
@@ -272,7 +272,7 @@ func TestEditChapterWorksWithCommitValidation(t *testing.T) {
 	if err := s.Progress.MarkChapterComplete(2, len([]rune(original)), "mystery", "quest"); err != nil {
 		t.Fatalf("MarkChapterComplete: %v", err)
 	}
-	if err := s.Progress.SetPendingRewrites([]int{2}, "打磨"); err != nil {
+	if err := s.Progress.SetPendingRewrites([]int{2}, "Trau chuốt"); err != nil {
 		t.Fatalf("SetPendingRewrites: %v", err)
 	}
 	if err := s.Progress.SetFlow(domain.FlowPolishing); err != nil {
@@ -282,8 +282,8 @@ func TestEditChapterWorksWithCommitValidation(t *testing.T) {
 	editTool := NewEditChapterTool(s)
 	editArgs, _ := json.Marshal(map[string]any{
 		"chapter":    2,
-		"old_string": "潮湿的泥土气味",
-		"new_string": "泥土和铁锈混杂的气味",
+		"old_string": "mùi đất ẩm ướt",
+		"new_string": "mùi đất và rỉ sét lẫn lộn",
 	})
 	if _, err := editTool.Execute(context.Background(), editArgs); err != nil {
 		t.Fatalf("edit_chapter: %v", err)
@@ -292,9 +292,9 @@ func TestEditChapterWorksWithCommitValidation(t *testing.T) {
 	commitTool := NewCommitChapterTool(s)
 	commitArgs, _ := json.Marshal(map[string]any{
 		"chapter":    2,
-		"summary":    "打磨后摘要",
-		"characters": []string{"主角"},
-		"key_events": []string{"完成打磨"},
+		"summary":    "Tóm tắt sau khi trau chuốt",
+		"characters": []string{"Nhân vật chính"},
+		"key_events": []string{"Hoàn thành trau chuốt"},
 	})
 	if _, err := commitTool.Execute(context.Background(), commitArgs); err != nil {
 		t.Fatalf("commit_chapter after edit: %v", err)

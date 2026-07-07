@@ -84,8 +84,8 @@ func Route(s State) *Instruction {
 		}
 		return &Instruction{
 			Agent:   "writer",
-			Task:    fmt.Sprintf("%s第 %d 章", verb, ch),
-			Reason:  fmt.Sprintf("PendingRewrites 队列剩余 %d 章", len(p.PendingRewrites)),
+			Task:    fmt.Sprintf("%s chương %d", verb, ch),
+			Reason:  fmt.Sprintf("Hàng đợi PendingRewrites còn lại %d chương", len(p.PendingRewrites)),
 			Chapter: ch,
 		}
 	}
@@ -107,32 +107,32 @@ func Route(s State) *Instruction {
 		case !s.HasArcReview:
 			return &Instruction{
 				Agent:  "editor",
-				Task:   fmt.Sprintf("对第 %d 卷第 %d 弧做弧级评审（scope=arc）", b.Volume, b.Arc),
-				Reason: "弧末评审未完成",
+				Task:   fmt.Sprintf("Tiến hành đánh giá Hồi đối với Quyển %d Hồi %d (scope=arc)", b.Volume, b.Arc),
+				Reason: "Chưa hoàn thành đánh giá Hồi cuối",
 			}
 		case !s.HasArcSummary:
 			return &Instruction{
 				Agent:  "editor",
-				Task:   fmt.Sprintf("生成第 %d 卷第 %d 弧摘要（save_arc_summary）", b.Volume, b.Arc),
-				Reason: "弧摘要未完成",
+				Task:   fmt.Sprintf("Tạo tóm tắt Hồi cho Quyển %d Hồi %d (save_arc_summary)", b.Volume, b.Arc),
+				Reason: "Chưa hoàn thành tóm tắt Hồi",
 			}
 		case b.IsVolumeEnd && !s.HasVolumeSummary:
 			return &Instruction{
 				Agent:  "editor",
-				Task:   fmt.Sprintf("生成第 %d 卷卷摘要（save_volume_summary）", b.Volume),
-				Reason: "卷摘要未完成",
+				Task:   fmt.Sprintf("Tạo tóm tắt Quyển cho Quyển %d (save_volume_summary)", b.Volume),
+				Reason: "Chưa hoàn thành tóm tắt Quyển",
 			}
 		case b.NeedsExpansion && b.NextArc > 0:
 			return &Instruction{
 				Agent:  "architect_long",
-				Task:   fmt.Sprintf("展开第 %d 卷第 %d 弧（save_foundation type=expand_arc）", b.NextVolume, b.NextArc),
-				Reason: "下一弧骨架待展开",
+				Task:   fmt.Sprintf("Triển khai Quyển %d Hồi %d (save_foundation type=expand_arc)", b.NextVolume, b.NextArc),
+				Reason: "Đang chờ triển khai khung Hồi tiếp theo",
 			}
 		case b.NeedsNewVolume:
 			return &Instruction{
 				Agent:  "architect_long",
-				Task:   "评估后调用 save_foundation type=append_volume（继续写）或 type=complete_book（全书结束）",
-				Reason: "卷末需决定追加新卷或结束全书",
+				Task:   "Sau khi đánh giá, gọi save_foundation type=append_volume (viết tiếp) hoặc type=complete_book (kết thúc toàn thư)",
+				Reason: "Cuối quyển cần quyết định thêm quyển mới hoặc kết thúc toàn thư",
 			}
 		}
 	}
@@ -144,17 +144,16 @@ func Route(s State) *Instruction {
 	}
 	return &Instruction{
 		Agent:   "writer",
-		Task:    fmt.Sprintf("写第 %d 章", next),
-		Reason:  "续写下一章",
+		Task:    fmt.Sprintf("Viết chương %d", next),
+		Reason:  "Viết tiếp chương sau",
 		Chapter: next,
 	}
 }
 
-// FormatMessage 把 Instruction 格式化为发给 Coordinator 的用户消息。
-// 格式固定，便于 Coordinator prompt 识别与 LLM 直接响应。
+// FormatMessage bọc Instruction thành tin nhắn gửi cho Coordinator.
 func FormatMessage(i *Instruction) string {
 	return fmt.Sprintf(
-		"[Host 下达指令]\n下一步：调用 subagent(%s, %q)\nagent: %s\ntask: %q\n理由：%s\n这是流程层的明确指令，请立即执行；subagent 的 agent/task 参数必须原样使用上面的 agent/task，不要改写 task，不要先调 novel_context，不要先输出推理。",
+		"[Host ra chỉ thị]\nBước tiếp theo: gọi subagent(%s, %q)\nagent: %s\ntask: %q\nLý do: %s\nĐây là chỉ thị rõ ràng của tầng quy trình, vui lòng thực thi ngay lập tức; tham số agent/task của subagent phải được sử dụng nguyên văn như agent/task ở trên, không được viết lại task, không được gọi novel_context trước, không được xuất ra suy luận trước.",
 		i.Agent, i.Task, i.Agent, i.Task, i.Reason,
 	)
 }

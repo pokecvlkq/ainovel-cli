@@ -8,17 +8,23 @@ import { ReviewPage } from './pages/ReviewPage';
 import { ChatPage } from './pages/ChatPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { GetSnapshot } from '../wailsjs/go/main/App';
+import { useNovelStore } from './stores/novelStore';
 import './styles/globals.css';
+
+import { EventsOn } from '../wailsjs/runtime/runtime';
 
 const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
   const [checking, setChecking] = useState(true);
+  const { setSnapshot, addEvent, appendStream, clearStream, setComplete } = useNovelStore();
 
   useEffect(() => {
     GetSnapshot()
       .then((snap) => {
         if (!snap || !snap.NovelName) {
           navigate('/welcome');
+        } else {
+          setSnapshot(snap);
         }
       })
       .catch(() => {
@@ -27,10 +33,45 @@ const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       .finally(() => {
         setChecking(false);
       });
-  }, [navigate]);
+  }, [navigate, setSnapshot]);
+
+  // Lắng nghe sự kiện từ Backend
+  useEffect(() => {
+    const unsubSnapshot = EventsOn('novel:snapshot', (snap: any) => {
+      if (snap) setSnapshot(snap);
+    });
+    const unsubEvent = EventsOn('novel:event', (ev: any) => {
+      if (ev) {
+        addEvent({
+          id: ev.ID || '',
+          agent: ev.Agent || 'SYSTEM',
+          type: ev.Level || 'info',
+          message: ev.Summary || ev.Detail || '',
+          timestamp: new Date(ev.Time).getTime() || Date.now(),
+        });
+      }
+    });
+    const unsubStream = EventsOn('novel:stream', (delta: any) => {
+      if (delta) appendStream(delta);
+    });
+    const unsubStreamClear = EventsOn('novel:stream-clear', () => {
+      clearStream();
+    });
+    const unsubDone = EventsOn('novel:done', () => {
+      setComplete(true);
+    });
+
+    return () => {
+      unsubSnapshot();
+      unsubEvent();
+      unsubStream();
+      unsubStreamClear();
+      unsubDone();
+    };
+  }, [setSnapshot, addEvent, appendStream, clearStream, setComplete]);
 
   if (checking) {
-    return <div className="h-screen w-screen bg-black flex items-center justify-center"><div className="animate-pulse text-slate-500 font-mono">Initializing Backend...</div></div>;
+    return <div className="h-screen w-screen bg-black flex items-center justify-center"><div className="animate-pulse text-slate-500 font-mono">Đang kết nối Backend...</div></div>;
   }
 
   return <>{children}</>;

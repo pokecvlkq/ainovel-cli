@@ -57,7 +57,7 @@ func buildLocations(volumes []domain.VolumeOutline) map[int]chapterLocation {
 }
 
 // chapterHeaderRe 匹配带章号的 Markdown 标题首行（# 第N章 / ## 第 12 章 ...）。
-var chapterHeaderRe = regexp.MustCompile(`^#+\s+第.+?章`)
+var chapterHeaderRe = regexp.MustCompile(`(?i)^#+\s+(?:第.+?章|Chương\s+\d+)`)
 
 // atxTitleRe 提取 ATX 标题（# 标题）的文字部分。
 var atxTitleRe = regexp.MustCompile(`^#{1,6}\s+(.+?)\s*$`)
@@ -114,16 +114,16 @@ func renderTXT(
 		if useLayered {
 			if loc, ok := locations[ch]; ok && loc.IsFirstOfVolume {
 				b.WriteString("\n═══════════════════════════════════════════\n")
-				fmt.Fprintf(&b, "           第 %d 卷  %s\n", loc.VolumeIdx, strings.TrimSpace(loc.VolumeTitle))
+				fmt.Fprintf(&b, "           Quyển %d  %s\n", loc.VolumeIdx, strings.TrimSpace(loc.VolumeTitle))
 				b.WriteString("═══════════════════════════════════════════\n\n")
 			}
 		}
 
 		title := strings.TrimSpace(titleIdx[ch])
 		if title != "" {
-			fmt.Fprintf(&b, "第 %d 章  %s\n\n", ch, title)
+			fmt.Fprintf(&b, "Chương %d: %s\n\n", ch, title)
 		} else {
-			fmt.Fprintf(&b, "第 %d 章\n\n", ch)
+			fmt.Fprintf(&b, "Chương %d\n\n", ch)
 		}
 
 		body := stripChapterTitleHeader(strings.TrimSpace(bodies[ch]), title)

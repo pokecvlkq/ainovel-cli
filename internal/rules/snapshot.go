@@ -186,11 +186,11 @@ func SystemDefaults() Candidate {
 		Structured: Structured{
 			ChapterWords: &WordRange{Min: 3000, Max: 6000},
 			// 定长固定串的 AI 套句；checker 字面子串匹配，带变量的模式（不是X而是Y）归语义层。
-			ForbiddenPhrases: []string{"某种程度上", "值得注意的是", "不知为何", "五味杂陈"},
+			ForbiddenPhrases: []string{"một phần nào đó", "đáng chú ý là", "không hiểu sao", "cảm xúc lẫn lộn"},
 			FatigueWords: map[string]int{
-				"不禁": 1, "竟然": 1, "仿佛": 2, "此外": 1, "然而": 2,
-				"一丝": 2, "一抹": 2, "一缕": 2, "宛如": 1, "不由得": 1,
-				"像一": 3, "沉默了": 2, "没有说话": 2, "几息": 3, "一息": 3, "数息": 2,
+				"không khỏi": 1, "vậy mà": 1, "dường như": 2, "hơn nữa": 1, "tuy nhiên": 2,
+				"một tia": 2, "một vệt": 2, "một luồng": 2, "như thể": 1, "bất giác": 1,
+				"giống như": 3, "trầm mặc": 2, "không nói gì": 2, "vài hơi thở": 3, "một hơi thở": 3, "nửa ngày": 2,
 			},
 		},
 	}

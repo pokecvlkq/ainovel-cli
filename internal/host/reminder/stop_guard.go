@@ -53,7 +53,7 @@ func NewStopGuard(st *store.Store, onBlock func(reason string, consecutive int32
 		}
 		inject := blockMessage(st, progress)
 		if progress != nil && len(progress.PendingRewrites) > 0 {
-			inject = fmt.Sprintf("禁止结束对话。待重写队列未清：%v，请立即调 writer 处理。", progress.PendingRewrites)
+			inject = fmt.Sprintf("Cấm kết thúc phiên thoại. Hàng đợi viết lại vẫn chưa dọn xong: %v, vui lòng gọi ngay writer để xử lý.", progress.PendingRewrites)
 		}
 		slog.Warn("stop_guard 拦截 end_turn",
 			"module", "host.reminder", "turn", info.TurnIndex, "consecutive", n)
@@ -66,7 +66,7 @@ func NewStopGuard(st *store.Store, onBlock func(reason string, consecutive int32
 
 func blockMessage(st *store.Store, progress *domain.Progress) string {
 	if progress != nil && flow.Route(flow.LoadState(st)) != nil {
-		return "禁止结束对话。Phase 尚未 Complete；请等待并执行 Host 下达的 [Host 下达指令]，不要自行调用 novel_context 或 subagent。"
+		return "Cấm kết thúc phiên thoại. Phase vẫn chưa Complete; vui lòng đợi và thực thi chỉ thị do Host ban hành [Host ra chỉ thị], không tự ý gọi novel_context hoặc subagent."
 	}
-	return "禁止结束对话。Phase 尚未 Complete，且当前没有 Host 路由指令；这是 Coordinator 裁定场景，请按 coordinator.md 的裁定规则继续处理，不要空等 Host 指令。"
+	return "Cấm kết thúc phiên thoại. Phase vẫn chưa Complete, và hiện tại không có chỉ thị điều hướng nào từ Host; đây là tình huống chờ đánh giá của Coordinator, vui lòng tiếp tục xử lý theo quy tắc của coordinator.md, đừng chờ đợi vô ích chỉ thị của Host."
 }

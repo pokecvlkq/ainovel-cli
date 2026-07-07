@@ -16,7 +16,7 @@ import (
 	"github.com/voocel/ainovel-cli/internal/store"
 )
 
-// CommitChapterTool 提交章节：加载正文 → 保存终稿 → 生成摘要 → 更新状态 → 更新进度。
+// CommitChapterTool Gửi chương: Tải văn bản → Lưu bản cuối cùng → Tạo tóm tắt → Cập nhật trạng thái → Cập nhật tiến độ.
 type CommitChapterTool struct {
 	store *store.Store
 }
@@ -25,8 +25,8 @@ func NewCommitChapterTool(store *store.Store) *CommitChapterTool {
 	return &CommitChapterTool{store: store}
 }
 
-// commitOutput 在 domain.CommitResult 之上嵌入扩展字段，保持 domain 包不依赖 rules。
-// 由于嵌入字段会被 JSON marshaler 提升（promoted），序列化结果等同于扁平结构。
+// commitOutput nhúng các trường mở rộng lên trên domain.CommitResult để giữ gói domain không phụ thuộc vào rules.
+// Vì các trường nhúng sẽ được JSON marshaler nâng cấp (promoted), kết quả tuần tự hoá tương đương với cấu trúc phẳng.
 type commitOutput struct {
 	domain.CommitResult
 	RuleViolations []rules.Violation `json:"rule_violations,omitempty"`
@@ -34,58 +34,58 @@ type commitOutput struct {
 
 func (t *CommitChapterTool) Name() string { return "commit_chapter" }
 func (t *CommitChapterTool) Description() string {
-	return "提交章节终稿。加载草稿正文保存为终稿，更新时间线、伏笔、关系、角色状态和进度。" +
-		"返回结构化事实：next_chapter / review_required / arc_end / volume_end / needs_expansion / book_complete / flow 等"
+	return "Gửi bản cuối của chương. Tải bản nháp lưu thành bản cuối, cập nhật dòng thời gian, foreshadowing, mối quan hệ, trạng thái nhân vật và tiến độ." +
+		"Trả về các thông tin có cấu trúc: next_chapter / review_required / arc_end / volume_end / needs_expansion / book_complete / flow v.v."
 }
-func (t *CommitChapterTool) Label() string { return "提交章节" }
+func (t *CommitChapterTool) Label() string { return "Gửi chương" }
 
-// 写工具（跨域原子操作：草稿→终稿→摘要→进度→checkpoint），禁止并发。
+// Công cụ ghi (thao tác nguyên tử xuyên miền: bản nháp → bản cuối → tóm tắt → tiến độ → checkpoint), cấm đồng thời.
 func (t *CommitChapterTool) ReadOnly(_ json.RawMessage) bool        { return false }
 func (t *CommitChapterTool) ConcurrencySafe(_ json.RawMessage) bool { return false }
 
 func (t *CommitChapterTool) Schema() map[string]any {
 	timelineSchema := schema.Object(
-		schema.Property("time", schema.String("故事内时间")).Required(),
-		schema.Property("event", schema.String("事件描述")).Required(),
-		schema.Property("characters", schema.Array("涉及角色", schema.String(""))),
+		schema.Property("time", schema.String("Thời gian trong truyện")).Required(),
+		schema.Property("event", schema.String("Mô tả sự kiện")).Required(),
+		schema.Property("characters", schema.Array("Nhân vật liên quan", schema.String(""))),
 	)
 	foreshadowSchema := schema.Object(
-		schema.Property("id", schema.String("伏笔 ID")).Required(),
-		schema.Property("action", schema.Enum("操作", "plant", "advance", "resolve")).Required(),
-		schema.Property("description", schema.String("伏笔描述（仅 plant 时必需）")),
+		schema.Property("id", schema.String("ID foreshadowing")).Required(),
+		schema.Property("action", schema.Enum("Thao tác", "plant", "advance", "resolve")).Required(),
+		schema.Property("description", schema.String("Mô tả foreshadowing (chỉ bắt buộc khi plant)")),
 	)
 	relationshipSchema := schema.Object(
-		schema.Property("character_a", schema.String("角色 A")).Required(),
-		schema.Property("character_b", schema.String("角色 B")).Required(),
-		schema.Property("relation", schema.String("当前关系描述")).Required(),
+		schema.Property("character_a", schema.String("Nhân vật A")).Required(),
+		schema.Property("character_b", schema.String("Nhân vật B")).Required(),
+		schema.Property("relation", schema.String("Mô tả mối quan hệ hiện tại")).Required(),
 	)
 	stateChangeSchema := schema.Object(
-		schema.Property("entity", schema.String("角色名或实体名")).Required(),
-		schema.Property("field", schema.String("变化属性")).Required(),
-		schema.Property("old_value", schema.String("变化前的值")),
-		schema.Property("new_value", schema.String("变化后的值")).Required(),
-		schema.Property("reason", schema.String("变化原因")),
+		schema.Property("entity", schema.String("Tên nhân vật hoặc tên thực thể")).Required(),
+		schema.Property("field", schema.String("Thuộc tính thay đổi")).Required(),
+		schema.Property("old_value", schema.String("Giá trị trước khi thay đổi")),
+		schema.Property("new_value", schema.String("Giá trị sau khi thay đổi")).Required(),
+		schema.Property("reason", schema.String("Lý do thay đổi")),
 	)
 	feedbackSchema := schema.Object(
-		schema.Property("deviation", schema.String("偏离大纲的描述")).Required(),
-		schema.Property("suggestion", schema.String("对后续大纲的调整建议")).Required(),
+		schema.Property("deviation", schema.String("Mô tả sự sai lệch so với đề cương")).Required(),
+		schema.Property("suggestion", schema.String("Đề xuất điều chỉnh cho đề cương tiếp theo")).Required(),
 	)
-	feedbackSchema["description"] = "对后续大纲的建议对象；必须直接传 JSON object，不要传字符串化 JSON"
+	feedbackSchema["description"] = "Đối tượng gợi ý cho đề cương tiếp theo; phải truyền trực tiếp JSON object, đừng truyền JSON đã string hóa"
 	return schema.Object(
-		schema.Property("chapter", schema.Int("章节号")).Required(),
-		schema.Property("summary", schema.String("本章内容摘要（200字以内）")).Required(),
-		schema.Property("characters", schema.Array("本章出场角色名", schema.String(""))).Required(),
-		schema.Property("key_events", schema.Array("本章关键事件", schema.String(""))).Required(),
-		schema.Property("timeline_events", schema.Array("本章时间线事件", timelineSchema)),
-		schema.Property("foreshadow_updates", schema.Array("伏笔操作", foreshadowSchema)),
-		schema.Property("relationship_changes", schema.Array("关系变化", relationshipSchema)),
-		schema.Property("state_changes", schema.Array("角色/实体状态变化", stateChangeSchema)),
-		schema.Property("cast_intros", schema.Array("本章首次引入且后续可能再出现的次要角色简介（不含主角及 characters.json 已有角色）", schema.Object(
-			schema.Property("name", schema.String("角色名")).Required(),
-			schema.Property("brief_role", schema.String("一句话定位（如：客栈老板/赌坊打手）")).Required(),
+		schema.Property("chapter", schema.Int("Số chương")).Required(),
+		schema.Property("summary", schema.String("Tóm tắt nội dung chương này (dưới 200 chữ)")).Required(),
+		schema.Property("characters", schema.Array("Tên các nhân vật xuất hiện trong chương này", schema.String(""))).Required(),
+		schema.Property("key_events", schema.Array("Các sự kiện chính trong chương này", schema.String(""))).Required(),
+		schema.Property("timeline_events", schema.Array("Các sự kiện dòng thời gian trong chương này", timelineSchema)),
+		schema.Property("foreshadow_updates", schema.Array("Thao tác foreshadowing", foreshadowSchema)),
+		schema.Property("relationship_changes", schema.Array("Thay đổi mối quan hệ", relationshipSchema)),
+		schema.Property("state_changes", schema.Array("Thay đổi trạng thái nhân vật/thực thể", stateChangeSchema)),
+		schema.Property("cast_intros", schema.Array("Giới thiệu nhân vật phụ xuất hiện lần đầu trong chương này và có thể xuất hiện lại sau này (không bao gồm nhân vật chính và các nhân vật đã có trong characters.json)", schema.Object(
+			schema.Property("name", schema.String("Tên nhân vật")).Required(),
+			schema.Property("brief_role", schema.String("Định vị bằng một câu (ví dụ: ông chủ nhà trọ/bảo kê sòng bạc)")).Required(),
 		))),
-		schema.Property("hook_type", schema.Enum("章末钩子类型", "crisis", "mystery", "desire", "emotion", "choice")),
-		schema.Property("dominant_strand", schema.Enum("本章主导叙事线", "quest", "fire", "constellation")),
+		schema.Property("hook_type", schema.Enum("Loại hook cuối chương", "crisis", "mystery", "desire", "emotion", "choice")),
+		schema.Property("dominant_strand", schema.Enum("Tuyến tự sự chính trong chương", "quest", "fire", "constellation")),
 		schema.Property("feedback", feedbackSchema),
 	)
 }
@@ -112,14 +112,14 @@ func (t *CommitChapterTool) Execute(_ context.Context, args json.RawMessage) (js
 		return nil, fmt.Errorf("chapter must be > 0: %w", errs.ErrToolArgs)
 	}
 	if t.store.Progress.IsChapterCompleted(a.Chapter) {
-		// 清理可能残留的 PendingCommit（崩溃发生在 ProgressMarked 之后、ClearPendingCommit 之前）
+		// Xoá các PendingCommit có thể còn sót lại (sự cố xảy ra sau ProgressMarked, trước ClearPendingCommit)
 		if pending, _ := t.store.Signals.LoadPendingCommit(); pending != nil && pending.Chapter == a.Chapter {
 			if err := t.appendCommitCheckpoint(a.Chapter); err != nil {
 				return nil, fmt.Errorf("checkpoint commit: %w: %w", errs.ErrStoreWrite, err)
 			}
 			_ = t.store.Signals.ClearPendingCommit()
 		}
-		// 打磨/重写路径：章节虽已完成，但仍在 pending_rewrites 中，允许覆盖并 drain 队列
+		// Đường dẫn trau chuốt/viết lại: mặc dù chương đã hoàn thành nhưng vẫn ở trong pending_rewrites, cho phép ghi đè và xả (drain) hàng đợi
 		progress, _ := t.store.Progress.Load()
 		if progress != nil && slices.Contains(progress.PendingRewrites, a.Chapter) {
 			return t.executeRewriteCommit(a.Chapter, a.Summary, a.Characters, a.KeyEvents,
@@ -132,33 +132,33 @@ func (t *CommitChapterTool) Execute(_ context.Context, args json.RawMessage) (js
 		return nil, fmt.Errorf("load pending commit: %w: %w", errs.ErrStoreRead, err)
 	}
 	if existingPending != nil && existingPending.Chapter != a.Chapter {
-		return nil, fmt.Errorf("存在未恢复的章节提交：第 %d 章（阶段 %s），请先恢复或重新提交该章: %w", existingPending.Chapter, existingPending.Stage, errs.ErrToolConflict)
+		return nil, fmt.Errorf("Có commit chương chưa được khôi phục: chương %d (giai đoạn %s), vui lòng khôi phục hoặc gửi lại chương này trước: %w", existingPending.Chapter, existingPending.Stage, errs.ErrToolConflict)
 	}
 	if err := t.store.Progress.ValidateChapterWork(a.Chapter); err != nil {
-		// 队列冲突保持原样（已带 ErrToolConflict 分类）；其他 IO 错误归 Precondition。
+		// Xung đột hàng đợi giữ nguyên (đã có phân loại ErrToolConflict); các lỗi IO khác được phân vào Precondition.
 		if errors.Is(err, errs.ErrToolConflict) {
 			return nil, err
 		}
-		return nil, fmt.Errorf("章节当前不允许提交: %w: %w", errs.ErrToolPrecondition, err)
+		return nil, fmt.Errorf("Chương hiện không được phép gửi: %w: %w", errs.ErrToolPrecondition, err)
 	}
 
-	// 分层模式越界拦截：必须先于任何写操作，否则越界 commit 会把章节文件、摘要、
-	// Progress 都改坏。boundary 复用给下方第 6b 步算弧/卷信号。
+	// Chặn vượt quá giới hạn trong chế độ phân lớp: Phải thực hiện trước bất kỳ thao tác ghi nào, nếu không commit vượt giới hạn sẽ làm hỏng tệp chương, tóm tắt,
+	// Tiến độ đều bị làm hỏng. boundary được tái sử dụng cho bước 6b bên dưới để tính tín hiệu arc/volume.
 	var boundary *store.ArcBoundary
 	if progress, perr := t.store.Progress.Load(); perr == nil && progress != nil && progress.Layered {
 		b, bErr := t.store.Outline.CheckArcBoundary(a.Chapter)
 		if bErr != nil {
-			return nil, fmt.Errorf("弧边界检测失败 chapter=%d: %w: %w", a.Chapter, errs.ErrStoreRead, bErr)
+			return nil, fmt.Errorf("Phát hiện biên arc thất bại chapter=%d: %w: %w", a.Chapter, errs.ErrStoreRead, bErr)
 		}
 		if b == nil {
 			return nil, fmt.Errorf(
-				"第 %d 章不在分层大纲范围内：写作必须先 expand_arc 扩展弧或 append_volume 追加卷；若全书已完结请调 save_foundation type=complete_book: %w",
+				"Chương %d không nằm trong phạm vi đề cương phân lớp: việc viết phải gọi expand_arc (mở rộng arc) hoặc append_volume (thêm volume) trước; nếu toàn bộ cuốn sách đã hoàn thành, vui lòng gọi save_foundation type=complete_book: %w",
 				a.Chapter, errs.ErrToolPrecondition)
 		}
 		boundary = b
 	}
 
-	// 1. 加载章节正文
+	// 1. Tải nội dung văn bản của chương
 	content, wordCount, err := t.store.Drafts.LoadChapterContent(a.Chapter)
 	if err != nil {
 		return nil, fmt.Errorf("load chapter content: %w: %w", errs.ErrStoreRead, err)
@@ -181,12 +181,12 @@ func (t *CommitChapterTool) Execute(_ context.Context, args json.RawMessage) (js
 		return nil, fmt.Errorf("save pending commit: %w: %w", errs.ErrStoreWrite, err)
 	}
 
-	// 2. 保存终稿
+	// 2. Lưu bản cuối cùng
 	if err := t.store.Drafts.SaveFinalChapter(a.Chapter, content); err != nil {
 		return nil, fmt.Errorf("save final chapter: %w: %w", errs.ErrStoreWrite, err)
 	}
 
-	// 3. 保存摘要
+	// 3. Lưu tóm tắt
 	summary := domain.ChapterSummary{
 		Chapter:    a.Chapter,
 		Summary:    a.Summary,
@@ -197,7 +197,7 @@ func (t *CommitChapterTool) Execute(_ context.Context, args json.RawMessage) (js
 		return nil, fmt.Errorf("save summary: %w: %w", errs.ErrStoreWrite, err)
 	}
 
-	// 4. 更新状态增量
+	// 4. Cập nhật gia số trạng thái
 	if len(a.TimelineEvents) > 0 {
 		for i := range a.TimelineEvents {
 			a.TimelineEvents[i].Chapter = a.Chapter
@@ -228,12 +228,12 @@ func (t *CommitChapterTool) Execute(_ context.Context, args json.RawMessage) (js
 		}
 	}
 
-	// 4b. 累加配角名册：本章出场的非核心角色进 cast_ledger，供 novel_context 召回。
-	// 失败时只 warn 不阻断 commit——名册是次要数据，可通过下一章 commit 自愈。
+	// 4b. Tích luỹ danh sách nhân vật phụ: các nhân vật không cốt lõi xuất hiện trong chương này sẽ vào cast_ledger để novel_context có thể gọi lại.
+	// Khi thất bại chỉ cảnh báo (warn) chứ không chặn commit —— danh sách nhân vật là dữ liệu thứ yếu, có thể tự phục hồi thông qua commit ở chương tiếp theo.
 	if len(a.Characters) > 0 {
 		coreNames := loadCoreCharacterNameSet(t.store)
 		if err := t.store.Cast.MergeAppearances(a.Chapter, a.Characters, a.CastIntros, coreNames); err != nil {
-			slog.Warn("配角名册累加失败，跳过", "module", "commit", "chapter", a.Chapter, "err", err)
+			slog.Warn("Tích luỹ danh sách nhân vật phụ thất bại, bỏ qua", "module", "commit", "chapter", a.Chapter, "err", err)
 		}
 	}
 
@@ -243,12 +243,12 @@ func (t *CommitChapterTool) Execute(_ context.Context, args json.RawMessage) (js
 		return nil, fmt.Errorf("update pending commit stage: %w: %w", errs.ErrStoreWrite, err)
 	}
 
-	// 5. 更新进度
+	// 5. Cập nhật tiến độ
 	if err := t.store.Progress.MarkChapterComplete(a.Chapter, wordCount, a.HookType, a.DominantStrand); err != nil {
 		return nil, fmt.Errorf("mark chapter complete: %w: %w", errs.ErrStoreWrite, err)
 	}
 
-	// 6. 判断是否需要审阅
+	// 6. Đánh giá xem có cần xét duyệt hay không
 	progress, err := t.store.Progress.Load()
 	if err != nil {
 		return nil, fmt.Errorf("load progress: %w: %w", errs.ErrStoreRead, err)
@@ -258,7 +258,7 @@ func (t *CommitChapterTool) Execute(_ context.Context, args json.RawMessage) (js
 		completedCount = len(progress.CompletedChapters)
 	}
 
-	// 6b. 长篇模式弧/卷信号：boundary 已在入口前置校验，Layered 时保证非 nil
+	// 6b. Tín hiệu arc/volume của chế độ tiểu thuyết dài: boundary đã được xác thực trước ở lối vào, đảm bảo không nil khi Layered
 	var arcEnd, volumeEnd, needsExpansion, needsNewVolume bool
 	var vol, arc, nextVol, nextArc int
 	if progress != nil && progress.Layered && boundary != nil {
@@ -281,7 +281,7 @@ func (t *CommitChapterTool) Execute(_ context.Context, args json.RawMessage) (js
 		reviewRequired, reviewReason = domain.ShouldReview(completedCount)
 	}
 
-	// 7. 构造结构化信号
+	// 7. Cấu trúc tín hiệu được xây dựng
 	result := domain.CommitResult{
 		Chapter:        a.Chapter,
 		Committed:      true,
@@ -302,7 +302,7 @@ func (t *CommitChapterTool) Execute(_ context.Context, args json.RawMessage) (js
 		NextArc:        nextArc,
 	}
 
-	// 8. 完成态判定：非分层写完最后一章 / 分层最终卷最后一章 → MarkComplete
+	// 8. Đánh giá trạng thái hoàn thành: Viết xong chương cuối cùng ở chế độ không phân lớp / chương cuối của tập cuối cùng ở chế độ phân lớp → MarkComplete
 	if t.applyCompletion(&result, progress) {
 		result.BookComplete = true
 	}
@@ -317,13 +317,13 @@ func (t *CommitChapterTool) Execute(_ context.Context, args json.RawMessage) (js
 		return nil, fmt.Errorf("update pending commit result: %w: %w", errs.ErrStoreWrite, err)
 	}
 
-	// 9. 追加 checkpoint。必须先于清除 pending_commit，确保重启后可见的
-	// pending_commit 总能驱动重跑补齐缺失 checkpoint。
+	// 9. Bổ sung checkpoint. Phải thực hiện trước khi xoá pending_commit, đảm bảo
+	// pending_commit có thể nhìn thấy sau khi khởi động lại luôn có thể điều khiển chạy lại để bù đắp checkpoint bị thiếu.
 	if err := t.appendCommitCheckpoint(a.Chapter); err != nil {
 		return nil, fmt.Errorf("checkpoint commit: %w: %w", errs.ErrStoreWrite, err)
 	}
 
-	// 10. 清除进度中间状态
+	// 10. Xoá trạng thái trung gian của tiến độ
 	if err := t.store.Progress.ClearInProgress(); err != nil {
 		return nil, fmt.Errorf("clear in-progress: %w: %w", errs.ErrStoreWrite, err)
 	}
@@ -331,7 +331,7 @@ func (t *CommitChapterTool) Execute(_ context.Context, args json.RawMessage) (js
 		return nil, fmt.Errorf("clear pending commit: %w: %w", errs.ErrStoreWrite, err)
 	}
 
-	// 11. 机械规则检查（仅返事实，不阻断）
+	// 11. Kiểm tra quy tắc cơ học (chỉ trả về sự thật, không chặn)
 	violations := t.checkRules(content, wordCount)
 	return json.Marshal(commitOutput{CommitResult: result, RuleViolations: violations})
 }
@@ -344,8 +344,8 @@ func (t *CommitChapterTool) appendCommitCheckpoint(chapter int) error {
 	return err
 }
 
-// checkRules 对章节正文做机械检查：内置产品底线 Lint（机制残留，始终执行）
-// + 用户规则 Check（读本书快照的 structured；快照缺失退到内置默认，保证机械底线始终在）。
+// checkRules thực hiện kiểm tra cơ học trên nội dung chương: Lint đường cơ sở của sản phẩm tích hợp (cơ chế còn sót lại, luôn thực thi)
+// + User rules Check (đọc snapshot structured của sách; nếu snapshot bị thiếu, lùi về mặc định tích hợp sẵn để đảm bảo đường cơ sở cơ học luôn tồn tại).
 func (t *CommitChapterTool) checkRules(text string, wordCount int) []rules.Violation {
 	violations := rules.Lint(text)
 	structured := rules.SystemDefaults().Structured
@@ -355,9 +355,9 @@ func (t *CommitChapterTool) checkRules(text string, wordCount int) []rules.Viola
 	return append(violations, rules.Check(text, wordCount, structured)...)
 }
 
-// executeRewriteCommit 处理打磨/重写章节的提交：覆盖终稿与摘要、更新字数、drain 队列。
-// 跳过所有世界状态追加（timeline / foreshadow / relationship / state_changes）与弧边界检测，
-// 这些已在章节原始提交时应用。
+// executeRewriteCommit xử lý việc gửi các chương trau chuốt/viết lại: ghi đè bản cuối cùng và bản tóm tắt, cập nhật số từ, xả (drain) hàng đợi.
+// Bỏ qua tất cả các thao tác bổ sung trạng thái thế giới (timeline / foreshadow / relationship / state_changes) và kiểm tra ranh giới arc,
+// những thứ này đã được áp dụng trong lần gửi ban đầu của chương.
 func (t *CommitChapterTool) executeRewriteCommit(
 	chapter int,
 	summary string,
@@ -365,7 +365,7 @@ func (t *CommitChapterTool) executeRewriteCommit(
 	hookType, dominantStrand string,
 	progress *domain.Progress,
 ) (json.RawMessage, error) {
-	// 1. 加载打磨后的正文
+	// 1. Tải văn bản đã được trau chuốt
 	content, wordCount, err := t.store.Drafts.LoadChapterContent(chapter)
 	if err != nil {
 		return nil, fmt.Errorf("rewrite: load chapter content: %w: %w", errs.ErrStoreRead, err)
@@ -374,24 +374,24 @@ func (t *CommitChapterTool) executeRewriteCommit(
 		return nil, fmt.Errorf("no content found for chapter %d: %w", chapter, errs.ErrToolPrecondition)
 	}
 
-	// 2. 硬校验：drafts 与现终稿完全相同 → 判定为未真正打磨/重写（writer 跳过了 draft_chapter）
-	// 拒绝 commit，强制 writer 先调 draft_chapter(mode=write) 写入新版本。
+	// 2. Xác thực cứng: drafts hoàn toàn giống với bản cuối cùng hiện tại → xác định là chưa thực sự trau chuốt/viết lại (writer đã bỏ qua draft_chapter)
+	// Từ chối commit, buộc người viết gọi draft_chapter(mode=write) trước để viết một phiên bản mới.
 	existingFinal, _ := t.store.Drafts.LoadChapterText(chapter)
 	if existingFinal != "" && existingFinal == content {
-		mode := "重写"
+		mode := "viết lại"
 		if progress != nil && progress.Flow == domain.FlowPolishing {
-			mode = "打磨"
+			mode = "trau chuốt"
 		}
-		return nil, fmt.Errorf("第 %d 章 drafts 与 chapters 内容完全相同，未检测到%s改动。请先调 draft_chapter(mode=write, chapter=%d) 写入%s后的新正文，再 commit_chapter: %w",
+		return nil, fmt.Errorf("Chương %d drafts có nội dung hoàn toàn giống với chapters, chưa phát hiện thay đổi %s. Vui lòng gọi draft_chapter(mode=write, chapter=%d) trước để ghi văn bản mới sau khi %s, sau đó gọi commit_chapter: %w",
 			chapter, mode, chapter, mode, errs.ErrToolPrecondition)
 	}
 
-	// 3. 覆盖终稿
+	// 3. Ghi đè bản cuối cùng
 	if err := t.store.Drafts.SaveFinalChapter(chapter, content); err != nil {
 		return nil, fmt.Errorf("rewrite: save final chapter: %w: %w", errs.ErrStoreWrite, err)
 	}
 
-	// 3. 覆盖摘要
+	// 3. Ghi đè bản tóm tắt
 	if err := t.store.Summaries.SaveSummary(domain.ChapterSummary{
 		Chapter:    chapter,
 		Summary:    summary,
@@ -401,12 +401,12 @@ func (t *CommitChapterTool) executeRewriteCommit(
 		return nil, fmt.Errorf("rewrite: save summary: %w: %w", errs.ErrStoreWrite, err)
 	}
 
-	// 4. 更新字数（MarkChapterComplete 对已完成章节是幂等的：replaces word count, slice.Contains 防止重复入队）
+	// 4. Cập nhật số từ (MarkChapterComplete là idempotic đối với các chương đã hoàn thành: thay thế word count, slice.Contains ngăn cản việc vào hàng đợi nhiều lần)
 	if err := t.store.Progress.MarkChapterComplete(chapter, wordCount, hookType, dominantStrand); err != nil {
 		return nil, fmt.Errorf("rewrite: update word count: %w: %w", errs.ErrStoreWrite, err)
 	}
 
-	// 5. Drain 待处理队列；队列空时 CompleteRewrite 会自动把 flow 切回 writing
+	// 5. Xả (Drain) hàng đợi đang chờ xử lý; khi hàng đợi rỗng, CompleteRewrite sẽ tự động chuyển dòng (flow) trở lại quá trình viết (writing)
 	if err := t.store.Progress.CompleteRewrite(chapter); err != nil {
 		return nil, fmt.Errorf("rewrite: complete rewrite: %w: %w", errs.ErrStoreWrite, err)
 	}
@@ -419,7 +419,7 @@ func (t *CommitChapterTool) executeRewriteCommit(
 		return nil, fmt.Errorf("rewrite: checkpoint commit: %w: %w", errs.ErrStoreWrite, err)
 	}
 
-	// 7. 读取 drain 后的 Progress 快照，作为事实返回
+	// 7. Đọc snapshot Progress sau khi drain, làm thông tin thực tế trả về
 	mode := "rewrite"
 	if progress.Flow == domain.FlowPolishing {
 		mode = "polish"
@@ -435,11 +435,11 @@ func (t *CommitChapterTool) executeRewriteCommit(
 	}
 	drained := len(remaining) == 0
 
-	// 队列清空后再判完结：返工提交不经过主路径 applyCompletion，完结只能在此触发。
-	//   - 分层 + 正向写作：用质量级 layeredBookComplete（要求线索收束），未满足让位架构师。
-	//   - 分层 + reopen 返工（ReopenedFromComplete）：返工只改已有章、不增减结构，按结构完整
-	//     即重新完结——若因返工扰动了某条线索就卡在 writing，终卷末会落到越界续写死循环。
-	//   - 非分层：写满 TotalChapters 即完结（返工不增减章数，原本就满）。
+	// Sau khi hàng đợi rỗng, đánh giá trạng thái hoàn thành một lần nữa: commit của việc làm lại (rework) không đi qua đường dẫn chính applyCompletion, việc hoàn thành chỉ có thể được kích hoạt ở đây.
+	//   - Phân lớp + viết tiến lên: sử dụng mức chất lượng layeredBookComplete (yêu cầu thu gọn manh mối), nếu không đáp ứng thì chuyển sang cho architect.
+	//   - Phân lớp + reopen làm lại (ReopenedFromComplete): làm lại chỉ thay đổi các chương hiện có, không thêm bớt cấu trúc, theo tính toàn vẹn cấu trúc
+	//     tức là hoàn thành lại - nếu do làm lại làm xáo trộn một luồng nào đó khiến quá trình bị kẹt ở phần viết (writing), cuối cùng sẽ rơi vào vòng lặp vô tận của việc tiếp tục viết vượt ranh giới.
+	//   - Không phân lớp: Viết đủ TotalChapters tức là hoàn thành (làm lại không tăng hay giảm số chương, ban đầu đã đầy).
 	bookComplete := false
 	if drained && latest != nil {
 		reComplete := false
@@ -461,7 +461,7 @@ func (t *CommitChapterTool) executeRewriteCommit(
 		}
 	}
 
-	// 同主路径：rewrite/polish 也做机械检查并附 rule_violations
+	// Cùng một lộ trình chính: rewrite/polish cũng thực hiện kiểm tra cơ học và đính kèm rule_violations
 	violations := t.checkRules(content, wordCount)
 	return json.Marshal(map[string]any{
 		"chapter":         chapter,
@@ -477,8 +477,8 @@ func (t *CommitChapterTool) executeRewriteCommit(
 	})
 }
 
-// buildSkipResult 为"章节已完成的重复提交"构造与正常 commit 对齐的事实返回。
-// 协调者据此做后续决策（writer/editor/architect 派发），而不会因为拿到 prose 提示而幻觉。
+// buildSkipResult xây dựng dữ liệu trả về tương ứng với một commit bình thường đối với trường hợp "gửi lặp lại chương đã hoàn thành".
+// Điều phối viên căn cứ vào đó để đưa ra quyết định tiếp theo (gửi cho người viết/biên tập/kiến trúc sư), chứ không phải bị ảo giác vì nhận được gợi ý nội dung chữ.
 func (t *CommitChapterTool) buildSkipResult(chapter int, progress *domain.Progress) (json.RawMessage, error) {
 	_, wordCount, _ := t.store.Drafts.LoadChapterContent(chapter)
 
@@ -515,9 +515,9 @@ func (t *CommitChapterTool) buildSkipResult(chapter int, progress *domain.Progre
 	return json.Marshal(result)
 }
 
-// loadCoreCharacterNameSet 加载 characters.json 中已有的角色名集合（含别名）。
-// 用作 cast_ledger 的"已知核心"过滤集——核心角色不进次要名册。
-// 加载失败时返回 nil（merge 时所有 characters 都进 ledger，可接受）。
+// loadCoreCharacterNameSet tải tập hợp tên nhân vật đã có trong characters.json (bao gồm cả bí danh).
+// Được sử dụng làm tập lọc "cốt lõi đã biết" cho cast_ledger —— nhân vật cốt lõi không được đưa vào danh sách nhân vật phụ.
+// Trả về nil khi quá trình tải thất bại (trong lúc merge, mọi nhân vật đều được đưa vào ledger, có thể chấp nhận được).
 func loadCoreCharacterNameSet(s *store.Store) map[string]bool {
 	chars, err := s.Characters.Load()
 	if err != nil || len(chars) == 0 {
@@ -537,12 +537,12 @@ func loadCoreCharacterNameSet(s *store.Store) map[string]bool {
 	return set
 }
 
-// applyCompletion 判断本次 commit 是否使全书完结，若是则 MarkComplete 并返回 true。
-//   - 非分层：写完约定总章数即完结。
-//   - 分层：架构师显式 save_foundation type=complete_book 是主路径；这里再加一道
-//     确定性兜底——当全书已客观满足完结条件（见 layeredBookComplete）时自动收尾。
-//     防止模型在终点既不 append_volume 也不 complete_book，导致"写手裸跑越界章节 →
-//     越界守卫拦截 → 反复重试"的 livelock（《凡骨》ch204..347 案例的根因）。
+// applyCompletion xác định xem commit này có kết thúc toàn bộ cuốn sách hay không, nếu có thì MarkComplete và trả về true.
+//   - Không phân lớp: Cuốn sách kết thúc khi hoàn thành số lượng chương đã thỏa thuận.
+//   - Phân lớp: Kiến trúc sư gọi tường minh save_foundation type=complete_book là luồng chính; ở đây thêm một lớp bảo vệ:
+//     kiểm tra xác định —— khi toàn bộ sách đạt đủ điều kiện hoàn thành một cách khách quan (xem layeredBookComplete) thì tự động kết thúc.
+//     Ngăn chặn trường hợp model đến điểm cuối mà không append_volume hay complete_book, dẫn đến "người viết cứ chạy ra ngoài giới hạn chương →
+//     Vệ binh giới hạn chặn → Thử lại liên tục" tạo thành livelock (Nguyên nhân cốt lõi trong case《Phàm Cốt》ch204..347).
 func (t *CommitChapterTool) applyCompletion(result *domain.CommitResult, progress *domain.Progress) bool {
 	if progress == nil {
 		return false
@@ -561,11 +561,11 @@ func (t *CommitChapterTool) applyCompletion(result *domain.CommitResult, progres
 	return false
 }
 
-// layeredStructurallyComplete 判定分层长篇是否"结构上写完"：返工队列空 + 无骨架弧待展开
-// + 所有已展开章节都已写。这是确定性的终态事实，不含伏笔/长线等语义判断——用作"防终态
-// 死循环"的安全网（返工排空后据此重新完结）。
+// layeredStructurallyComplete đánh giá xem tiểu thuyết dài phân lớp đã "được viết xong về mặt cấu trúc" hay chưa: hàng đợi rework trống + không có arc khung cần triển khai
+// + Tất cả các chương đã mở rộng đều được viết xong. Đây là sự thật rõ ràng của trạng thái kết thúc, không mang các phán đoán ngữ nghĩa như foreshadowing/tuyến truyện dài —— dùng làm "bảo vệ trạng thái kết thúc
+// Vòng lặp vô tận" lưới an toàn (sau khi làm rỗng rework, việc kết thúc lại dựa vào điều này).
 func (t *CommitChapterTool) layeredStructurallyComplete(progress *domain.Progress) bool {
-	// 1. 返工队列必须清空
+	// 1. Phải làm trống hàng đợi rework
 	if len(progress.PendingRewrites) > 0 {
 		return false
 	}
@@ -573,7 +573,7 @@ func (t *CommitChapterTool) layeredStructurallyComplete(progress *domain.Progres
 	if err != nil || len(volumes) == 0 {
 		return false
 	}
-	// 2. 不能还有骨架弧待展开（计划内仍有内容要写）
+	// 2. Không thể có cung khung chờ mở rộng (vẫn còn nội dung được lên kế hoạch viết)
 	for i := range volumes {
 		for j := range volumes[i].Arcs {
 			if !volumes[i].Arcs[j].IsExpanded() {
@@ -581,24 +581,24 @@ func (t *CommitChapterTool) layeredStructurallyComplete(progress *domain.Progres
 			}
 		}
 	}
-	// 3. 已展开章节必须全部写完
+	// 3. Phải viết tất cả các chương đã được mở rộng
 	expanded := len(domain.FlattenOutline(volumes))
 	return expanded > 0 && len(progress.CompletedChapters) >= expanded
 }
 
-// layeredBookComplete 用客观事实判断分层长篇是否真正写完，对照 architect-long.md 完结判定
-// 清单里可量化的几项 + 结构性事实。结构完整之上再要求伏笔归零、长线收束——任一不满足都
-// 让位给架构师继续 expand_arc / append_volume，绝不抢在故事没写完时收尾。无 compass 时保守
-// 判为未完结。这是正向写作的"质量级"完结判定，比 layeredStructurallyComplete 更严。
+// layeredBookComplete sử dụng thông tin khách quan để xác định xem tiểu thuyết phân lớp đã được viết xong hoàn toàn hay chưa, đối chiếu với tiêu chí đánh giá hoàn thành architect-long.md
+// Vài mục có thể định lượng trong danh sách + các sự kiện có tính cấu trúc. Ngoài ra, tính hoàn thiện cấu trúc đòi hỏi không còn foreshadowing chưa mở và các luồng truyện dài đều kết thúc —— nếu thiếu bất kỳ điều kiện nào
+// sẽ chuyển lại cho architect tiếp tục expand_arc / append_volume, và tuyệt đối không kết thúc khi câu chuyện chưa được viết xong. Cực kỳ bảo thủ khi không có compass
+// sẽ được đánh giá là chưa hoàn thành. Đây là đánh giá hoàn thành "chất lượng" của việc viết tịnh tiến, nghiêm ngặt hơn layeredStructurallyComplete.
 func (t *CommitChapterTool) layeredBookComplete(progress *domain.Progress) bool {
 	if !t.layeredStructurallyComplete(progress) {
 		return false
 	}
-	// 4. 活跃伏笔必须归零（承诺已兑现）
+	// 4. Foreshadowing đang hoạt động phải về không (lời hứa đã được thực hiện)
 	if active, aerr := t.store.World.LoadActiveForeshadow(); aerr != nil || len(active) > 0 {
 		return false
 	}
-	// 5. 指南针活跃长线必须收束（无 compass / 长线未清都交回架构师裁定）
+	// 5. Các tuyến truyện dài theo la bàn phải kết thúc (nếu không có compass / tuyến truyện dài chưa kết thúc, giao lại cho architect quyết định)
 	compass, cerr := t.store.Outline.LoadCompass()
 	if cerr != nil || compass == nil || len(compass.OpenThreads) > 0 {
 		return false

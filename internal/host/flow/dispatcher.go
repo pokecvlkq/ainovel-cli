@@ -80,7 +80,7 @@ func (d *Dispatcher) Dispatch() {
 func formatDispatchMessage(inst *Instruction, n int) string {
 	msg := FormatMessage(inst)
 	if n > 1 {
-		msg += fmt.Sprintf("\n（注意：本指令为第 %d 次下达——上次派发后路由事实未变化。本次允许先调 novel_context 核对事实，再裁定照常执行或改派其它子代理。）", n)
+		msg = fmt.Sprintf("[Host ra chỉ thị] (Ban hành lần thứ %d)\n%s\n\nLưu ý: Hệ thống phát hiện bạn đã liên tục %d lần được phân công cùng một nhiệm vụ giống hệt nhau. Điều này thường có nghĩa là sau khi bạn được phân công nhiệm vụ này lần trước, bạn đã không đẩy trạng thái lên theo đúng tiến độ (ví dụ: chưa thực thi thành công công cụ save_ tương ứng dẫn đến việc không lưu xuống đĩa).\nVui lòng gọi novel_context trước để đối chiếu sự thật, sau đó quyết định xem nên tiếp tục thực thi hay phân công lại.", n, msg, n)
 	}
 	return msg
 }

@@ -32,23 +32,23 @@ func buildResumePrompt(store *storepkg.Store) (string, string, error) {
 	var b strings.Builder
 	title := progress.NovelName
 	if title == "" {
-		title = "当前小说"
+		title = "Tiểu thuyết hiện tại"
 	}
-	b.WriteString(fmt.Sprintf("[恢复] 本书「%s」", title))
+	b.WriteString(fmt.Sprintf("[Khôi phục] Cuốn sách «%s»", title))
 	if n := len(progress.CompletedChapters); n > 0 {
-		b.WriteString(fmt.Sprintf("已完成 %d 章", n))
+		b.WriteString(fmt.Sprintf(" đã hoàn thành %d chương", n))
 		if progress.TotalChapters > 0 {
-			b.WriteString(fmt.Sprintf("（共 %d 章）", progress.TotalChapters))
+			b.WriteString(fmt.Sprintf(" (tổng cộng %d chương)", progress.TotalChapters))
 		}
-		b.WriteString(fmt.Sprintf("，共 %d 字", progress.TotalWordCount))
+		b.WriteString(fmt.Sprintf(", tổng cộng %d chữ", progress.TotalWordCount))
 	}
 	b.WriteString("。\n")
-	b.WriteString("Host 将根据当前事实下达下一步 `[Host 下达指令]` 消息。收到后立即执行，不要先调 novel_context 推理。\n")
+	b.WriteString("Host sẽ đưa ra chỉ thị tiếp theo `[Host ra chỉ thị]` dựa trên thực tế hiện tại. Nhận được thì thực thi ngay, đừng gọi novel_context để suy luận trước.\n")
 
 	if meta, _ := store.RunMeta.Load(); meta != nil && meta.PendingSteer != "" {
-		b.WriteString("\n用户在停机期间留下了一条干预意见：\n「")
+		b.WriteString("\nNgười dùng đã để lại một ý kiến can thiệp trong thời gian tạm dừng:\n「")
 		b.WriteString(meta.PendingSteer)
-		b.WriteString("」\n请先按 coordinator.md 的用户干预规则评估处理。")
+		b.WriteString("」\nVui lòng đánh giá và xử lý theo quy tắc can thiệp của người dùng trong coordinator.md trước.")
 	}
 
 	return b.String(), label, nil
@@ -59,29 +59,29 @@ func buildResumePrompt(store *storepkg.Store) (string, string, error) {
 func describeResume(store *storepkg.Store, progress *domain.Progress) string {
 	switch progress.Phase {
 	case domain.PhasePremise, domain.PhaseOutline:
-		return fmt.Sprintf("恢复：规划阶段（%s）", progress.Phase)
+		return fmt.Sprintf("Khôi phục: Giai đoạn quy hoạch (%s)", progress.Phase)
 	case domain.PhaseWriting:
 		// 优先级与 Router 的决策优先级对齐，让 label 与即将派发的指令一致。
 		if pending, _ := store.Signals.LoadPendingCommit(); pending != nil {
-			return fmt.Sprintf("恢复：第 %d 章提交中断", pending.Chapter)
+			return fmt.Sprintf("Khôi phục: Đang gửi chương %d", pending.Chapter)
 		}
 		if len(progress.PendingRewrites) > 0 {
 			verb := "Viết lại"
 			if progress.Flow == domain.FlowPolishing {
 				verb = "Gọt giũa"
 			}
-			return fmt.Sprintf("%s恢复：%d 章待处理", verb, len(progress.PendingRewrites))
+			return fmt.Sprintf("Khôi phục: Đợi %s %d chương", strings.ToLower(verb), len(progress.PendingRewrites))
 		}
 		if progress.Flow == domain.FlowReviewing {
-			return "恢复：审阅中断"
+			return "Khôi phục: Đang xét duyệt"
 		}
 		if progress.InProgressChapter > 0 {
-			return fmt.Sprintf("恢复：第 %d 章进行中", progress.InProgressChapter)
+			return fmt.Sprintf("Khôi phục: Đang viết chương %d", progress.InProgressChapter)
 		}
 		if label := describeArcEndLabel(store, progress); label != "" {
 			return label
 		}
-		return fmt.Sprintf("恢复：从第 %d 章继续", progress.NextChapter())
+		return fmt.Sprintf("Khôi phục: Tiếp tục từ chương %d", progress.NextChapter())
 	}
 	return "Khôi phục"
 }
@@ -100,15 +100,15 @@ func describeArcEndLabel(store *storepkg.Store, progress *domain.Progress) strin
 	vol, arc := boundary.Volume, boundary.Arc
 	switch {
 	case !store.World.HasArcReview(lastCh):
-		return fmt.Sprintf("恢复：弧末评审待处理（V%d A%d）", vol, arc)
+		return fmt.Sprintf("Khôi phục: Đợi xét duyệt cuối hồi (Quyển %d Hồi %d)", vol, arc)
 	case !store.Summaries.HasArcSummary(vol, arc):
-		return fmt.Sprintf("恢复：弧摘要待生成（V%d A%d）", vol, arc)
+		return fmt.Sprintf("Khôi phục: Đợi tóm tắt hồi (Quyển %d Hồi %d)", vol, arc)
 	case boundary.IsVolumeEnd && !store.Summaries.HasVolumeSummary(vol):
-		return fmt.Sprintf("恢复：卷摘要待生成（V%d）", vol)
+		return fmt.Sprintf("Khôi phục: Đợi tóm tắt quyển (Quyển %d)", vol)
 	case boundary.NeedsExpansion && boundary.NextArc > 0:
-		return fmt.Sprintf("恢复：待展开下一弧（V%d A%d）", boundary.NextVolume, boundary.NextArc)
+		return fmt.Sprintf("Khôi phục: Đợi triển khai hồi tiếp theo (Quyển %d Hồi %d)", boundary.NextVolume, boundary.NextArc)
 	case boundary.NeedsNewVolume:
-		return fmt.Sprintf("恢复：待决策下一卷（V%d 末）", vol)
+		return fmt.Sprintf("Khôi phục: Đợi quyết định quyển tiếp theo (Cuối quyển %d)", vol)
 	}
 	return ""
 }

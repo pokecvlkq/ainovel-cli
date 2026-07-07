@@ -4,7 +4,7 @@ import { useNovelStore } from '../stores/novelStore';
 import { EventsOn, EventsOff } from '../../wailsjs/runtime/runtime';
 
 export function useWailsEvents() {
-  const { setSnapshot, addEvent, appendStream, clearStream } = useNovelStore();
+  const { setSnapshot, addEvent, appendStream, clearStream, setComplete } = useNovelStore();
 
   useEffect(() => {
     try {
@@ -24,14 +24,20 @@ export function useWailsEvents() {
         clearStream();
       });
 
+      // Khi AI viết xong toàn bộ → cập nhật trạng thái hoàn thành
+      EventsOn('novel:done', () => {
+        setComplete(true);
+      });
+
       return () => {
         EventsOff('novel:snapshot');
         EventsOff('novel:event');
         EventsOff('novel:stream');
         EventsOff('novel:stream-clear');
+        EventsOff('novel:done');
       };
     } catch (e) {
       console.warn("Wails runtime not found. Events disabled.");
     }
-  }, [setSnapshot, addEvent, appendStream, clearStream]);
+  }, [setSnapshot, addEvent, appendStream, clearStream, setComplete]);
 }

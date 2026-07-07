@@ -85,7 +85,7 @@ func TestStopGuard_DefaultBlockMessageWaitsForHost(t *testing.T) {
 	}
 
 	decision := NewStopGuard(s, nil)(context.Background(), agentcore.StopInfo{TurnIndex: 1})
-	if !strings.Contains(decision.InjectMessage, "[Host 下达指令]") {
+	if !strings.Contains(decision.InjectMessage, "[Host ra chỉ thị]") {
 		t.Fatalf("inject message should point to Host instruction, got %q", decision.InjectMessage)
 	}
 	for _, forbidden := range []string{"查 novel_context", "调子代理"} {
@@ -102,7 +102,7 @@ func TestStopGuard_DefaultBlockMessageAllowsCoordinatorJudgmentWhenNoRoute(t *te
 	}
 
 	decision := NewStopGuard(s, nil)(context.Background(), agentcore.StopInfo{TurnIndex: 1})
-	if strings.Contains(decision.InjectMessage, "[Host 下达指令]") {
+	if strings.Contains(decision.InjectMessage, "[Host ra chỉ thị]") {
 		t.Fatalf("no-route inject should not tell coordinator to wait for Host, got %q", decision.InjectMessage)
 	}
 	if !strings.Contains(decision.InjectMessage, "裁定场景") {

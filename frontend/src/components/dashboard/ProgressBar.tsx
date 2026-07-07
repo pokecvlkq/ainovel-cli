@@ -5,8 +5,10 @@ import { Target } from 'lucide-react';
 export const ProgressBar: React.FC = () => {
   const { snapshot } = useNovelStore();
   
-  const percentage = snapshot.totalChapters > 0 
-    ? Math.round((snapshot.currentChapter / snapshot.totalChapters) * 100) 
+  const current = snapshot.CompletedCount || snapshot.CurrentChapter || 0;
+  const total = snapshot.TotalChapters || 0;
+  const percentage = total > 0 
+    ? Math.round((current / total) * 100) 
     : 0;
 
   return (
@@ -14,11 +16,11 @@ export const ProgressBar: React.FC = () => {
       <div className="flex items-center justify-between mb-4 relative z-10">
         <div className="flex items-center gap-2">
           <Target size={18} className="text-blue-500" />
-          <h3 className="font-semibold text-white tracking-wide">Overall Progress</h3>
+          <h3 className="font-semibold text-white tracking-wide">Tiến Độ Tổng Thể</h3>
         </div>
         <div className="flex items-center gap-3">
           <span className="text-sm font-medium text-slate-400 font-mono">
-            Chapter {snapshot.currentChapter} / {snapshot.totalChapters || '?'}
+            Chương {current} / {total || '?'}
           </span>
           <span className="bg-blue-500/20 text-blue-400 font-bold px-2 py-0.5 rounded text-sm font-mono border border-blue-500/30">
             {percentage}%

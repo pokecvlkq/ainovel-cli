@@ -160,8 +160,8 @@ func renderCommandPalette(width int, items []commandPaletteItem, cursor int) str
 		}
 
 		name := nameRenderer.Render(item.Name)
-		// truncateWidth 按视觉宽度截断（中文字符算 2 列）；用 truncate 会按 rune 数算，
-		// 中文场景实际宽度 = 期望的 2 倍，导致弹窗溢出。
+		// truncateWidth cắt ngắn theo chiều rộng hình ảnh (ký tự tiếng Trung tính 2 cột); dùng truncate sẽ tính theo số rune,
+		// chiều rộng thực tế trong trường hợp tiếng Trung = gấp đôi mong đợi, dẫn đến tràn popup.
 		desc := truncateWidth(item.Description, max(12, contentW-18))
 		descText := descRenderer.Render(desc)
 		line := prefix + name

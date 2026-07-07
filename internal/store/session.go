@@ -152,7 +152,7 @@ func (s *SessionStore) subAgentPath(agentName, task string) string {
 	return fmt.Sprintf("meta/sessions/agents/%s-%s.jsonl", agentName, suffix)
 }
 
-var chapterRe = regexp.MustCompile(`第\s*(\d+)\s*章`)
+var chapterRe = regexp.MustCompile(`(?i)(?:第\s*|Chương\s*)(\d+)(?:\s*章)?`)
 
 func extractChapter(task string) string {
 	m := chapterRe.FindStringSubmatch(task)
