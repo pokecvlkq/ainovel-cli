@@ -734,11 +734,31 @@ func renderProviderSidebar(snap host.UISnapshot, width int) string {
 		if statusStr == "Dead" {
 			statusColor = colorError
 			statusLabel = "Hết Quota"
+			if !p.DeadSince.IsZero() {
+				rem := time.Until(p.DeadSince.Add(5 * time.Minute))
+				if rem > 0 {
+					mins := int(rem.Minutes())
+					secs := int(rem.Seconds()) % 60
+					if mins > 0 {
+						statusLabel = fmt.Sprintf("Nghỉ %dp%ds", mins, secs)
+					} else {
+						statusLabel = fmt.Sprintf("Nghỉ %ds", secs)
+					}
+				} else {
+					statusLabel = "Đang thử lại"
+				}
+			}
 		} else if statusStr == "Cooldown" {
 			statusColor = colorReview
 			rem := time.Until(p.ResumeAt)
 			if rem > 0 {
-				statusLabel = fmt.Sprintf("Nghỉ %ds", int(rem.Seconds()))
+				mins := int(rem.Minutes())
+				secs := int(rem.Seconds()) % 60
+				if mins > 0 {
+					statusLabel = fmt.Sprintf("Nghỉ %dp%ds", mins, secs)
+				} else {
+					statusLabel = fmt.Sprintf("Nghỉ %ds", secs)
+				}
 			} else {
 				statusLabel = "Đang mở lại"
 			}

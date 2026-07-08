@@ -322,6 +322,7 @@ func (m *failoverModel) Generate(ctx context.Context, messages []agentcore.Messa
 	for {
 		resp, err := current.model.Generate(ctx, messages, tools, opts...)
 		if err == nil {
+			GlobalQuotaTracker.MarkActive(current.provider)
 			return resp, nil
 		}
 
@@ -366,6 +367,7 @@ func (m *failoverModel) GenerateStream(ctx context.Context, messages []agentcore
 			out <- agentcore.StreamEvent{Type: agentcore.StreamEventError, Err: err}
 			return
 		}
+		GlobalQuotaTracker.MarkActive(current.provider)
 		if resp != nil {
 			out <- agentcore.StreamEvent{
 				Type:       agentcore.StreamEventDone,
@@ -460,10 +462,12 @@ func (m *failoverModel) pickNextFallback(current modelTarget, tried map[modelTar
 	reason := agentcore.FailoverReason(err)
 
 	msg := strings.ToLower(err.Error())
-	isQuota := strings.Contains(msg, "quota") ||
-		strings.Contains(msg, "billing") ||
-		strings.Contains(msg, "insufficient") ||
-		(strings.Contains(msg, "exceeded") && !strings.Contains(msg, "deadline"))
+	isBilling := strings.Contains(msg, "billing") ||
+		strings.Contains(msg, "payment required") ||
+		strings.Contains(msg, "insufficient")
+
+	isQuota := !isBilling && (strings.Contains(msg, "quota") ||
+		(strings.Contains(msg, "exceeded") && !strings.Contains(msg, "deadline")))
 
 	isOverload := strings.Contains(msg, "high demand") ||
 		strings.Contains(msg, "spikes in demand") ||
@@ -473,7 +477,12 @@ func (m *failoverModel) pickNextFallback(current modelTarget, tried map[modelTar
 		strings.Contains(msg, "429")
 
 	if !eligible {
-		if isQuota {
+		if isBilling {
+			eligible = true
+			if reason == "" {
+				reason = "billing"
+			}
+		} else if isQuota {
 			eligible = true
 			if reason == "" {
 				reason = "quota"
@@ -487,8 +496,10 @@ func (m *failoverModel) pickNextFallback(current modelTarget, tried map[modelTar
 	}
 
 	if current.provider != "" {
-		if isQuota || reason == "quota" {
+		if isBilling || reason == "billing" {
 			GlobalQuotaTracker.MarkQuotaExhausted(current.provider)
+		} else if isQuota || reason == "quota" {
+			GlobalQuotaTracker.MarkCooldown(current.provider, "Quota Exceeded (Temp)")
 		} else if isOverload || reason == "overloaded" || reason == "rate_limit" {
 			GlobalQuotaTracker.MarkCooldown(current.provider, reason)
 		}
