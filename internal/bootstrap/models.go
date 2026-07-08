@@ -463,7 +463,7 @@ func (m *failoverModel) pickNextFallback(current modelTarget, tried map[modelTar
 	isQuota := strings.Contains(msg, "quota") ||
 		strings.Contains(msg, "billing") ||
 		strings.Contains(msg, "insufficient") ||
-		strings.Contains(msg, "exceeded")
+		(strings.Contains(msg, "exceeded") && !strings.Contains(msg, "deadline"))
 
 	isOverload := strings.Contains(msg, "high demand") ||
 		strings.Contains(msg, "spikes in demand") ||
