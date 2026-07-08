@@ -186,8 +186,18 @@ func (v *VertexModel) convertMessages(messages []agentcore.Message) ([]*genai.Co
 	var history []*genai.Content
 	var lastParts []genai.Part
 
-	for i, msg := range messages {
+	var allContents []*genai.Content
+	var currentToolContent *genai.Content
+
+	for _, msg := range messages {
 		var parts []genai.Part
+
+		role := string(msg.Role)
+		if role == string(agentcore.RoleAssistant) {
+			role = "model"
+		} else if role == string(agentcore.RoleSystem) || role == string(agentcore.RoleTool) {
+			role = "user"
+		}
 
 		if msg.Role == agentcore.RoleTool {
 			toolName, _ := msg.Metadata["tool_call_id"].(string)
@@ -205,44 +215,50 @@ func (v *VertexModel) convertMessages(messages []agentcore.Message) ([]*genai.Co
 					})
 				}
 			}
-		} else {
-			for _, block := range msg.Content {
-				if block.Type == agentcore.ContentText {
-					parts = append(parts, genai.Text(block.Text))
-				} else if block.Type == agentcore.ContentToolCall {
-					var args map[string]any
-					_ = json.Unmarshal(block.ToolCall.Args, &args)
-					parts = append(parts, genai.FunctionCall{
-						Name: block.ToolCall.Name,
-						Args: args,
-					})
+
+			if len(parts) > 0 {
+				if currentToolContent != nil {
+					currentToolContent.Parts = append(currentToolContent.Parts, parts...)
+				} else {
+					currentToolContent = &genai.Content{
+						Role:  role,
+						Parts: parts,
+					}
+					allContents = append(allContents, currentToolContent)
 				}
+			}
+			continue
+		}
+
+		currentToolContent = nil
+
+		for _, block := range msg.Content {
+			if block.Type == agentcore.ContentText {
+				parts = append(parts, genai.Text(block.Text))
+			} else if block.Type == agentcore.ContentToolCall {
+				var args map[string]any
+				_ = json.Unmarshal(block.ToolCall.Args, &args)
+				parts = append(parts, genai.FunctionCall{
+					Name: block.ToolCall.Name,
+					Args: args,
+				})
 			}
 		}
 
-		if len(parts) == 0 {
-			continue // Skip empty messages
+		if len(parts) > 0 {
+			allContents = append(allContents, &genai.Content{
+				Role:  role,
+				Parts: parts,
+			})
 		}
-
-		if i == len(messages)-1 {
-			lastParts = parts
-			break
-		}
-
-		role := string(msg.Role)
-		if role == string(agentcore.RoleAssistant) {
-			role = "model"
-		} else if role == string(agentcore.RoleSystem) {
-			role = "user" // Vertex doesn't strictly have a 'system' role in history, fallback to user or use SystemInstruction. For now, user.
-		} else if role == string(agentcore.RoleTool) {
-			role = "user" // Function responses are sent as 'user' role
-		}
-
-		history = append(history, &genai.Content{
-			Role:  role,
-			Parts: parts,
-		})
 	}
+
+	if len(allContents) > 0 {
+		lastContent := allContents[len(allContents)-1]
+		lastParts = lastContent.Parts
+		history = allContents[:len(allContents)-1]
+	}
+
 	return history, lastParts
 }
 

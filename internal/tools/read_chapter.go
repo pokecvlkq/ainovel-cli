@@ -34,7 +34,7 @@ func (t *ReadChapterTool) Schema() map[string]any {
 		schema.Property("chapter", schema.Int("Số chương (Bắt buộc khi đọc một chương)")),
 		schema.Property("from", schema.Int("Số chương bắt đầu (Dùng khi đọc một khoảng)")),
 		schema.Property("to", schema.Int("Số chương kết thúc (Dùng khi đọc một khoảng)")),
-		schema.Property("source", schema.Enum("Nguồn", "final", "draft")).Required(),
+		schema.Property("source", schema.Enum("Nguồn đọc, mặc định là final", "final", "draft")),
 		schema.Property("character", schema.String("Tên nhân vật (Dùng khi trích xuất đoạn hội thoại)")),
 		schema.Property("max_runes", schema.Int("Số lượng ký tự tối đa mỗi chương (Cắt bớt khi đọc một khoảng, mặc định 2000)")),
 	)
@@ -51,6 +51,9 @@ func (t *ReadChapterTool) Execute(_ context.Context, args json.RawMessage) (json
 	}
 	if err := json.Unmarshal(args, &a); err != nil {
 		return nil, fmt.Errorf("invalid args: %w", err)
+	}
+	if a.Source == "" {
+		a.Source = "final"
 	}
 
 	// Chế độ 1: Trích xuất hội thoại nhân vật
