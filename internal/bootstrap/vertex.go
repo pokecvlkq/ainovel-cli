@@ -74,6 +74,67 @@ func extractProjectID(jsonData []byte) string {
 	return ""
 }
 
+// convertSchema converts a generic JSON schema representation to genai.Schema
+func convertSchema(v any) *genai.Schema {
+	if v == nil {
+		return nil
+	}
+	var m map[string]any
+	switch val := v.(type) {
+	case map[string]any:
+		m = val
+	case []byte:
+		_ = json.Unmarshal(val, &m)
+	case string:
+		_ = json.Unmarshal([]byte(val), &m)
+	default:
+		b, _ := json.Marshal(v)
+		_ = json.Unmarshal(b, &m)
+	}
+
+	if m == nil {
+		return nil
+	}
+
+	schema := &genai.Schema{}
+	if t, ok := m["type"].(string); ok {
+		switch t {
+		case "string":
+			schema.Type = genai.TypeString
+		case "number":
+			schema.Type = genai.TypeNumber
+		case "integer":
+			schema.Type = genai.TypeInteger
+		case "boolean":
+			schema.Type = genai.TypeBoolean
+		case "array":
+			schema.Type = genai.TypeArray
+		case "object":
+			schema.Type = genai.TypeObject
+		}
+	}
+	if d, ok := m["description"].(string); ok {
+		schema.Description = d
+	}
+	if props, ok := m["properties"].(map[string]any); ok {
+		schema.Properties = make(map[string]*genai.Schema)
+		for k, p := range props {
+			schema.Properties[k] = convertSchema(p)
+		}
+	}
+	if reqs, ok := m["required"].([]any); ok {
+		for _, r := range reqs {
+			if s, ok := r.(string); ok {
+				schema.Required = append(schema.Required, s)
+			}
+		}
+	}
+	if items, ok := m["items"]; ok {
+		schema.Items = convertSchema(items)
+	}
+	return schema
+}
+
 func NewVertexModel(ctx context.Context, projectID, location, modelName, credentialsFile string) (*VertexModel, error) {
 	if location == "" {
 		location = os.Getenv("VERTEX_LOCATION")
@@ -127,11 +188,36 @@ func (v *VertexModel) convertMessages(messages []agentcore.Message) ([]*genai.Co
 
 	for i, msg := range messages {
 		var parts []genai.Part
-		for _, block := range msg.Content {
-			if block.Type == agentcore.ContentText {
-				parts = append(parts, genai.Text(block.Text))
+
+		if msg.Role == agentcore.RoleTool {
+			toolName, _ := msg.Metadata["tool_call_id"].(string)
+			if len(msg.Content) > 0 {
+				var respMap map[string]any
+				if err := json.Unmarshal([]byte(msg.Content[0].Text), &respMap); err == nil {
+					parts = append(parts, genai.FunctionResponse{
+						Name:     toolName,
+						Response: respMap,
+					})
+				} else {
+					parts = append(parts, genai.FunctionResponse{
+						Name:     toolName,
+						Response: map[string]any{"result": msg.Content[0].Text},
+					})
+				}
 			}
-			// Add support for images or tool calls here if needed in the future
+		} else {
+			for _, block := range msg.Content {
+				if block.Type == agentcore.ContentText {
+					parts = append(parts, genai.Text(block.Text))
+				} else if block.Type == agentcore.ContentToolCall {
+					var args map[string]any
+					_ = json.Unmarshal(block.ToolCall.Args, &args)
+					parts = append(parts, genai.FunctionCall{
+						Name: block.ToolCall.Name,
+						Args: args,
+					})
+				}
+			}
 		}
 
 		if len(parts) == 0 {
@@ -148,6 +234,8 @@ func (v *VertexModel) convertMessages(messages []agentcore.Message) ([]*genai.Co
 			role = "model"
 		} else if role == string(agentcore.RoleSystem) {
 			role = "user" // Vertex doesn't strictly have a 'system' role in history, fallback to user or use SystemInstruction. For now, user.
+		} else if role == string(agentcore.RoleTool) {
+			role = "user" // Function responses are sent as 'user' role
 		}
 
 		history = append(history, &genai.Content{
@@ -161,6 +249,20 @@ func (v *VertexModel) convertMessages(messages []agentcore.Message) ([]*genai.Co
 func (v *VertexModel) Generate(ctx context.Context, messages []agentcore.Message, tools []agentcore.ToolSpec, opts ...agentcore.CallOption) (*agentcore.LLMResponse, error) {
 	model := v.client.GenerativeModel(v.modelName)
 	
+	if len(tools) > 0 {
+		var decls []*genai.FunctionDeclaration
+		for _, t := range tools {
+			decls = append(decls, &genai.FunctionDeclaration{
+				Name:        t.Name,
+				Description: t.Description,
+				Parameters:  convertSchema(t.Parameters),
+			})
+		}
+		model.Tools = []*genai.Tool{
+			{FunctionDeclarations: decls},
+		}
+	}
+
 	// Convert messages
 	history, lastParts := v.convertMessages(messages)
 
@@ -176,21 +278,26 @@ func (v *VertexModel) Generate(ctx context.Context, messages []agentcore.Message
 		return nil, fmt.Errorf("vertex ai returned no candidates")
 	}
 
-	// Extract text response
-	var responseText string
+	// Extract text response and tool calls
+	var responseBlocks []agentcore.ContentBlock
 	for _, part := range resp.Candidates[0].Content.Parts {
 		if txt, ok := part.(genai.Text); ok {
-			responseText += string(txt)
+			responseBlocks = append(responseBlocks, agentcore.TextBlock(string(txt)))
+		} else if fc, ok := part.(genai.FunctionCall); ok {
+			argsBytes, _ := json.Marshal(fc.Args)
+			responseBlocks = append(responseBlocks, agentcore.ToolCallBlock(agentcore.ToolCall{
+				ID:   fc.Name, // Vertex doesn't have a call ID, use name
+				Name: fc.Name,
+				Args: argsBytes,
+			}))
 		}
 	}
 
 	// Simple mapping back to agentcore.LLMResponse
 	return &agentcore.LLMResponse{
 		Message: agentcore.Message{
-			Role: agentcore.RoleAssistant,
-			Content: []agentcore.ContentBlock{
-				agentcore.TextBlock(responseText),
-			},
+			Role:    agentcore.RoleAssistant,
+			Content: responseBlocks,
 		},
 	}, nil
 }
@@ -201,7 +308,7 @@ func (v *VertexModel) GenerateStream(ctx context.Context, messages []agentcore.M
 }
 
 func (v *VertexModel) SupportsTools() bool {
-	return false // Set to true once tool support is implemented
+	return true
 }
 
 func (v *VertexModel) Close() {
