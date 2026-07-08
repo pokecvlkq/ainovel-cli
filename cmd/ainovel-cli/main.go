@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/joho/godotenv"
 	"github.com/voocel/ainovel-cli/assets"
 	"github.com/voocel/ainovel-cli/internal/bootstrap"
 	"github.com/voocel/ainovel-cli/internal/entry/headless"
@@ -25,6 +26,9 @@ var (
 var headlessMode bool
 
 func main() {
+	// Tải biến môi trường từ .env (nếu có) — cần thiết cho Vertex AI credentials
+	_ = godotenv.Load()
+
 	// 子命令在常规 flag 解析之前拦截：eval 是离线评测 harness，参数体系独立。
 	if len(os.Args) > 1 && os.Args[1] == "eval" {
 		os.Exit(eval.Command(os.Args[2:]))
