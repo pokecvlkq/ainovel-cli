@@ -5,6 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
+	"sync/atomic"
 
 	"cloud.google.com/go/vertexai/genai"
 	"github.com/voocel/agentcore"
@@ -22,10 +25,11 @@ import (
 // 4. Hỗ trợ multi-account fallback: mỗi provider Vertex dùng 1 Service Account riêng.
 // ================================================
 type VertexModel struct {
-	client    *genai.Client
-	modelName string
-	projectID string
-	location  string
+	client      *genai.Client
+	modelName   string
+	projectID   string
+	location    string
+	callCounter int64 // bộ đếm tạo ID duy nhất cho mỗi lần gọi tool
 }
 
 // resolveCredential xử lý giá trị api_key linh hoạt:
@@ -200,7 +204,15 @@ func (v *VertexModel) convertMessages(messages []agentcore.Message) ([]*genai.Co
 		}
 
 		if msg.Role == agentcore.RoleTool {
-			toolName, _ := msg.Metadata["tool_call_id"].(string)
+			toolCallID, _ := msg.Metadata["tool_call_id"].(string)
+			// Tách phần _N (counter) ra để lấy lại tên hàm gốc cho Vertex AI
+			toolName := toolCallID
+			if idx := strings.LastIndex(toolCallID, "_"); idx > 0 {
+				suffix := toolCallID[idx+1:]
+				if _, err := strconv.Atoi(suffix); err == nil {
+					toolName = toolCallID[:idx]
+				}
+			}
 			if len(msg.Content) > 0 {
 				var respMap map[string]any
 				if err := json.Unmarshal([]byte(msg.Content[0].Text), &respMap); err == nil {
@@ -301,8 +313,9 @@ func (v *VertexModel) Generate(ctx context.Context, messages []agentcore.Message
 			responseBlocks = append(responseBlocks, agentcore.TextBlock(string(txt)))
 		} else if fc, ok := part.(genai.FunctionCall); ok {
 			argsBytes, _ := json.Marshal(fc.Args)
+			callID := fc.Name + "_" + strconv.FormatInt(atomic.AddInt64(&v.callCounter, 1), 10)
 			responseBlocks = append(responseBlocks, agentcore.ToolCallBlock(agentcore.ToolCall{
-				ID:   fc.Name, // Vertex doesn't have a call ID, use name
+				ID:   callID,
 				Name: fc.Name,
 				Args: argsBytes,
 			}))
