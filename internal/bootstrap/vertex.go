@@ -177,6 +177,12 @@ func NewVertexModel(ctx context.Context, projectID, location, modelName, credent
 		return nil, fmt.Errorf("không thể tạo Vertex AI client: %v", err)
 	}
 
+	// Tự động loại bỏ prefix "google/" và suffix ":free"/":paid" nếu user nhập nhầm
+	modelName = strings.TrimPrefix(modelName, "google/")
+	if idx := strings.Index(modelName, ":"); idx > 0 {
+		modelName = modelName[:idx]
+	}
+
 	return &VertexModel{
 		client:    client,
 		modelName: modelName,
