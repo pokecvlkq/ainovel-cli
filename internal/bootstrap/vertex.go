@@ -2,19 +2,25 @@ package bootstrap
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 
 	"cloud.google.com/go/vertexai/genai"
 	"github.com/voocel/agentcore"
+	"google.golang.org/api/option"
 )
 
-// VertexModel implements agentcore.ChatModel for Google Cloud Vertex AI.
-// Note for future upgrades: 
-// 1. To authenticate, you can either run `gcloud auth application-default login` on your machine.
-// 2. Or, create a Service Account in GCP, download the JSON key, and set the environment variable:
-//    export GOOGLE_APPLICATION_CREDENTIALS="/path/to/your/service-account-file.json"
-// The Vertex AI client will automatically pick up the credentials from either method.
+// VertexModel triển khai agentcore.ChatModel cho Google Cloud Vertex AI.
+//
+// === HƯỚNG DẪN NÂNG CẤP (Vertex AI Provider) ===
+// 1. Xác thực: Dùng Service Account JSON, truyền qua:
+//    - config.json: "api_key": "$VERTEX_ACC_1"  (đọc JSON từ biến môi trường .env)
+//    - config.json: "api_key": "credentials/aitnd.json"  (đọc file trực tiếp)
+// 2. project_id được TỰ ĐỘNG parse từ JSON credential, không cần cấu hình thêm.
+// 3. location mặc định "us-central1", có thể ghi đè bằng env VERTEX_LOCATION.
+// 4. Hỗ trợ multi-account fallback: mỗi provider Vertex dùng 1 Service Account riêng.
+// ================================================
 type VertexModel struct {
 	client    *genai.Client
 	modelName string
@@ -22,21 +28,88 @@ type VertexModel struct {
 	location  string
 }
 
-func NewVertexModel(ctx context.Context, projectID, location, modelName string) (*VertexModel, error) {
-	// If projectID or location are empty, you could also fall back to env vars
-	if projectID == "" {
-		projectID = os.Getenv("VERTEX_PROJECT_ID")
+// resolveCredential xử lý giá trị api_key linh hoạt:
+//   - Bắt đầu bằng "$": đọc nội dung từ biến môi trường (ví dụ "$VERTEX_ACC_1")
+//   - Bắt đầu bằng "{": coi là chuỗi JSON credential trực tiếp
+//   - Còn lại: coi là đường dẫn file JSON
+//
+// Trả về: (jsonBytes, isJSON, error)
+func resolveCredential(raw string) ([]byte, bool, error) {
+	if raw == "" {
+		return nil, false, nil
 	}
-	if location == "" {
-		location = os.Getenv("VERTEX_LOCATION")
-		if location == "" {
-			location = "us-central1" // Default fallback
+
+	value := raw
+
+	// Bước 1: Nếu bắt đầu bằng $, đọc từ biến môi trường
+	if value[0] == '$' {
+		envVar := value[1:]
+		value = os.Getenv(envVar)
+		if value == "" {
+			return nil, false, fmt.Errorf("biến môi trường %s không tồn tại hoặc rỗng", envVar)
 		}
 	}
 
-	client, err := genai.NewClient(ctx, projectID, location)
+	// Bước 2: Nếu là chuỗi JSON (bắt đầu bằng {), trả về trực tiếp
+	if len(value) > 0 && value[0] == '{' {
+		return []byte(value), true, nil
+	}
+
+	// Bước 3: Coi là đường dẫn file, đọc nội dung
+	data, err := os.ReadFile(value)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create vertex ai client: %v", err)
+		return nil, false, fmt.Errorf("không thể đọc file credential %q: %w", value, err)
+	}
+	return data, true, nil
+}
+
+// extractProjectID trích xuất project_id từ JSON credential
+func extractProjectID(jsonData []byte) string {
+	var sa struct {
+		ProjectID string `json:"project_id"`
+	}
+	if err := json.Unmarshal(jsonData, &sa); err == nil && sa.ProjectID != "" {
+		return sa.ProjectID
+	}
+	return ""
+}
+
+func NewVertexModel(ctx context.Context, projectID, location, modelName, credentialsFile string) (*VertexModel, error) {
+	if location == "" {
+		location = os.Getenv("VERTEX_LOCATION")
+		if location == "" {
+			location = "us-central1"
+		}
+	}
+
+	var opts []option.ClientOption
+
+	// Xử lý credential và tự động parse project_id
+	if credentialsFile != "" {
+		jsonData, isJSON, err := resolveCredential(credentialsFile)
+		if err != nil {
+			return nil, fmt.Errorf("lỗi xử lý credential: %w", err)
+		}
+		if isJSON && len(jsonData) > 0 {
+			opts = append(opts, option.WithCredentialsJSON(jsonData))
+			// Tự động lấy project_id từ Service Account JSON nếu chưa có
+			if projectID == "" {
+				projectID = extractProjectID(jsonData)
+			}
+		}
+	}
+
+	// Fallback cuối cùng cho projectID
+	if projectID == "" {
+		projectID = os.Getenv("VERTEX_PROJECT_ID")
+	}
+	if projectID == "" {
+		return nil, fmt.Errorf("không xác định được project_id: cần khai báo trong credential JSON hoặc env VERTEX_PROJECT_ID")
+	}
+
+	client, err := genai.NewClient(ctx, projectID, location, opts...)
+	if err != nil {
+		return nil, fmt.Errorf("không thể tạo Vertex AI client: %v", err)
 	}
 
 	return &VertexModel{

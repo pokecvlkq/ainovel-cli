@@ -279,7 +279,7 @@ func createModelFromConfig(providerKey, model string, pc ProviderConfig, cache m
 
 	if providerType == "vertex" || providerType == "vertex_ai" {
 		// NewVertexModel implementation for Google Vertex AI (Phương án 2)
-		m, err := NewVertexModel(context.Background(), "", "", model)
+		m, err := NewVertexModel(context.Background(), "", "", model, pc.APIKey)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create vertex model: %w", err)
 		}

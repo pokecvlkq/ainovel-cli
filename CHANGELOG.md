@@ -2,6 +2,19 @@
 
 Tất cả những thay đổi nổi bật đối với dự án AINovel CLI sẽ được ghi chép tại đây.
 
+## [v1.1.4] - 2026-07-08
+
+### Thêm mới (Added)
+- **Tích hợp Google Vertex AI Custom Provider**: 
+  - Triển khai Vertex AI làm nhà cung cấp mô hình chính thức (Phương án 2) thông qua thư viện chuẩn `cloud.google.com/go/vertexai/genai`.
+  - Hỗ trợ nạp credentials an toàn từ chuỗi JSON Service Account trực tiếp thông qua biến môi trường trong tệp `.env`.
+  - Thiết lập cơ chế tự động parse `project_id` trực tiếp từ dữ liệu JSON Service Account, giúp tinh giản cấu hình.
+  - Hỗ trợ cấu hình song song nhiều tài khoản Vertex AI (Ví dụ: `Vertex1-aitnd` và `Vertex2-poke`) trỏ tới các biến môi trường khác nhau trong `.env` để làm dự phòng xoay vòng (fallback) khi một tài khoản hết hạn mức (Quota Exceeded).
+
+### Thay đổi (Changed)
+- **Cấu hình biến môi trường**: Tích hợp thư viện `github.com/joho/godotenv` vào hàm khởi chạy chính `main.go` để tự động nạp các cài đặt cấu hình từ file `.env` cục bộ.
+- **Bảo mật**: Thêm thư mục `credentials/` vào danh sách loại trừ `.gitignore` tránh nguy cơ rò rỉ Service Account Keys lên kho mã nguồn.
+
 ## [v1.1.3] - 2026-07-08
 
 ### Thêm mới (Added)

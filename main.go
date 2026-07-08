@@ -4,6 +4,7 @@ import (
 	"embed"
 	"log"
 
+	"github.com/joho/godotenv"
 	"github.com/voocel/ainovel-cli/assets"
 	"github.com/voocel/ainovel-cli/internal/bootstrap"
 	"github.com/wailsapp/wails/v2"
@@ -16,6 +17,9 @@ import (
 var dist embed.FS
 
 func main() {
+	// 0. Tải biến môi trường từ .env (nếu có)
+	_ = godotenv.Load()
+
 	// 1. Tải cấu hình
 	cfg, err := bootstrap.LoadConfig("")
 	if err != nil {
