@@ -9,6 +9,7 @@ import { ChatPage } from './pages/ChatPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { GetSnapshot } from '../wailsjs/go/main/App';
 import { useNovelStore } from './stores/novelStore';
+import { AskUserModal } from './components/dashboard/AskUserModal';
 import './styles/globals.css';
 
 import { EventsOn } from '../wailsjs/runtime/runtime';
@@ -16,7 +17,7 @@ import { EventsOn } from '../wailsjs/runtime/runtime';
 const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const navigate = useNavigate();
   const [checking, setChecking] = useState(true);
-  const { setSnapshot, addEvent, appendStream, clearStream, setComplete } = useNovelStore();
+  const { setSnapshot, addEvent, appendStream, clearStream, setComplete, setAskUserQuestions } = useNovelStore();
 
   useEffect(() => {
     GetSnapshot()
@@ -60,6 +61,11 @@ const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const unsubDone = EventsOn('novel:done', () => {
       setComplete(true);
     });
+    const unsubAskUser = EventsOn('novel:ask_user', (questions: any) => {
+      if (questions && questions.length > 0) {
+        setAskUserQuestions(questions);
+      }
+    });
 
     return () => {
       unsubSnapshot();
@@ -67,14 +73,20 @@ const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       unsubStream();
       unsubStreamClear();
       unsubDone();
+      unsubAskUser();
     };
-  }, [setSnapshot, addEvent, appendStream, clearStream, setComplete]);
+  }, [setSnapshot, addEvent, appendStream, clearStream, setComplete, setAskUserQuestions]);
 
   if (checking) {
     return <div className="h-screen w-screen bg-black flex items-center justify-center"><div className="animate-pulse text-slate-500 font-mono">Đang kết nối Backend...</div></div>;
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      <AskUserModal />
+    </>
+  );
 };
 
 export default function App() {

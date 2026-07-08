@@ -6,6 +6,7 @@ import (
 )
 
 // renderEditorScreen hiển thị trình soạn thảo văn bản chiếm toàn màn hình.
+//nolint:unused
 func renderEditorScreen(width, height int, ed textarea.Model, err error) string {
 	// Tiêu đề
 	header := lipgloss.NewStyle().

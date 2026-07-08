@@ -695,6 +695,19 @@ func (h *Host) Snapshot() UISnapshot {
 	}
 
 	snap.Agents = h.observer.agentSnapshots()
+
+	// Gán provider/model đang dùng cho mỗi agent snapshot
+	for i := range snap.Agents {
+		role := agentRoleName(snap.Agents[i].Name)
+		if role != "" {
+			p, m, _ := h.models.CurrentSelection(role)
+			snap.Agents[i].Provider = p
+			snap.Agents[i].Model = m
+		}
+	}
+
+	snap.ProviderStatuses = bootstrap.GlobalQuotaTracker.AllStatuses()
+
 	h.fillContextStatus(&snap)
 	snap.StatusLabel = deriveStatusLabel(snap)
 

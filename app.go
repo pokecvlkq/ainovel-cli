@@ -25,6 +25,7 @@ type App struct {
 	host   *host.Host
 	store  *store.Store
 	mu     sync.Mutex
+	askCh  chan *tools.AskUserResponse // Kênh nhận phản hồi từ frontend
 }
 
 // NewApp creates a new App application struct
@@ -32,6 +33,7 @@ func NewApp(cfg bootstrap.Config, bundle assets.Bundle) *App {
 	return &App{
 		cfg:    cfg,
 		bundle: bundle,
+		askCh:  make(chan *tools.AskUserResponse, 1),
 	}
 }
 
@@ -129,9 +131,7 @@ func (a *App) StartNovel(prompt string) error {
 	a.host = eng
 	a.store = store.NewStore(eng.Dir())
 
-	eng.AskUser().SetHandler(func(ctx context.Context, questions []tools.Question) (*tools.AskUserResponse, error) {
-		return nil, fmt.Errorf("ask-user needs async implementation")
-	})
+	eng.AskUser().SetHandler(a.askUserHandler)
 
 	err = eng.PrepareUserRules(prompt)
 	if err != nil {
@@ -165,6 +165,7 @@ func (a *App) ResumeNovel(dir string) error {
 	}
 	a.host = eng
 	a.store = store.NewStore(eng.Dir())
+	eng.AskUser().SetHandler(a.askUserHandler)
 
 	label, err := eng.Resume()
 	if err != nil {
@@ -366,6 +367,35 @@ func (a *App) CoCreate(message string) (CoCreateReply, error) {
 	return CoCreateReply{Response: "Tính năng CoCreate đang được phát triển"}, nil
 }
 
-func (a *App) AnswerQuestion(answer string) {
-	// TODO: Handle ask user bridge response
+// askUserHandler xử lý khi LLM cần hỏi ý kiến người dùng qua giao diện Wails.
+func (a *App) askUserHandler(ctx context.Context, questions []tools.Question) (*tools.AskUserResponse, error) {
+	// Emit sự kiện sang frontend để hiển thị modal
+	runtime.EventsEmit(a.ctx, "novel:ask_user", questions)
+
+	// Chờ phản hồi từ frontend hoặc context bị huỷ
+	select {
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	case resp := <-a.askCh:
+		return resp, nil
+	}
+}
+
+// FrontendAnswer chứa phản hồi từ giao diện React khi user trả lời câu hỏi.
+type FrontendAnswer struct {
+	Answers map[string]string `json:"answers"`
+	Notes   map[string]string `json:"notes"`
+}
+
+// AnswerQuestion nhận phản hồi từ frontend và chuyển tiếp cho LLM handler đang chờ.
+func (a *App) AnswerQuestion(payload FrontendAnswer) {
+	resp := &tools.AskUserResponse{
+		Answers: payload.Answers,
+		Notes:   payload.Notes,
+	}
+	select {
+	case a.askCh <- resp:
+	default:
+		// Không có handler nào đang chờ, bỏ qua để tránh deadlock
+	}
 }

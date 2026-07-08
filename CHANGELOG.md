@@ -2,8 +2,19 @@
 
 Tất cả những thay đổi nổi bật đối với dự án AINovel CLI sẽ được ghi chép tại đây.
 
-## [v1.1.2] - 2026-07-07
+## [v1.1.3] - 2026-07-08
 
+### Thêm mới (Added)
+- **Hệ thống Quản lý Quota (Quota Tracker)**: Xây dựng cơ chế theo dõi In-Memory Thread-safe với 3 trạng thái: `Active` (Sẵn sàng), `Cooldown` (Nghỉ 60s), và `Dead` (Hết hạn mức).
+- **Giao diện Dashboard TUI nâng cao**: 
+  - Bổ sung sidebar `Tài khoản` liệt kê trạng thái thời gian thực của toàn bộ API keys.
+  - Hiển thị trực quan `⚡ [provider]` dưới tên từng Agent đang hoạt động ở cả sidebar và màn hình chính.
+
+### Thay đổi (Changed)
+- **Cải tiến Load Balancing & Fallback**: Các vai trò giờ đây có thể xoay vòng lệch mảng fallbacks (ví dụ Writer quay vòng 01-07, Editor quay vòng 03-07-01-02) để chia đều tải trọng mạng và API limits.
+- **Tối ưu xoay vòng API**: Tự động bỏ qua các models/API keys đang bị lỗi Quota hoặc đang Cooldown trong quá trình thử lại (failover) mà không làm ngắt quãng phiên tạo nội dung.
+
+## [v1.1.2] - 2026-07-07
 ### Thay đổi (Changed)
 - **Sửa lỗi Strict Tool Calling cho Gemini**: Tắt chế độ `StrictSchema` trong `DraftChapterTool` để tránh lỗi biên dịch/gọi API của Gemini khi sử dụng vai trò `writer` chạy trên các model Gemini.
 - **Bản địa hóa 100% giao diện TUI/CLI**:

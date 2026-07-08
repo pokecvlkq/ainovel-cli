@@ -5,6 +5,7 @@ import (
 	"slices"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/voocel/ainovel-cli/internal/host"
@@ -82,6 +83,10 @@ func renderStateContent(snap host.UISnapshot, contentW int) string {
 			renderHighlightField("Chờ xử lý", truncate(snap.PendingSteer, contentW-10)), contentW))
 	}
 
+	if body := renderProviderSidebar(snap, contentW); body != "" {
+		sections = append(sections, renderSidebarSection("Tài khoản", body, contentW))
+	}
+
 	if body := renderUsageSidebar(snap, contentW); body != "" {
 		sections = append(sections, renderSidebarSection("Sử dụng", body, contentW))
 	}
@@ -121,6 +126,10 @@ func renderAgentLine(agent host.AgentSnapshot, width int) string {
 	}
 	if ctx := agentContextLine(agent); ctx != "" {
 		line += "\n" + lipgloss.NewStyle().Foreground(colorDim).Italic(true).Render("  "+truncate(ctx, max(8, width-2)))
+	}
+	if agent.Provider != "" {
+		provLabel := "⚡ " + agent.Provider
+		line += "\n" + lipgloss.NewStyle().Foreground(colorAccent).Render("  "+truncate(provLabel, max(8, width-2)))
 	}
 	return line
 }
@@ -709,4 +718,34 @@ func taskKindLabel(kind string) string {
 	default:
 		return kind
 	}
+}
+
+func renderProviderSidebar(snap host.UISnapshot, width int) string {
+	if len(snap.ProviderStatuses) == 0 {
+		return ""
+	}
+
+	var b strings.Builder
+	for _, p := range snap.ProviderStatuses {
+		statusColor := colorSuccess
+		statusLabel := "Sẵn sàng"
+		
+		statusStr := string(p.Status)
+		if statusStr == "Dead" {
+			statusColor = colorError
+			statusLabel = "Hết Quota"
+		} else if statusStr == "Cooldown" {
+			statusColor = colorReview
+			rem := time.Until(p.ResumeAt)
+			if rem > 0 {
+				statusLabel = fmt.Sprintf("Nghỉ %ds", int(rem.Seconds()))
+			} else {
+				statusLabel = "Đang mở lại"
+			}
+		}
+
+		coloredStatus := lipgloss.NewStyle().Foreground(statusColor).Render(statusLabel)
+		b.WriteString(renderField(p.Provider, coloredStatus))
+	}
+	return b.String()
 }

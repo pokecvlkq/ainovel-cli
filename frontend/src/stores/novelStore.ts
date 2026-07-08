@@ -65,6 +65,18 @@ export interface NovelEvent {
   timestamp: number;
 }
 
+export interface Option {
+  label: string;
+  description: string;
+}
+
+export interface Question {
+  question: string;
+  header: string;
+  options: Option[];
+  multiSelect: boolean;
+}
+
 // Giá trị mặc định an toàn — plain object, không class constructor
 const emptySnapshot: UISnapshot = {
   Provider: '',
@@ -109,11 +121,13 @@ interface NovelState {
   events: NovelEvent[];
   streamBuffer: string;
   isComplete: boolean;
+  askUserQuestions: Question[] | null;
   setSnapshot: (snapshot: UISnapshot) => void;
   addEvent: (event: NovelEvent) => void;
   appendStream: (text: string) => void;
   clearStream: () => void;
   setComplete: (done: boolean) => void;
+  setAskUserQuestions: (questions: Question[] | null) => void;
 }
 
 export const useNovelStore = create<NovelState>((set) => ({
@@ -121,9 +135,11 @@ export const useNovelStore = create<NovelState>((set) => ({
   events: [],
   streamBuffer: '',
   isComplete: false,
+  askUserQuestions: null,
   setSnapshot: (snapshot) => set({ snapshot }),
   addEvent: (event) => set((state) => ({ events: [...state.events, event] })),
   appendStream: (text) => set((state) => ({ streamBuffer: state.streamBuffer + text })),
   clearStream: () => set({ streamBuffer: '' }),
   setComplete: (done) => set({ isComplete: done }),
+  setAskUserQuestions: (questions) => set({ askUserQuestions: questions }),
 }));

@@ -309,13 +309,23 @@ func (m *failoverModel) Generate(ctx context.Context, messages []agentcore.Messa
 	current := m.currentTarget()
 	tried := map[modelTarget]bool{current: true}
 
+	for !GlobalQuotaTracker.IsAvailable(current.provider) {
+		next, ok := m.findNextAvailableFallback(tried)
+		if !ok {
+			break
+		}
+		m.reportFailover(current, next, "unavailable", fmt.Errorf("provider %s unavailable", current.provider))
+		current = next
+		tried[current] = true
+	}
+
 	for {
 		resp, err := current.model.Generate(ctx, messages, tools, opts...)
 		if err == nil {
 			return resp, nil
 		}
 
-		next, reason, ok := m.pickNextFallback(tried, err)
+		next, reason, ok := m.pickNextFallback(current, tried, err)
 		if !ok {
 			return nil, err
 		}
@@ -334,10 +344,20 @@ func (m *failoverModel) GenerateStream(ctx context.Context, messages []agentcore
 		current := m.currentTarget()
 		tried := map[modelTarget]bool{current: true}
 
+		for !GlobalQuotaTracker.IsAvailable(current.provider) {
+			next, ok := m.findNextAvailableFallback(tried)
+			if !ok {
+				break
+			}
+			m.reportFailover(current, next, "unavailable", fmt.Errorf("provider %s unavailable", current.provider))
+			current = next
+			tried[current] = true
+		}
+
 	retry:
 		source, resp, err := m.startAttempt(ctx, current, messages, tools, opts...)
 		if err != nil {
-			if next, reason, ok := m.pickNextFallback(tried, err); ok {
+			if next, reason, ok := m.pickNextFallback(current, tried, err); ok {
 				m.reportFailover(current, next, reason, err)
 				current = next
 				tried[current] = true
@@ -360,7 +380,7 @@ func (m *failoverModel) GenerateStream(ctx context.Context, messages []agentcore
 			switch ev.Type {
 			case agentcore.StreamEventError:
 				if ev.Err != nil && !forwarded {
-					if next, reason, ok := m.pickNextFallback(tried, ev.Err); ok {
+					if next, reason, ok := m.pickNextFallback(current, tried, ev.Err); ok {
 						m.reportFailover(current, next, reason, ev.Err)
 						current = next
 						tried[current] = true
@@ -412,7 +432,23 @@ func (m *failoverModel) currentTarget() modelTarget {
 	}
 }
 
-func (m *failoverModel) pickNextFallback(tried map[modelTarget]bool, err error) (modelTarget, string, bool) {
+func (m *failoverModel) findNextAvailableFallback(tried map[modelTarget]bool) (modelTarget, bool) {
+	for _, target := range m.fallbacks {
+		if tried[target] {
+			continue
+		}
+		if target.model == nil {
+			continue
+		}
+		if GlobalQuotaTracker.IsAvailable(target.provider) {
+			return target, true
+		}
+		tried[target] = true
+	}
+	return modelTarget{}, false
+}
+
+func (m *failoverModel) pickNextFallback(current modelTarget, tried map[modelTarget]bool, err error) (modelTarget, string, bool) {
 	if err == nil {
 		return modelTarget{}, "", false
 	}
@@ -423,23 +459,26 @@ func (m *failoverModel) pickNextFallback(tried map[modelTarget]bool, err error) 
 	eligible := agentcore.IsFailoverEligible(err)
 	reason := agentcore.FailoverReason(err)
 
-	// agentcore không coi quota errors là failover-eligible, nhưng với cấu hình
-	// nhiều API key (multi-provider) ta cần xoay sang key tiếp theo khi hết quota.
-	// Đồng thời agentcore pattern "quota exceeded" không khớp thông báo Gemini
-	// "You exceeded your current quota" (thứ tự từ ngược), nên phải check thủ công.
+	msg := strings.ToLower(err.Error())
+	isQuota := strings.Contains(msg, "quota") ||
+		strings.Contains(msg, "billing") ||
+		strings.Contains(msg, "insufficient") ||
+		strings.Contains(msg, "exceeded")
+
+	isOverload := strings.Contains(msg, "high demand") ||
+		strings.Contains(msg, "spikes in demand") ||
+		strings.Contains(msg, "temporary") ||
+		strings.Contains(msg, "rate limit") ||
+		strings.Contains(msg, "too many requests") ||
+		strings.Contains(msg, "429")
+
 	if !eligible {
-		msg := strings.ToLower(err.Error())
-		if strings.Contains(msg, "quota") ||
-			strings.Contains(msg, "billing") ||
-			strings.Contains(msg, "insufficient") ||
-			strings.Contains(msg, "exceeded") {
+		if isQuota {
 			eligible = true
 			if reason == "" {
 				reason = "quota"
 			}
-		} else if strings.Contains(msg, "high demand") ||
-			strings.Contains(msg, "spikes in demand") ||
-			strings.Contains(msg, "temporary") {
+		} else if isOverload {
 			eligible = true
 			if reason == "" {
 				reason = "overloaded"
@@ -447,19 +486,23 @@ func (m *failoverModel) pickNextFallback(tried map[modelTarget]bool, err error) 
 		}
 	}
 
+	if current.provider != "" {
+		if isQuota || reason == "quota" {
+			GlobalQuotaTracker.MarkQuotaExhausted(current.provider)
+		} else if isOverload || reason == "overloaded" || reason == "rate_limit" {
+			GlobalQuotaTracker.MarkCooldown(current.provider, reason)
+		}
+	}
+
 	if !eligible {
 		return modelTarget{}, reason, false
 	}
-	for _, target := range m.fallbacks {
-		if tried[target] {
-			continue
-		}
-		if target.model == nil {
-			continue
-		}
-		return target, reason, true
+	
+	next, ok := m.findNextAvailableFallback(tried)
+	if !ok {
+		return modelTarget{}, reason, false
 	}
-	return modelTarget{}, reason, false
+	return next, reason, true
 }
 
 func (m *failoverModel) reportFailover(from, to modelTarget, reason string, err error) {

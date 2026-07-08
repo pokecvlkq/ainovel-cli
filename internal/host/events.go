@@ -4,6 +4,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/voocel/ainovel-cli/internal/bootstrap"
 	"github.com/voocel/ainovel-cli/internal/domain"
 )
 
@@ -38,6 +39,7 @@ func (e Event) Running() bool {
 
 // UISnapshot 是 TUI 渲染所需的聚合状态快照。
 type UISnapshot struct {
+	ProviderStatuses   []bootstrap.ProviderStatusSnapshot
 	Provider           string
 	NovelName          string
 	ModelName          string
@@ -133,6 +135,8 @@ type AgentSnapshot struct {
 	Turn      int
 	Context   AgentContextSnapshot
 	UpdatedAt time.Time
+	Provider  string // provider key đang dùng (e.g. "gemini-01")
+	Model     string // model name đang dùng (e.g. "gemini-2.5-flash")
 }
 
 // AgentCacheStat 是单个 agent 的缓存命中累计（投影到左栏）。

@@ -24,7 +24,6 @@ export const CommandBar: React.FC = () => {
   const handleSteer = () => {
     if (!steerInput.trim()) return;
     // Call backend API (CoCreate/Steer)
-    console.log('Steer requested:', steerInput);
     setSteerInput('');
   };
 
@@ -33,7 +32,7 @@ export const CommandBar: React.FC = () => {
     if (win.go && win.go.main && win.go.main.App && win.go.main.App.OpenFolder) {
       win.go.main.App.OpenFolder().catch(console.error);
     } else {
-      console.log('Open folder requested (fallback)');
+      // Fallback
     }
   };
 

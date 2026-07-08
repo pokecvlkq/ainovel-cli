@@ -75,6 +75,9 @@ func renderAgentCard(agentName string, snap *host.AgentSnapshot, prog progress.M
 	}
 
 	body := lipgloss.NewStyle().Foreground(colorMuted).Render(taskDesc)
+	if snap != nil && snap.Provider != "" {
+		body += "\n" + lipgloss.NewStyle().Foreground(colorAccent).Render("⚡ "+snap.Provider)
+	}
 
 	// Riêng Writer thì hiển thị thanh tiến trình
 	footer := ""
