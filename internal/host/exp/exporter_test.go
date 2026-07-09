@@ -30,7 +30,7 @@ func newTestStore(t *testing.T, novelName string, completed []int) (*store.Store
 		if err := s.Progress.StartChapter(ch); err != nil {
 			t.Fatalf("start chapter %d: %v", ch, err)
 		}
-		if err := s.Progress.MarkChapterComplete(ch, 5, "cliff", "main"); err != nil {
+		if err := s.Progress.MarkChapterComplete(ch, 5, 5, "cliff", "main"); err != nil {
 			t.Fatalf("mark complete %d: %v", ch, err)
 		}
 	}

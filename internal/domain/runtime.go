@@ -35,20 +35,22 @@ const (
 
 // Progress 进度追踪，持久化到 meta/progress.json。
 type Progress struct {
-	NovelName         string      `json:"novel_name"`
-	Phase             Phase       `json:"phase"`
-	CurrentChapter    int         `json:"current_chapter"`
-	TotalChapters     int         `json:"total_chapters"`
-	CompletedChapters []int       `json:"completed_chapters"`
-	TotalWordCount    int         `json:"total_word_count"`
-	ChapterWordCounts map[int]int `json:"chapter_word_counts,omitempty"` // 每章字数，支持重写时修正总字数
-	InProgressChapter int         `json:"in_progress_chapter,omitempty"` // 正在写作的章节（场景级恢复）
-	CompletedScenes   []int       `json:"completed_scenes,omitempty"`    // 当前章节已完成的场景编号
-	Flow              FlowState   `json:"flow,omitempty"`                // 当前流程
-	PendingRewrites   []int       `json:"pending_rewrites,omitempty"`    // 待重写章节队列
-	RewriteReason     string      `json:"rewrite_reason,omitempty"`      // 重写原因
-	StrandHistory     []string    `json:"strand_history,omitempty"`      // 按章节顺序记录 dominant_strand
-	HookHistory       []string    `json:"hook_history,omitempty"`        // 按章节顺序记录 hook_type
+	NovelName             string      `json:"novel_name"`
+	Phase                 Phase       `json:"phase"`
+	CurrentChapter        int         `json:"current_chapter"`
+	TotalChapters         int         `json:"total_chapters"`
+	CompletedChapters     []int       `json:"completed_chapters"`
+	TotalWordCount        int         `json:"total_word_count"`
+	TotalRealWordCount    int         `json:"total_real_word_count"`
+	ChapterWordCounts     map[int]int `json:"chapter_word_counts,omitempty"`      // 每章字数，支持重写时修正总字数
+	ChapterRealWordCounts map[int]int `json:"chapter_real_word_counts,omitempty"` // 每章真实字数（按空格）
+	InProgressChapter     int         `json:"in_progress_chapter,omitempty"`      // 正在写作的章节（场景级恢复）
+	CompletedScenes       []int       `json:"completed_scenes,omitempty"`         // 当前章节已完成的场景编号
+	Flow                  FlowState   `json:"flow,omitempty"`                     // 当前流程
+	PendingRewrites       []int       `json:"pending_rewrites,omitempty"`         // 待重写章节队列
+	RewriteReason         string      `json:"rewrite_reason,omitempty"`           // 重写原因
+	StrandHistory         []string    `json:"strand_history,omitempty"`           // 按章节顺序记录 dominant_strand
+	HookHistory           []string    `json:"hook_history,omitempty"`             // 按章节顺序记录 hook_type
 	// 长篇分层追踪（仅长篇模式使用，短篇/中篇为零值）
 	CurrentVolume int  `json:"current_volume,omitempty"`
 	CurrentArc    int  `json:"current_arc,omitempty"`

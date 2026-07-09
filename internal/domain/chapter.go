@@ -2,6 +2,7 @@ package domain
 
 import (
 	"fmt"
+	"strings"
 	"unicode/utf8"
 )
 
@@ -27,7 +28,12 @@ func ShouldArcReview(isArcEnd, isVolumeEnd bool, volume, arc int) (bool, string)
 	return false, ""
 }
 
-// WordCount 按 rune 计算字数。
-func WordCount(content string) int {
+// CharCount 按 rune 计算字符数。
+func CharCount(content string) int {
 	return utf8.RuneCountInString(content)
+}
+
+// WordCount 按空格计算实际字数。
+func WordCount(content string) int {
+	return len(strings.Fields(content))
 }

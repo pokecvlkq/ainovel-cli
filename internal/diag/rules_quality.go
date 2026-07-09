@@ -202,10 +202,10 @@ func ExcessiveRewrites(snap *Snapshot) []Finding {
 
 // WordCountAnomaly 检测章节字数异常。
 func WordCountAnomaly(snap *Snapshot) []Finding {
-	if snap.Progress == nil || len(snap.Progress.ChapterWordCounts) < 3 {
+	if snap.Progress == nil || len(snap.Progress.ChapterRealWordCounts) < 3 {
 		return nil
 	}
-	wc := snap.Progress.ChapterWordCounts
+	wc := snap.Progress.ChapterRealWordCounts
 
 	var sum float64
 	for _, w := range wc {

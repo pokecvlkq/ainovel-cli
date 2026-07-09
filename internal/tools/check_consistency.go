@@ -51,7 +51,7 @@ func (t *CheckConsistencyTool) Execute(_ context.Context, args json.RawMessage) 
 	result := map[string]any{"chapter": a.Chapter}
 
 	// Nội dung chương
-	content, wordCount, err := t.store.Drafts.LoadChapterContent(a.Chapter)
+	content, wordCount, _, err := t.store.Drafts.LoadChapterContent(a.Chapter)
 	if err != nil {
 		return nil, fmt.Errorf("load chapter content: %w: %w", errs.ErrStoreRead, err)
 	}

@@ -20,7 +20,7 @@ func completedBook(t *testing.T, n int) *store.Store {
 		t.Fatalf("InitProgress: %v", err)
 	}
 	for ch := 1; ch <= n; ch++ {
-		if err := s.Progress.MarkChapterComplete(ch, 100, "", ""); err != nil {
+		if err := s.Progress.MarkChapterComplete(ch, 100, 100, "", ""); err != nil {
 			t.Fatalf("MarkChapterComplete(%d): %v", ch, err)
 		}
 	}
@@ -72,7 +72,7 @@ func TestReopenBookRejectsNonCompleteBook(t *testing.T) {
 	if err := s.Progress.Init("test", 5); err != nil {
 		t.Fatalf("InitProgress: %v", err)
 	}
-	if err := s.Progress.MarkChapterComplete(1, 100, "", ""); err != nil { // phase→writing
+	if err := s.Progress.MarkChapterComplete(1, 100, 100, "", ""); err != nil { // phase→writing
 		t.Fatalf("MarkChapterComplete: %v", err)
 	}
 	tool := NewReopenBookTool(s)

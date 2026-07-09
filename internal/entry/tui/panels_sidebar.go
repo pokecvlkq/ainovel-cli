@@ -729,7 +729,7 @@ func renderProviderSidebar(snap host.UISnapshot, width int) string {
 	for _, p := range snap.ProviderStatuses {
 		statusColor := colorSuccess
 		statusLabel := "Sẵn sàng"
-		
+
 		statusStr := string(p.Status)
 		if statusStr == "Dead" {
 			statusColor = colorError

@@ -2,6 +2,14 @@
 
 Tất cả những thay đổi nổi bật đối với dự án AINovel CLI sẽ được ghi chép tại đây.
 
+## [v1.1.5] - 2026-07-09
+
+### Thêm mới (Added)
+- **Hệ thống đếm ký tự và đếm chữ**:
+  - Tách biệt bộ đếm `CharCount` (ký tự) và `WordCount` (chữ) trong `chapter.go`.
+  - Cập nhật `domain.Progress` để theo dõi cả `TotalWordCount` (ký tự, giữ nguyên tên để tương thích ngược) và `TotalRealWordCount` (chữ) cùng với `ChapterRealWordCounts`.
+  - Cập nhật hệ thống chẩn đoán (Diagnostics) trong `rules_quality.go` và `diag.go` để sử dụng `TotalRealWordCount` cho các thống kê chữ.
+
 ## [v1.1.4] - 2026-07-08
 
 ### Thêm mới (Added)

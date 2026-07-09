@@ -519,7 +519,7 @@ func (m *failoverModel) pickNextFallback(current modelTarget, tried map[modelTar
 	if !eligible {
 		return modelTarget{}, reason, false
 	}
-	
+
 	next, ok := m.findNextAvailableFallback(tried)
 	if !ok {
 		return modelTarget{}, reason, false

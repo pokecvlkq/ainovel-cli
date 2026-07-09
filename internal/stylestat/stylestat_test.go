@@ -28,8 +28,8 @@ func TestComputePatterns(t *testing.T) {
 	}
 	want := map[string]int{
 		"Câu chỉnh hướng『không phải… mà là…』":                     6,
-		"Từ chỉ thời gian nhanh『nhịp thở/khoảnh khắc』":           6,
-		"So sánh tu từ『như một/giống như/tựa như』":               6,
+		"Từ chỉ thời gian nhanh『nhịp thở/khoảnh khắc』":            6,
+		"So sánh tu từ『như một/giống như/tựa như』":                6,
 		"Tiết tấu im lặng『im lặng/không nói gì/không ngoảnh lại』": 6,
 	}
 	for _, p := range s.Patterns {

@@ -18,8 +18,9 @@ import (
 //
 // === HƯỚNG DẪN NÂNG CẤP (Vertex AI Provider) ===
 // 1. Xác thực: Dùng Service Account JSON, truyền qua:
-//    - config.json: "api_key": "$VERTEX_ACC_1"  (đọc JSON từ biến môi trường .env)
-//    - config.json: "api_key": "credentials/aitnd.json"  (đọc file trực tiếp)
+//   - config.json: "api_key": "$VERTEX_ACC_1"  (đọc JSON từ biến môi trường .env)
+//   - config.json: "api_key": "credentials/aitnd.json"  (đọc file trực tiếp)
+//
 // 2. project_id được TỰ ĐỘNG parse từ JSON credential, không cần cấu hình thêm.
 // 3. location mặc định "us-central1", có thể ghi đè bằng env VERTEX_LOCATION.
 // 4. Hỗ trợ multi-account fallback: mỗi provider Vertex dùng 1 Service Account riêng.
@@ -282,7 +283,7 @@ func (v *VertexModel) convertMessages(messages []agentcore.Message) ([]*genai.Co
 
 func (v *VertexModel) Generate(ctx context.Context, messages []agentcore.Message, tools []agentcore.ToolSpec, opts ...agentcore.CallOption) (*agentcore.LLMResponse, error) {
 	model := v.client.GenerativeModel(v.modelName)
-	
+
 	if len(tools) > 0 {
 		var decls []*genai.FunctionDeclaration
 		for _, t := range tools {

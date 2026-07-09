@@ -438,8 +438,8 @@ func (t *ContextTool) architectReferences() map[string]string {
 }
 
 // foundationStatus Kiểm tra tính hoàn thiện của các cài đặt cơ bản, trả về danh sách các mục còn thiếu.
-// Dùng chung logic phán đoán store.FoundationMissing với công cụ save_foundation, để đảm bảo LLM thấy 
-// ready/missing từ novel_context và foundation_ready từ save_foundation 
+// Dùng chung logic phán đoán store.FoundationMissing với công cụ save_foundation, để đảm bảo LLM thấy
+// ready/missing từ novel_context và foundation_ready từ save_foundation
 // luôn nhất quán (các chi tiết như yêu cầu compass dài hạn sẽ không bị sai lệch).
 func (t *ContextTool) foundationStatus() map[string]any {
 	missing := t.store.FoundationMissing()

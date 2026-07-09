@@ -141,7 +141,7 @@ func (s *ProgressStore) IsChapterCompleted(chapter int) bool {
 }
 
 // MarkChapterComplete 标记章节完成，原子性更新进度。
-func (s *ProgressStore) MarkChapterComplete(chapter, wordCount int, hookType, dominantStrand string) error {
+func (s *ProgressStore) MarkChapterComplete(chapter, wordCount, realWordCount int, hookType, dominantStrand string) error {
 	return s.io.WithWriteLock(func() error {
 		p, err := s.loadUnlocked()
 		if err != nil {
@@ -153,11 +153,19 @@ func (s *ProgressStore) MarkChapterComplete(chapter, wordCount int, hookType, do
 		if p.ChapterWordCounts == nil {
 			p.ChapterWordCounts = make(map[int]int)
 		}
+		if p.ChapterRealWordCounts == nil {
+			p.ChapterRealWordCounts = make(map[int]int)
+		}
 		if oldWC, ok := p.ChapterWordCounts[chapter]; ok {
 			p.TotalWordCount -= oldWC
 		}
+		if oldRWC, ok := p.ChapterRealWordCounts[chapter]; ok {
+			p.TotalRealWordCount -= oldRWC
+		}
 		p.ChapterWordCounts[chapter] = wordCount
 		p.TotalWordCount += wordCount
+		p.ChapterRealWordCounts[chapter] = realWordCount
+		p.TotalRealWordCount += realWordCount
 		if !slices.Contains(p.CompletedChapters, chapter) {
 			p.CompletedChapters = append(p.CompletedChapters, chapter)
 		}

@@ -68,15 +68,15 @@ func (s *DraftStore) LoadDraft(chapter int) (string, error) {
 }
 
 // LoadChapterContent 加载章节草稿正文及字数。
-func (s *DraftStore) LoadChapterContent(chapter int) (string, int, error) {
+func (s *DraftStore) LoadChapterContent(chapter int) (string, int, int, error) {
 	draft, err := s.LoadDraft(chapter)
 	if err != nil {
-		return "", 0, err
+		return "", 0, 0, err
 	}
 	if draft != "" {
-		return draft, utf8.RuneCountInString(draft), nil
+		return draft, domain.CharCount(draft), domain.WordCount(draft), nil
 	}
-	return "", 0, nil
+	return "", 0, 0, nil
 }
 
 // SaveFinalChapter 保存最终章节正文到 chapters/{ch}.md。

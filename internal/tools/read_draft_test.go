@@ -297,7 +297,7 @@ func TestDraftChapterRejectsCompleted(t *testing.T) {
 	}
 	_ = s.Drafts.SaveDraft(1, "Nội dung chính chương 1")
 	_ = s.Progress.StartChapter(1)
-	_ = s.Progress.MarkChapterComplete(1, 3000, "", "")
+	_ = s.Progress.MarkChapterComplete(1, 3000, 3000, "", "")
 
 	tool := NewDraftChapterTool(s)
 	args, _ := json.Marshal(map[string]any{

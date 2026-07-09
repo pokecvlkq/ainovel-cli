@@ -19,7 +19,7 @@ func TestDraftChapterRejectsUnfinishedPendingRewrite(t *testing.T) {
 		t.Fatalf("Progress.Init: %v", err)
 	}
 	for ch := 1; ch <= 58; ch++ {
-		if err := s.Progress.MarkChapterComplete(ch, 3000, "", ""); err != nil {
+		if err := s.Progress.MarkChapterComplete(ch, 3000, 3000, "", ""); err != nil {
 			t.Fatalf("MarkChapterComplete(%d): %v", ch, err)
 		}
 	}

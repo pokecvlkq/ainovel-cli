@@ -159,7 +159,7 @@ func (t *CommitChapterTool) Execute(_ context.Context, args json.RawMessage) (js
 	}
 
 	// 1. Tải nội dung văn bản của chương
-	content, wordCount, err := t.store.Drafts.LoadChapterContent(a.Chapter)
+	content, wordCount, realWordCount, err := t.store.Drafts.LoadChapterContent(a.Chapter)
 	if err != nil {
 		return nil, fmt.Errorf("load chapter content: %w: %w", errs.ErrStoreRead, err)
 	}
@@ -244,7 +244,7 @@ func (t *CommitChapterTool) Execute(_ context.Context, args json.RawMessage) (js
 	}
 
 	// 5. Cập nhật tiến độ
-	if err := t.store.Progress.MarkChapterComplete(a.Chapter, wordCount, a.HookType, a.DominantStrand); err != nil {
+	if err := t.store.Progress.MarkChapterComplete(a.Chapter, wordCount, realWordCount, a.HookType, a.DominantStrand); err != nil {
 		return nil, fmt.Errorf("mark chapter complete: %w: %w", errs.ErrStoreWrite, err)
 	}
 
@@ -366,7 +366,7 @@ func (t *CommitChapterTool) executeRewriteCommit(
 	progress *domain.Progress,
 ) (json.RawMessage, error) {
 	// 1. Tải văn bản đã được trau chuốt
-	content, wordCount, err := t.store.Drafts.LoadChapterContent(chapter)
+	content, wordCount, realWordCount, err := t.store.Drafts.LoadChapterContent(chapter)
 	if err != nil {
 		return nil, fmt.Errorf("rewrite: load chapter content: %w: %w", errs.ErrStoreRead, err)
 	}
@@ -402,7 +402,7 @@ func (t *CommitChapterTool) executeRewriteCommit(
 	}
 
 	// 4. Cập nhật số từ (MarkChapterComplete là idempotic đối với các chương đã hoàn thành: thay thế word count, slice.Contains ngăn cản việc vào hàng đợi nhiều lần)
-	if err := t.store.Progress.MarkChapterComplete(chapter, wordCount, hookType, dominantStrand); err != nil {
+	if err := t.store.Progress.MarkChapterComplete(chapter, wordCount, realWordCount, hookType, dominantStrand); err != nil {
 		return nil, fmt.Errorf("rewrite: update word count: %w: %w", errs.ErrStoreWrite, err)
 	}
 
@@ -480,7 +480,7 @@ func (t *CommitChapterTool) executeRewriteCommit(
 // buildSkipResult xây dựng dữ liệu trả về tương ứng với một commit bình thường đối với trường hợp "gửi lặp lại chương đã hoàn thành".
 // Điều phối viên căn cứ vào đó để đưa ra quyết định tiếp theo (gửi cho người viết/biên tập/kiến trúc sư), chứ không phải bị ảo giác vì nhận được gợi ý nội dung chữ.
 func (t *CommitChapterTool) buildSkipResult(chapter int, progress *domain.Progress) (json.RawMessage, error) {
-	_, wordCount, _ := t.store.Drafts.LoadChapterContent(chapter)
+	_, wordCount, _, _ := t.store.Drafts.LoadChapterContent(chapter)
 
 	result := domain.CommitResult{
 		Chapter:     chapter,

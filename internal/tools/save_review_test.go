@@ -18,7 +18,7 @@ func TestSaveReviewPersistsContractAssessment(t *testing.T) {
 	if err := s.Progress.Init("test", 10); err != nil {
 		t.Fatalf("Progress.Init: %v", err)
 	}
-	if err := s.Progress.MarkChapterComplete(3, 3000, "", ""); err != nil {
+	if err := s.Progress.MarkChapterComplete(3, 3000, 3000, "", ""); err != nil {
 		t.Fatalf("MarkChapterComplete: %v", err)
 	}
 
@@ -69,7 +69,7 @@ func TestSaveReviewRejectsMissingDimensions(t *testing.T) {
 	if err := s.Progress.Init("test", 10); err != nil {
 		t.Fatalf("Progress.Init: %v", err)
 	}
-	if err := s.Progress.MarkChapterComplete(3, 3000, "", ""); err != nil {
+	if err := s.Progress.MarkChapterComplete(3, 3000, 3000, "", ""); err != nil {
 		t.Fatalf("MarkChapterComplete: %v", err)
 	}
 
@@ -99,7 +99,7 @@ func TestSaveReviewRejectsDimensionWithoutComment(t *testing.T) {
 	if err := s.Progress.Init("test", 10); err != nil {
 		t.Fatalf("Progress.Init: %v", err)
 	}
-	if err := s.Progress.MarkChapterComplete(3, 3000, "", ""); err != nil {
+	if err := s.Progress.MarkChapterComplete(3, 3000, 3000, "", ""); err != nil {
 		t.Fatalf("MarkChapterComplete: %v", err)
 	}
 
@@ -138,7 +138,7 @@ func TestSaveReviewRejectsUnfinishedAffectedChapter(t *testing.T) {
 		t.Fatalf("Progress.Init: %v", err)
 	}
 	for ch := 1; ch <= 58; ch++ {
-		if err := s.Progress.MarkChapterComplete(ch, 3000, "", ""); err != nil {
+		if err := s.Progress.MarkChapterComplete(ch, 3000, 3000, "", ""); err != nil {
 			t.Fatalf("MarkChapterComplete(%d): %v", ch, err)
 		}
 	}
@@ -198,7 +198,7 @@ func TestSaveReviewDerivesVerdictFromScore(t *testing.T) {
 	if err := s.Progress.Init("test", 10); err != nil {
 		t.Fatalf("Progress.Init: %v", err)
 	}
-	if err := s.Progress.MarkChapterComplete(3, 3000, "", ""); err != nil {
+	if err := s.Progress.MarkChapterComplete(3, 3000, 3000, "", ""); err != nil {
 		t.Fatalf("MarkChapterComplete: %v", err)
 	}
 

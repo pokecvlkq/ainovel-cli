@@ -63,11 +63,11 @@ func (qt *QuotaTracker) MarkActive(provider string) {
 func (qt *QuotaTracker) MarkCooldown(provider, reason string) {
 	qt.mu.Lock()
 	defer qt.mu.Unlock()
-	
+
 	if reason == "" {
 		reason = "Rate Limit / Overloaded"
 	}
-	
+
 	qt.statuses[provider] = &ProviderStatusSnapshot{
 		Provider: provider,
 		Status:   StatusCooldown,
@@ -80,7 +80,7 @@ func (qt *QuotaTracker) MarkCooldown(provider, reason string) {
 func (qt *QuotaTracker) IsAvailable(provider string) bool {
 	qt.mu.RLock()
 	defer qt.mu.RUnlock()
-	
+
 	status, exists := qt.statuses[provider]
 	if !exists {
 		return true // Mặc định là Active nếu chưa có lỗi gì
@@ -109,7 +109,7 @@ func (qt *QuotaTracker) IsAvailable(provider string) bool {
 func (qt *QuotaTracker) AllStatuses() []ProviderStatusSnapshot {
 	qt.mu.RLock()
 	defer qt.mu.RUnlock()
-	
+
 	snapshots := make([]ProviderStatusSnapshot, 0, len(qt.statuses))
 	for _, status := range qt.statuses {
 		snapshots = append(snapshots, *status)

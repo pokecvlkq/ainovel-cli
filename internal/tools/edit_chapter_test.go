@@ -64,7 +64,7 @@ func TestEditChapterSeedsFromFinalChapter(t *testing.T) {
 	if err := s.Drafts.SaveFinalChapter(3, original); err != nil {
 		t.Fatalf("SaveFinalChapter: %v", err)
 	}
-	if err := s.Progress.MarkChapterComplete(3, len([]rune(original)), "mystery", "quest"); err != nil {
+	if err := s.Progress.MarkChapterComplete(3, len([]rune(original)), len([]rune(original)), "mystery", "quest"); err != nil {
 		t.Fatalf("MarkChapterComplete: %v", err)
 	}
 	if err := s.Progress.SetPendingRewrites([]int{3}, "Trau chuốt thử nghiệm"); err != nil {
@@ -120,7 +120,7 @@ func TestEditChapterRejectsCompletedWithoutQueue(t *testing.T) {
 	if err := s.Drafts.SaveFinalChapter(2, original); err != nil {
 		t.Fatalf("SaveFinalChapter: %v", err)
 	}
-	if err := s.Progress.MarkChapterComplete(2, len([]rune(original)), "mystery", "quest"); err != nil {
+	if err := s.Progress.MarkChapterComplete(2, len([]rune(original)), len([]rune(original)), "mystery", "quest"); err != nil {
 		t.Fatalf("MarkChapterComplete: %v", err)
 	}
 
@@ -269,7 +269,7 @@ func TestEditChapterWorksWithCommitValidation(t *testing.T) {
 	if err := s.Drafts.SaveFinalChapter(2, original); err != nil {
 		t.Fatalf("SaveFinalChapter: %v", err)
 	}
-	if err := s.Progress.MarkChapterComplete(2, len([]rune(original)), "mystery", "quest"); err != nil {
+	if err := s.Progress.MarkChapterComplete(2, len([]rune(original)), len([]rune(original)), "mystery", "quest"); err != nil {
 		t.Fatalf("MarkChapterComplete: %v", err)
 	}
 	if err := s.Progress.SetPendingRewrites([]int{2}, "Trau chuốt"); err != nil {

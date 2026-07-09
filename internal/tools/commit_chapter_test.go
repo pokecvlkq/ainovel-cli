@@ -41,7 +41,7 @@ func TestCommitChapterRejectsNonPendingRewrite(t *testing.T) {
 	if err := store.Progress.Init("test", 10); err != nil {
 		t.Fatalf("InitProgress: %v", err)
 	}
-	if err := store.Progress.MarkChapterComplete(2, 3000, "", ""); err != nil {
+	if err := store.Progress.MarkChapterComplete(2, 3000, 3000, "", ""); err != nil {
 		t.Fatalf("MarkChapterComplete: %v", err)
 	}
 	if err := store.Progress.SetPendingRewrites([]int{2}, "Kiểm tra viết lại"); err != nil {
@@ -95,7 +95,7 @@ func TestCommitChapterAllowsPendingRewrite(t *testing.T) {
 	if err := store.Progress.Init("test", 10); err != nil {
 		t.Fatalf("InitProgress: %v", err)
 	}
-	if err := store.Progress.MarkChapterComplete(2, 3000, "", ""); err != nil {
+	if err := store.Progress.MarkChapterComplete(2, 3000, 3000, "", ""); err != nil {
 		t.Fatalf("MarkChapterComplete: %v", err)
 	}
 	if err := store.Progress.SetPendingRewrites([]int{2}, "Kiểm tra viết lại"); err != nil {
@@ -314,11 +314,14 @@ func TestCommitChapterNonLayeredRecompletesAfterRework(t *testing.T) {
 	if err := s.Drafts.SaveFinalChapter(2, ch2); err != nil {
 		t.Fatalf("SaveFinalChapter: %v", err)
 	}
-	if err := s.Progress.MarkChapterComplete(1, 100, "", ""); err != nil {
+	if err := s.Progress.MarkChapterComplete(1, 100, 100, "", ""); err != nil {
 		t.Fatalf("MarkChapterComplete(1): %v", err)
 	}
-	if err := s.Progress.MarkChapterComplete(2, len([]rune(ch2)), "", ""); err != nil {
+	if err := s.Progress.MarkChapterComplete(2, len([]rune(ch2)), len([]rune(ch2)), "", ""); err != nil {
 		t.Fatalf("MarkChapterComplete(2): %v", err)
+	}
+	if err := s.Progress.MarkComplete(); err != nil {
+		t.Fatalf("MarkComplete: %v", err)
 	}
 	if err := s.Progress.MarkComplete(); err != nil {
 		t.Fatalf("MarkComplete: %v", err)
@@ -405,7 +408,7 @@ func TestCommitChapterLayeredReopenRecompletesDespiteOpenThread(t *testing.T) {
 		if err := s.Drafts.SaveFinalChapter(ch, body); err != nil {
 			t.Fatalf("SaveFinalChapter %d: %v", ch, err)
 		}
-		if err := s.Progress.MarkChapterComplete(ch, len([]rune(body)), "", ""); err != nil {
+		if err := s.Progress.MarkChapterComplete(ch, len([]rune(body)), len([]rune(body)), "", ""); err != nil {
 			t.Fatalf("MarkChapterComplete %d: %v", ch, err)
 		}
 	}
@@ -467,7 +470,7 @@ func TestCommitChapterRejectsPolishWithoutDraftChange(t *testing.T) {
 	if err := s.Drafts.SaveFinalChapter(2, original); err != nil {
 		t.Fatalf("SaveFinalChapter: %v", err)
 	}
-	if err := s.Progress.MarkChapterComplete(2, len([]rune(original)), "mystery", "quest"); err != nil {
+	if err := s.Progress.MarkChapterComplete(2, len([]rune(original)), len([]rune(original)), "mystery", "quest"); err != nil {
 		t.Fatalf("MarkChapterComplete: %v", err)
 	}
 

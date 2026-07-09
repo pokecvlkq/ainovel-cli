@@ -45,7 +45,9 @@ func (t *EditChapterTool) ReadOnly(_ json.RawMessage) bool { return false }
 func (t *EditChapterTool) ConcurrencySafe(_ json.RawMessage) bool { return false }
 
 // ActivityDescription Cung cấp mô tả hoạt động của công cụ hiện tại để hiển thị trên UI/log.
-func (t *EditChapterTool) ActivityDescription(_ json.RawMessage) string { return "Chỉnh sửa bản nháp chương" }
+func (t *EditChapterTool) ActivityDescription(_ json.RawMessage) string {
+	return "Chỉnh sửa bản nháp chương"
+}
 
 func (t *EditChapterTool) Description() string {
 	return "Thay thế chuỗi tại vị trí cố định cho bản nháp chương (ưu tiên cho ngữ cảnh trau chuốt, tiết kiệm token hơn việc viết lại toàn bộ chương của draft_chapter)." +

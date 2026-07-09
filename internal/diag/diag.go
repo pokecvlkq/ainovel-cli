@@ -86,7 +86,7 @@ func buildStats(snap *Snapshot) Stats {
 	p := snap.Progress
 	st.CompletedChapters = len(p.CompletedChapters)
 	st.TotalChapters = p.TotalChapters
-	st.TotalWords = p.TotalWordCount
+	st.TotalWords = p.TotalRealWordCount
 	st.Phase = string(p.Phase)
 	st.Flow = string(p.Flow)
 
