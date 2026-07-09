@@ -800,8 +800,13 @@ func (h *Host) fillDetails(snap *UISnapshot, progress *domain.Progress) {
 	}
 	if progress != nil && len(progress.CompletedChapters) > 0 {
 		lastCh := progress.CompletedChapters[len(progress.CompletedChapters)-1]
-		wc := progress.ChapterWordCounts[lastCh]
-		snap.LastCommitSummary = fmt.Sprintf("Chương %d (%d từ)", lastCh, wc)
+		charCount := progress.ChapterWordCounts[lastCh]
+		wordCount := progress.ChapterRealWordCounts[lastCh]
+		if wordCount > 0 {
+			snap.LastCommitSummary = fmt.Sprintf("Chương %d (%d chữ, %d ký tự)", lastCh, wordCount, charCount)
+		} else {
+			snap.LastCommitSummary = fmt.Sprintf("Chương %d (%d ký tự)", lastCh, charCount)
+		}
 	}
 	currentCh := 1
 	if progress != nil && len(progress.CompletedChapters) > 0 {
