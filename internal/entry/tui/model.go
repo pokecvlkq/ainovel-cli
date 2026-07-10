@@ -588,7 +588,7 @@ func (m *Model) outputDir() string {
 }
 
 func defaultSteerPlaceholder() string {
-	return "Nhập thay đổi, VD: Đẩy tuyến tình cảm lên chương 4"
+	return "Nhập thay đổi, VD: Sửa chương 4. Hoặc /projects để chọn lại dự án"
 }
 
 func (m *Model) syncRuntimePlaceholder() {

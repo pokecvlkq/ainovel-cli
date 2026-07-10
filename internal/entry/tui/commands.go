@@ -71,10 +71,11 @@ func commandRegistryInstance() commandRegistry {
 			Description: "Quản lý dự án",
 			AutoExecute: true,
 			Run: func(m Model, _ []string) (tea.Model, tea.Cmd) {
-				if p, err := store.DiscoverProjects(m.cfg.OutputDir); err == nil && len(p) > 0 {
+				if p, err := store.DiscoverProjects(m.baseOutputDir); err == nil && len(p) > 0 {
 					m.projects = p
 					m.mode = modeProjectPicker
 					m.textarea.Blur()
+					m.projectIdx = 0
 				} else {
 					m.applyEvent(host.Event{
 						Time: time.Now(), Category: "ERROR", Summary: "Không tìm thấy dự án nào", Level: "error",

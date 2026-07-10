@@ -982,7 +982,7 @@ func (m Model) switchProject(dirName string) (tea.Model, tea.Cmd) {
 	if m.runtime != nil {
 		m.runtime.Close()
 	}
-	m.cfg.OutputDir = filepath.Join(m.cfg.OutputDir, dirName)
+	m.cfg.OutputDir = filepath.Join(m.baseOutputDir, dirName)
 	rt, err := host.New(m.cfg, m.bundle)
 	if err != nil {
 		m.err = err
@@ -1026,7 +1026,7 @@ func (m Model) switchToNewProject(dirName string) (Model, tea.Cmd, error) {
 	// So we should make a copy of cfg? Or just assume m.cfg.OutputDir is always "output"
 	// Let's copy cfg:
 	newCfg := m.cfg
-	newCfg.OutputDir = filepath.Join(m.cfg.OutputDir, dirName)
+	newCfg.OutputDir = filepath.Join(m.baseOutputDir, dirName)
 	if err := os.MkdirAll(newCfg.OutputDir, 0755); err != nil {
 		return m, nil, err
 	}
