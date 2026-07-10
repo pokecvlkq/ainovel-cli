@@ -3,10 +3,13 @@ package tui
 import (
 	"strings"
 	"testing"
+
+	"github.com/voocel/ainovel-cli/assets"
+	"github.com/voocel/ainovel-cli/internal/bootstrap"
 )
 
 func TestEnterStartingSwitchesToWorkbenchImmediately(t *testing.T) {
-	m := NewModel(nil, nil, "")
+	m := NewModel(nil, bootstrap.Config{}, assets.Bundle{}, nil, "")
 	m.width = 120
 	m.height = 40
 	m.resizeTextarea()
@@ -35,7 +38,7 @@ func TestEnterStartingSwitchesToWorkbenchImmediately(t *testing.T) {
 }
 
 func TestApplyStartupPromptEventTruncatesSummaryButKeepsDetail(t *testing.T) {
-	m := NewModel(nil, nil, "")
+	m := NewModel(nil, bootstrap.Config{}, assets.Bundle{}, nil, "")
 	prompt := strings.Repeat("Đặt", maxPromptEventRunes+50)
 
 	m.applyStartupPromptEvent(prompt)

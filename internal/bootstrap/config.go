@@ -3,7 +3,6 @@ package bootstrap
 import (
 	"fmt"
 	"log/slog"
-	"path/filepath"
 	"strings"
 
 	"github.com/voocel/agentcore/llm"
@@ -316,7 +315,7 @@ func (c *Config) DefaultProviderConfig() ProviderConfig {
 // FillDefaults 填充默认值。
 func (c *Config) FillDefaults() {
 	if c.OutputDir == "" {
-		c.OutputDir = filepath.Join("output", "novel")
+		c.OutputDir = "output"
 	}
 	if c.Providers == nil {
 		c.Providers = make(map[string]ProviderConfig)

@@ -6,6 +6,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/voocel/ainovel-cli/internal/host"
+	"github.com/voocel/ainovel-cli/internal/store"
 )
 
 type slashCommandSpec struct {
@@ -60,6 +61,26 @@ func commandRegistryInstance() commandRegistry {
 			Run: func(m Model, _ []string) (tea.Model, tea.Cmd) {
 				m.help = newHelpState(m.width, m.height)
 				m.textarea.Blur()
+				return m, nil
+			},
+		},
+		{
+			Name:        "projects",
+			Group:       "system",
+			Usage:       "/projects",
+			Description: "Quản lý dự án",
+			AutoExecute: true,
+			Run: func(m Model, _ []string) (tea.Model, tea.Cmd) {
+				if p, err := store.DiscoverProjects(m.cfg.OutputDir); err == nil && len(p) > 0 {
+					m.projects = p
+					m.mode = modeProjectPicker
+					m.textarea.Blur()
+				} else {
+					m.applyEvent(host.Event{
+						Time: time.Now(), Category: "ERROR", Summary: "Không tìm thấy dự án nào", Level: "error",
+					})
+					m.refreshEventViewport()
+				}
 				return m, nil
 			},
 		},

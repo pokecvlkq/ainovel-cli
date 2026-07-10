@@ -42,12 +42,13 @@ const (
 type appMode int
 
 const (
-	modeNew       appMode = iota // 等待用户输入小说需求
-	modeProjectPicker            // Màn hình chọn dự án
-	modeRunning                  // 正在创作（包括出错停止，输入可恢复）
-	modeDone                     // 创作完成
-	modeEditing                  // Đang chỉnh sửa văn bản
-	modeReviewing                // Giao diện duyệt bản thảo
+	modeNew           appMode = iota // 等待用户输入小说需求
+	modeProjectPicker                // Màn hình chọn dự án
+	modeNamingProject                // State for naming a new project
+	modeRunning                      // 正在创作（包括出错停止，输入可恢复）
+	modeDone                         // 创作完成
+	modeEditing                      // Đang chỉnh sửa văn bản
+	modeReviewing                    // Giao diện duyệt bản thảo
 )
 
 // 顶栏 / 流式活动共用的 spinner 帧序列（bubbles.Spinner.MiniDot）。
@@ -106,6 +107,8 @@ type Model struct {
 	hoverPane      focusPane
 	hoverActive    bool
 	mode           appMode
+	baseOutputDir  string
+	logCleanup     func()
 	starting       bool // UI 已进入工作台，Host 正在执行启动初始化
 	startupMode    startupMode
 	cocreateSeq    int
@@ -152,23 +155,21 @@ func NewModel(runtime *host.Host, cfg bootstrap.Config, bundle assets.Bundle, br
 
 	mode := modeNew
 	var projects []store.ProjectInfo
-	if runtime != nil {
-		if p, err := store.DiscoverProjects(runtime.Dir()); err == nil && len(p) > 0 {
-			projects = p
-			mode = modeProjectPicker
-		}
+	if p, err := store.DiscoverProjects(cfg.OutputDir); err == nil && len(p) > 0 {
+		projects = p
+		mode = modeProjectPicker
 	}
 
 	return Model{
-		runtime:      runtime,
-		cfg:          cfg,
-		bundle:       bundle,
-		askBridge:    bridge,
-		version:      strings.TrimSpace(version),
-		autoScroll:   true,
-		streamScroll: true,
-		mode:         mode,
-		projects:     projects,
+		baseOutputDir: cfg.OutputDir,
+		cfg:           cfg,
+		bundle:        bundle,
+		askBridge:     bridge,
+		version:       strings.TrimSpace(version),
+		autoScroll:    true,
+		streamScroll:  true,
+		mode:          mode,
+		projects:      projects,
 		startupMode:  startupModeQuick,
 		textarea:     ta,
 		editor:       editor,
@@ -703,6 +704,8 @@ func (m Model) View() string {
 	var body string
 	if m.mode == modeProjectPicker {
 		body = renderProjectPicker(m.width, bodyH, m.projects, m.projectIdx)
+	} else if m.mode == modeNamingProject {
+		body = renderNamingProject(m.width, bodyH, m.textarea.View())
 	} else if m.mode == modeNew {
 		errMsg := ""
 		if m.err != nil {

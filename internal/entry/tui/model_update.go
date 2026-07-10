@@ -187,14 +187,33 @@ func (m Model) handleBaseKeyMsg(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 			return m.switchProject(p.DirName)
 		case tea.KeyRunes:
 			if strings.ToLower(string(msg.Runes)) == "n" {
-				m.mode = modeNew
+				m.mode = modeNamingProject
+				m.textarea.Reset()
+				m.textarea.Focus()
 				return m, nil
 			}
-		case tea.KeyEsc:
-			m.mode = modeNew
-			return m, nil
 		}
 		return m, nil
+	}
+
+	if m.mode == modeNamingProject {
+		switch msg.Type {
+		case tea.KeyEsc:
+			m.mode = modeProjectPicker
+			return m, nil
+		case tea.KeyEnter:
+			name := strings.TrimSpace(m.textarea.Value())
+			newM, cmd, err := m.switchToNewProject(name)
+			if err != nil {
+				newM.err = err
+				return newM, nil
+			}
+			newM.mode = modeNew
+			return newM, cmd
+		}
+		var cmd tea.Cmd
+		m.textarea, cmd = m.textarea.Update(msg)
+		return m, cmd
 	}
 
 	if m.mode == modeEditing {
@@ -431,7 +450,7 @@ func (m Model) handleEnterKey() (tea.Model, tea.Cmd) {
 	case modeNew:
 		m.err = nil
 		// Tạo subfolder mới
-		newModel, switchCmd, err := m.switchToNewProject()
+		newModel, switchCmd, err := m.switchToNewProject("")
 		if err != nil {
 			m.err = err
 			return m, nil
@@ -994,19 +1013,28 @@ func (m Model) switchProject(dirName string) (tea.Model, tea.Cmd) {
 	)
 }
 
-func (m Model) switchToNewProject() (Model, tea.Cmd, error) {
+func (m Model) switchToNewProject(dirName string) (Model, tea.Cmd, error) {
 	if m.runtime != nil {
 		m.runtime.Close()
 	}
-	dirName := time.Now().Format("20060102-150405")
-	m.cfg.OutputDir = filepath.Join(m.cfg.OutputDir, dirName)
-	if err := os.MkdirAll(m.cfg.OutputDir, 0755); err != nil {
+	if dirName == "" {
+		dirName = time.Now().Format("20060102-150405")
+	}
+	// Do not append to m.cfg.OutputDir, just use the base path and join dirName
+	// but wait, m.cfg.OutputDir was set in config.go. Let's make a copy or something?
+	// The problem is if we modify m.cfg.OutputDir, next time we can't find the base.
+	// So we should make a copy of cfg? Or just assume m.cfg.OutputDir is always "output"
+	// Let's copy cfg:
+	newCfg := m.cfg
+	newCfg.OutputDir = filepath.Join(m.cfg.OutputDir, dirName)
+	if err := os.MkdirAll(newCfg.OutputDir, 0755); err != nil {
 		return m, nil, err
 	}
-	rt, err := host.New(m.cfg, m.bundle)
+	rt, err := host.New(newCfg, m.bundle)
 	if err != nil {
 		return m, nil, err
 	}
+	m.cfg = newCfg
 	m.runtime = rt
 	if m.askBridge != nil {
 		m.runtime.AskUser().SetHandler(m.askBridge.handler)

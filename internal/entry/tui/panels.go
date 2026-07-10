@@ -278,17 +278,12 @@ func renderProjectPicker(width, height int, projects []store.ProjectInfo, projec
 
 	var b strings.Builder
 	b.WriteString("\n")
-	b.WriteString(title)
-	b.WriteString("\n")
-	b.WriteString(subtitle)
-	b.WriteString("\n\n")
-	b.WriteString(divider)
-	b.WriteString("\n\n")
-	b.WriteString(listBlock)
-	b.WriteString("\n\n")
-	b.WriteString(divider)
-	b.WriteString("\n\n")
-	b.WriteString(prompt)
+	b.WriteString(title + "\n\n")
+	b.WriteString(subtitle + "\n")
+	b.WriteString(divider + "\n\n")
+	b.WriteString(listBlock + "\n\n")
+	b.WriteString(divider + "\n")
+	b.WriteString(prompt + "\n")
 
 	return lipgloss.NewStyle().
 		Width(width).
@@ -297,3 +292,39 @@ func renderProjectPicker(width, height int, projects []store.ProjectInfo, projec
 		AlignVertical(lipgloss.Center).
 		Render(b.String())
 }
+
+// renderNamingProject hiển thị màn hình đặt tên cho dự án mới.
+func renderNamingProject(width, height int, text string) string {
+	title := lipgloss.NewStyle().Foreground(colorAccent).Bold(true).Render("TẠO DỰ ÁN TRUYỆN MỚI")
+	subtitle := lipgloss.NewStyle().Foreground(colorMuted).Render("Nhập tên thư mục dự án (Enter để tự động tạo tên theo thời gian):")
+
+	divW := 60
+	if divW > width-8 {
+		divW = width - 8
+	}
+	divider := lipgloss.NewStyle().Foreground(colorDim).Render(strings.Repeat("~", divW))
+
+	inputBox := lipgloss.NewStyle().
+		Border(lipgloss.RoundedBorder()).
+		BorderForeground(colorDim).
+		Padding(0, 1).
+		Width(divW).
+		Render(text)
+
+	var b strings.Builder
+	b.WriteString("\n")
+	b.WriteString(title + "\n\n")
+	b.WriteString(subtitle + "\n")
+	b.WriteString(divider + "\n\n")
+	b.WriteString(inputBox + "\n\n")
+	b.WriteString(divider + "\n")
+	b.WriteString(lipgloss.NewStyle().Foreground(colorDim).Italic(true).Render("Enter Xác nhận · Esc Quay lại") + "\n")
+
+	return lipgloss.NewStyle().
+		Width(width).
+		Height(height).
+		AlignHorizontal(lipgloss.Center).
+		AlignVertical(lipgloss.Center).
+		Render(b.String())
+}
+
