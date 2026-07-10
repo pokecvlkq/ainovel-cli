@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "status": "ready",
+  "structured": {
+    "genre": "Ngôn tình học đường",
+    "chapter_words": {
+      "min": 3000,
+      "max": 6000
+    },
+    "forbidden_phrases": [
+      "một phần nào đó",
+      "đáng chú ý là",
+      "không hiểu sao",
+      "cảm xúc lẫn lộn"
+    ],
+    "fatigue_words": {
+      "bất giác": 1,
+      "dường như": 2,
+      "giống như": 3,
+      "hơn nữa": 1,
+      "không khỏi": 1,
+      "không nói gì": 2,
+      "một hơi thở": 3,
+      "một luồng": 2,
+      "một tia": 2,
+      "một vệt": 2,
+      "như thể": 1,
+      "nửa ngày": 2,
+      "trầm mặc": 2,
+      "tuy nhiên": 2,
+      "vài hơi thở": 3,
+      "vậy mà": 1
+    }
+  },
+  "preferences": "## [startup_prompt]\n\nTruyện ngắn tập trung vào nữ chính là học sinh cấp 3, xây dựng phong cách nhân vật theo hướng Gen Z nhí nhảnh, năng động, trẻ trung.",
+  "sources": [
+    "system_defaults",
+    "startup_prompt"
+  ],
+  "uncertain": [
+    "Viết truyện ngắn: Không có định nghĩa độ dài cụ thể (số chữ) để đưa vào structured.",
+    "Gen Z nhí nhảnh: Là phong cách ngôn ngữ và tính cách, không phải quy tắc kỹ thuật có thể cấu trúc hóa."
+  ]
+}

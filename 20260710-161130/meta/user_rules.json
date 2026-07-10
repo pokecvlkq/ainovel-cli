@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "status": "ready",
+  "structured": {
+    "genre": "Ngôn tình đô thị",
+    "chapter_words": {
+      "min": 3000,
+      "max": 6000
+    },
+    "forbidden_phrases": [
+      "một phần nào đó",
+      "đáng chú ý là",
+      "không hiểu sao",
+      "cảm xúc lẫn lộn"
+    ],
+    "fatigue_words": {
+      "bất giác": 1,
+      "dường như": 2,
+      "giống như": 3,
+      "hơn nữa": 1,
+      "không khỏi": 1,
+      "không nói gì": 2,
+      "một hơi thở": 3,
+      "một luồng": 2,
+      "một tia": 2,
+      "một vệt": 2,
+      "như thể": 1,
+      "nửa ngày": 2,
+      "trầm mặc": 2,
+      "tuy nhiên": 2,
+      "vài hơi thở": 3,
+      "vậy mà": 1
+    }
+  },
+  "preferences": "## [startup_prompt]\n\nXây dựng hình tượng nữ chính thuộc thế hệ Gen Z, có tính cách nhí nhảnh, cá tính xen lẫn sự đáng yêu, cute. Cốt truyện bắt đầu từ cột mốc nữ chính 18 tuổi sau khi thi đại học và chuyển đến Hà Nội. Phong cách hành văn phóng khoáng, khai thác yếu tố tình cảm và sắc dục nhưng phải đảm bảo tính nghệ thuật, sử dụng từ ngữ văn chương bóng bẩy, tuyệt đối không dùng các từ ngữ thô tục, nhạy cảm trực diện, thay vào đó là lối miêu tả gợi hình, ẩn dụ bằng văn phong văn học.",
+  "sources": [
+    "system_defaults",
+    "startup_prompt"
+  ],
+  "uncertain": [
+    "Yêu cầu 'phóng khoáng, sắc dục' và 'không viết từ nhạy cảm': Đây là chỉ dẫn về phong cách và giới hạn nội dung mang tính định hướng thẩm mỹ, không phải quy tắc kỹ thuật cứng nhắc nên không đưa vào structured.",
+    "Không có yêu cầu cụ thể về số lượng từ mỗi chương (chỉ có yêu cầu về độ dài mạch truyện qua các giai đoạn tuổi tác)."
+  ]
+}

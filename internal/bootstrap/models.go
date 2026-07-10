@@ -475,7 +475,9 @@ func (m *failoverModel) pickNextFallback(current modelTarget, tried map[modelTar
 	msg := strings.ToLower(err.Error())
 	isBilling := strings.Contains(msg, "billing") ||
 		strings.Contains(msg, "payment required") ||
-		strings.Contains(msg, "insufficient")
+		strings.Contains(msg, "insufficient") ||
+		strings.Contains(msg, "denied access") ||
+		strings.Contains(msg, "403")
 
 	isQuota := !isBilling && (strings.Contains(msg, "quota") ||
 		(strings.Contains(msg, "exceeded") && !strings.Contains(msg, "deadline")))

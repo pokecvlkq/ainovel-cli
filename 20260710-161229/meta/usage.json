@@ -1,0 +1,36 @@
+{
+  "schema": 2,
+  "updated_at": "2026-07-10T16:12:34.667917+07:00",
+  "overall": {
+    "input": 4797,
+    "output": 241,
+    "cache_read": 0,
+    "cache_write": 0,
+    "cost_usd": 0.00156075,
+    "saved_usd": 0,
+    "cache_capable": true
+  },
+  "per_agent": {
+    "coordinator": {
+      "input": 4797,
+      "output": 241,
+      "cache_read": 0,
+      "cache_write": 0,
+      "cost_usd": 0.00156075,
+      "saved_usd": 0,
+      "cache_capable": true
+    }
+  },
+  "per_model": {
+    "gemini/gemini-3.1-flash-lite": {
+      "input": 4797,
+      "output": 241,
+      "cache_read": 0,
+      "cache_write": 0,
+      "cost_usd": 0.00156075,
+      "saved_usd": 0,
+      "cache_capable": true
+    }
+  },
+  "missing_assistant_usage": 0
+}
