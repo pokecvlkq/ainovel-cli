@@ -65,6 +65,23 @@ func DiscoverProjects(outputDir string) ([]ProjectInfo, error) {
 		})
 	}
 
+	// Kiểm tra xem outputDir bản thân nó có chứa project cũ không (legacy)
+	rootProgressPath := filepath.Join(outputDir, "meta", "progress.json")
+	if info, err := os.Stat(rootProgressPath); err == nil {
+		if data, err := os.ReadFile(rootProgressPath); err == nil {
+			var progress domain.Progress
+			if err := json.Unmarshal(data, &progress); err == nil {
+				projects = append(projects, ProjectInfo{
+					DirName:            ".",
+					NovelName:          progress.NovelName,
+					ChapterCount:       progress.CurrentChapter,
+					TotalRealWordCount: progress.TotalRealWordCount,
+					LastUpdated:        info.ModTime(),
+				})
+			}
+		}
+	}
+
 	// Sắp xếp giảm dần theo LastUpdated (mới nhất xếp trên)
 	sort.Slice(projects, func(i, j int) bool {
 		return projects[i].LastUpdated.After(projects[j].LastUpdated)

@@ -185,19 +185,31 @@ func NewModel(runtime *host.Host, cfg bootstrap.Config, bundle assets.Bundle, br
 }
 
 func (m Model) Init() tea.Cmd {
-	return tea.Batch(
+	var cmds []tea.Cmd
+	cmds = append(cmds,
 		textarea.Blink,
-		listenEvents(m.runtime),
-		listenAskUser(m.askBridge),
-		listenDone(m.runtime),
-		listenStream(m.runtime),
-		tickSnapshot(m.runtime),
-		bootstrapRuntime(m.runtime),
 		tickSpinner(),
 		tickToolSpinner(),
 		tickCursor(),
 		tickStreamFlush(),
 	)
+
+	if m.runtime != nil {
+		cmds = append(cmds,
+			listenEvents(m.runtime),
+			listenAskUser(m.askBridge),
+			listenDone(m.runtime),
+			listenStream(m.runtime),
+			tickSnapshot(m.runtime),
+		)
+
+		// Chỉ gọi bootstrap nếu không ở màn hình chọn project
+		if m.mode != modeProjectPicker {
+			cmds = append(cmds, bootstrapRuntime(m.runtime))
+		}
+	}
+
+	return tea.Batch(cmds...)
 }
 
 func (m *Model) paneAtMouse(x, y int) (focusPane, bool) {
