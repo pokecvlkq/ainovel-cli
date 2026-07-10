@@ -170,6 +170,33 @@ func (m Model) handleBaseKeyMsg(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		m.lastKeyAt = time.Now()
 	}
 
+	if m.mode == modeProjectPicker {
+		switch msg.Type {
+		case tea.KeyUp:
+			if m.projectIdx > 0 {
+				m.projectIdx--
+			}
+			return m, nil
+		case tea.KeyDown:
+			if m.projectIdx < len(m.projects)-1 {
+				m.projectIdx++
+			}
+			return m, nil
+		case tea.KeyEnter:
+			p := m.projects[m.projectIdx]
+			return m.switchProject(p.DirName)
+		case tea.KeyRunes:
+			if strings.ToLower(string(msg.Runes)) == "n" {
+				m.mode = modeNew
+				return m, nil
+			}
+		case tea.KeyEsc:
+			m.mode = modeNew
+			return m, nil
+		}
+		return m, nil
+	}
+
 	if m.mode == modeEditing {
 		switch msg.Type {
 		case tea.KeyCtrlS:
@@ -403,6 +430,14 @@ func (m Model) handleEnterKey() (tea.Model, tea.Cmd) {
 	switch m.mode {
 	case modeNew:
 		m.err = nil
+		// Tạo subfolder mới
+		newModel, switchCmd, err := m.switchToNewProject()
+		if err != nil {
+			m.err = err
+			return m, nil
+		}
+		m = newModel
+
 		if m.startupMode == startupModeQuick {
 			plan, err := startup.PrepareQuick(startup.Request{
 				Mode:        startup.ModeQuick,
@@ -415,10 +450,10 @@ func (m Model) handleEnterKey() (tea.Model, tea.Cmd) {
 				return m, nil
 			}
 			cmd := m.enterStarting(plan.RawPrompt)
-			return m, tea.Batch(startRuntime(m.runtime, plan), cmd)
+			return m, tea.Batch(switchCmd, startRuntime(m.runtime, plan), cmd)
 		}
 		m.cocreate = newCoCreateState(text)
-		return m, m.sendCoCreate()
+		return m, tea.Batch(switchCmd, m.sendCoCreate())
 	case modeRunning:
 		// 不本地回显 USER 事件 —— Host.Continue/Steer 入口已 emit "USER" 事件，
 		// 走 events channel 回流到 TUI。架构 §2.3：观察层只观察，不产生事实。
@@ -922,4 +957,64 @@ func (m *Model) applyRuntimeReplay(items []domain.RuntimeQueueItem) {
 	m.streamRound = len(m.streamRounds)
 	m.refreshEventViewport()
 	m.refreshStreamViewport()
+}
+
+func (m Model) switchProject(dirName string) (tea.Model, tea.Cmd) {
+	if m.runtime != nil {
+		m.runtime.Close()
+	}
+	m.cfg.OutputDir = filepath.Join(m.cfg.OutputDir, dirName)
+	rt, err := host.New(m.cfg, m.bundle)
+	if err != nil {
+		m.err = err
+		return m, nil
+	}
+	m.runtime = rt
+	if m.askBridge != nil {
+		m.runtime.AskUser().SetHandler(m.askBridge.handler)
+	}
+
+	m.mode = modeRunning
+	m.starting = true
+	m.snapshot.IsRunning = true
+	m.snapshot.RuntimeState = "running"
+	enableMouse := m.enterRunning()
+	m.resetOutputPanels()
+	m.resizeTextarea()
+	m.textarea.Placeholder = "Đang khởi tạo..."
+
+	return m, tea.Batch(
+		listenEvents(m.runtime),
+		listenDone(m.runtime),
+		listenStream(m.runtime),
+		tickSnapshot(m.runtime),
+		bootstrapRuntime(m.runtime),
+		enableMouse,
+		m.textarea.Focus(),
+	)
+}
+
+func (m Model) switchToNewProject() (Model, tea.Cmd, error) {
+	if m.runtime != nil {
+		m.runtime.Close()
+	}
+	dirName := time.Now().Format("20060102-150405")
+	m.cfg.OutputDir = filepath.Join(m.cfg.OutputDir, dirName)
+	if err := os.MkdirAll(m.cfg.OutputDir, 0755); err != nil {
+		return m, nil, err
+	}
+	rt, err := host.New(m.cfg, m.bundle)
+	if err != nil {
+		return m, nil, err
+	}
+	m.runtime = rt
+	if m.askBridge != nil {
+		m.runtime.AskUser().SetHandler(m.askBridge.handler)
+	}
+	return m, tea.Batch(
+		listenEvents(m.runtime),
+		listenDone(m.runtime),
+		listenStream(m.runtime),
+		tickSnapshot(m.runtime),
+	), nil
 }

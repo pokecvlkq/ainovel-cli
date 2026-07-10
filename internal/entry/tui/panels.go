@@ -1,11 +1,13 @@
 package tui
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/viewport"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/voocel/ainovel-cli/internal/host"
+	"github.com/voocel/ainovel-cli/internal/store"
 )
 
 // renderTopBar 渲染顶部状态栏。
@@ -228,6 +230,65 @@ func renderWelcome(width, height int, errMsg string, mode startupMode) string {
 		b.WriteString("\n\n")
 		b.WriteString(lipgloss.NewStyle().Foreground(colorError).Bold(true).Render("! " + errMsg))
 	}
+
+	return lipgloss.NewStyle().
+		Width(width).
+		Height(height).
+		AlignHorizontal(lipgloss.Center).
+		AlignVertical(lipgloss.Center).
+		Render(b.String())
+}
+
+// renderProjectPicker hiển thị màn hình chọn dự án.
+func renderProjectPicker(width, height int, projects []store.ProjectInfo, projectIdx int) string {
+	title := lipgloss.NewStyle().Foreground(colorAccent).Bold(true).Render("CHỌN DỰ ÁN TRUYỆN")
+	subtitle := lipgloss.NewStyle().Foreground(colorMuted).Render("Danh sách các dự án đang viết")
+
+	divW := 60
+	if divW > width-8 {
+		divW = width - 8
+	}
+	divider := lipgloss.NewStyle().Foreground(colorDim).Render(strings.Repeat("~", divW))
+
+	var listLines []string
+	for i, p := range projects {
+		prefix := "  "
+		style := lipgloss.NewStyle().Foreground(bodyTextColor)
+		if i == projectIdx {
+			prefix = "> "
+			style = lipgloss.NewStyle().Foreground(colorAccent).Bold(true)
+		}
+
+		name := p.NovelName
+		if name == "" {
+			name = "Chưa có tên truyện (" + p.DirName + ")"
+		}
+
+		timeStr := p.LastUpdated.Format("02/01/2006 15:04")
+		info := fmt.Sprintf("%d chương · %d chữ · Cập nhật: %s", p.ChapterCount, p.TotalRealWordCount, timeStr)
+
+		line := prefix + name + "  " + lipgloss.NewStyle().Foreground(colorDim).Render(info)
+		listLines = append(listLines, style.Render(line))
+	}
+
+	listBlock := strings.Join(listLines, "\n")
+
+	prompt := lipgloss.NewStyle().Foreground(colorDim).Italic(true).
+		Render("↑/↓ Chọn dự án · Enter Tiếp tục · N Tạo mới truyện")
+
+	var b strings.Builder
+	b.WriteString("\n")
+	b.WriteString(title)
+	b.WriteString("\n")
+	b.WriteString(subtitle)
+	b.WriteString("\n\n")
+	b.WriteString(divider)
+	b.WriteString("\n\n")
+	b.WriteString(listBlock)
+	b.WriteString("\n\n")
+	b.WriteString(divider)
+	b.WriteString("\n\n")
+	b.WriteString(prompt)
 
 	return lipgloss.NewStyle().
 		Width(width).

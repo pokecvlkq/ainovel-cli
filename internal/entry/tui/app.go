@@ -24,7 +24,7 @@ func Run(cfg bootstrap.Config, bundle assets.Bundle, version string) error {
 	defer cleanup()
 	defer rt.Close()
 
-	m := NewModel(rt, bridge, version)
+	m := NewModel(rt, cfg, bundle, bridge, version)
 	// Không bật báo cáo chuột toàn cục khi khởi động: trang chào mừng không dùng chuột, tắt báo cáo có thể giữ nguyên
 	// thao tác kéo chọn sao chép gốc của terminal. Khi vào không gian làm việc (modeRunning) mới do enterRunning bật báo cáo,
 	// để hỗ trợ nhấp chuyển bảng / cuộn chuột / kéo thanh bên.

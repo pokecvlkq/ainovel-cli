@@ -2,6 +2,15 @@
 
 Tất cả những thay đổi nổi bật đối với dự án AINovel CLI sẽ được ghi chép tại đây.
 
+## [v1.1.6] - 2026-07-10
+
+### Thêm mới (Added)
+- **Tính năng Project Picker (Quản lý nhiều truyện)**:
+  - Cho phép người dùng viết và quản lý nhiều dự án truyện độc lập trong thư mục `output/`.
+  - Tự động quét các truyện cũ khi khởi động (nếu có) và hiển thị màn hình chọn dự án.
+  - Tự động tạo thư mục con (mang timestamp) khi bắt đầu một truyện mới, tránh ghi đè dữ liệu.
+  - Giao diện (TUI) trực quan: Hiển thị tên truyện, số chương, tổng số chữ và thời gian cập nhật. Dễ dàng di chuyển bằng phím mũi tên và chọn bằng `Enter`.
+
 ## [v1.1.5] - 2026-07-09
 
 ### Thêm mới (Added)

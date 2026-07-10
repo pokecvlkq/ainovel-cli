@@ -12,7 +12,10 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/x/ansi"
+	"github.com/voocel/ainovel-cli/assets"
+	"github.com/voocel/ainovel-cli/internal/bootstrap"
 	"github.com/voocel/ainovel-cli/internal/host"
+	"github.com/voocel/ainovel-cli/internal/store"
 	"github.com/voocel/ainovel-cli/internal/tools"
 	"github.com/voocel/ainovel-cli/internal/utils"
 )
@@ -40,6 +43,7 @@ type appMode int
 
 const (
 	modeNew       appMode = iota // 等待用户输入小说需求
+	modeProjectPicker            // Màn hình chọn dự án
 	modeRunning                  // 正在创作（包括出错停止，输入可恢复）
 	modeDone                     // 创作完成
 	modeEditing                  // Đang chỉnh sửa văn bản
@@ -57,6 +61,8 @@ var toolSpinnerFrames = []string{"⣾", "⣽", "⣻", "⢿", "⡿", "⣟", "⣯"
 // Model 是 TUI 的顶层状态。
 type Model struct {
 	runtime        *host.Host
+	cfg            bootstrap.Config
+	bundle         assets.Bundle
 	askBridge      *askUserBridge
 	askState       *askUserState
 	cocreate       *cocreateState
@@ -71,6 +77,8 @@ type Model struct {
 	compItems      []commandPaletteItem
 	compIdx        int
 	compActive     bool
+	projects       []store.ProjectInfo // Danh sách dự án
+	projectIdx     int                 // Index dự án đang chọn
 	snapshot       host.UISnapshot
 	events         []host.Event
 	eventIndex     map[string]int   // event.ID → m.events 下标；调用类事件到达时原地更新
@@ -113,7 +121,7 @@ type Model struct {
 }
 
 // NewModel 创建 TUI Model。
-func NewModel(rt *host.Host, bridge *askUserBridge, version string) Model {
+func NewModel(runtime *host.Host, cfg bootstrap.Config, bundle assets.Bundle, bridge *askUserBridge, version string) Model {
 	ta := textarea.New()
 	ta.Placeholder = placeholderForNewMode(startupModeQuick)
 	ta.CharLimit = 5000
@@ -142,13 +150,25 @@ func NewModel(rt *host.Host, bridge *askUserBridge, version string) Model {
 
 	prog := progress.New(progress.WithDefaultGradient())
 
+	mode := modeNew
+	var projects []store.ProjectInfo
+	if runtime != nil {
+		if p, err := store.DiscoverProjects(runtime.Dir()); err == nil && len(p) > 0 {
+			projects = p
+			mode = modeProjectPicker
+		}
+	}
+
 	return Model{
-		runtime:      rt,
+		runtime:      runtime,
+		cfg:          cfg,
+		bundle:       bundle,
 		askBridge:    bridge,
 		version:      strings.TrimSpace(version),
 		autoScroll:   true,
 		streamScroll: true,
-		mode:         modeNew,
+		mode:         mode,
+		projects:     projects,
 		startupMode:  startupModeQuick,
 		textarea:     ta,
 		editor:       editor,
@@ -669,7 +689,9 @@ func (m Model) View() string {
 	_, inputH, bodyH := m.layoutHeights()
 
 	var body string
-	if m.mode == modeNew {
+	if m.mode == modeProjectPicker {
+		body = renderProjectPicker(m.width, bodyH, m.projects, m.projectIdx)
+	} else if m.mode == modeNew {
 		errMsg := ""
 		if m.err != nil {
 			errMsg = m.err.Error()

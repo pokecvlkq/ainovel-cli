@@ -233,6 +233,7 @@ func (a *App) GetSnapshot() host.UISnapshot {
 			TotalChapters:     progress.TotalChapters,
 			CompletedCount:    len(progress.CompletedChapters),
 			TotalWordCount:    progress.TotalWordCount,
+			TotalRealWordCount: progress.TotalRealWordCount,
 			InProgressChapter: progress.InProgressChapter,
 			RuntimeState:      "stopped",
 		}

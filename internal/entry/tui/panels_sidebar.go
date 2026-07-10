@@ -43,7 +43,9 @@ func renderStateContent(snap host.UISnapshot, contentW int) string {
 			overview.WriteString(renderField("Hoàn thành", fmt.Sprintf("Chương %d", snap.CompletedCount)))
 		}
 	}
-	overview.WriteString(renderField("Số từ", formatNumber(snap.TotalWordCount)))
+	overview.WriteString(renderField("Số ký tự", formatNumber(snap.TotalWordCount)))
+	overview.WriteString("\n")
+	overview.WriteString(renderField("Số chữ", formatNumber(snap.TotalRealWordCount)))
 	if label, ch := inProgressDisplay(snap); label != "" {
 		overview.WriteString(renderField(label, fmt.Sprintf("Chương %d", ch)))
 	}

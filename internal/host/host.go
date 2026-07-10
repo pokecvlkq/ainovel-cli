@@ -677,6 +677,7 @@ func (h *Host) Snapshot() UISnapshot {
 		snap.TotalChapters = progress.TotalChapters
 		snap.CompletedCount = len(progress.CompletedChapters)
 		snap.TotalWordCount = progress.TotalWordCount
+		snap.TotalRealWordCount = progress.TotalRealWordCount
 		snap.InProgressChapter = progress.InProgressChapter
 		snap.PendingRewrites = progress.PendingRewrites
 		snap.RewriteReason = progress.RewriteReason

@@ -7,6 +7,7 @@ import (
 	"log/slog"
 
 	"github.com/voocel/agentcore/schema"
+	"github.com/voocel/ainovel-cli/internal/domain"
 	"github.com/voocel/ainovel-cli/internal/store"
 )
 
@@ -129,7 +130,7 @@ func (t *ReadChapterTool) Execute(_ context.Context, args json.RawMessage) (json
 	return json.Marshal(map[string]any{
 		"chapter":    a.Chapter,
 		"content":    content,
-		"word_count": len([]rune(content)),
+		"word_count": domain.WordCount(content),
 	})
 }
 
